@@ -17,8 +17,8 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "group")
-public class Group extends BaseEntity {
+@Table(name = "party")
+public class Party extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -70,12 +70,10 @@ public class Group extends BaseEntity {
     @NotNull
     private boolean isActivated;
 
-    @OneToMany(mappedBy = "group")
-    private Set<GroupUser> groupUsers;
+    @OneToMany(mappedBy = "party")
     private Set<PartyEndUser> partyEndUsers = new HashSet<>();
 
-    @OneToMany(mappedBy = "group")
-    private Set<Point> points;
+    @OneToMany(mappedBy = "party")
     private Set<Point> points = new HashSet<>();
 
 }

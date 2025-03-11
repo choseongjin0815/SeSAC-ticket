@@ -1,7 +1,7 @@
 package com.onspring.onspring_customer.domain.user.entity;
 
 import com.onspring.onspring_customer.domain.common.entity.BaseEntity;
-import com.onspring.onspring_customer.domain.customer.entity.Group;
+import com.onspring.onspring_customer.domain.customer.entity.Party;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -21,8 +21,8 @@ public class Point extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Group group;
+    @JoinColumn(name = "party_id")
+    private Party party;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
