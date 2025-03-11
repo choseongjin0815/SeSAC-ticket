@@ -11,6 +11,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -71,8 +72,10 @@ public class Group extends BaseEntity {
 
     @OneToMany(mappedBy = "group")
     private Set<GroupUser> groupUsers;
+    private Set<PartyEndUser> partyEndUsers = new HashSet<>();
 
     @OneToMany(mappedBy = "group")
     private Set<Point> points;
+    private Set<Point> points = new HashSet<>();
 
 }

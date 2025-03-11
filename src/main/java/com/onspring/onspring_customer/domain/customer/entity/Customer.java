@@ -41,6 +41,6 @@ public class Customer extends BaseEntity {
     private Set<CustomerFranchise> customerFranchises = new HashSet<>();
 
     @OneToMany(mappedBy = "customer")
-    private Set<Group> groups = new HashSet<>();
+    private Set<Party> parties = new HashSet<>();
 
 }
