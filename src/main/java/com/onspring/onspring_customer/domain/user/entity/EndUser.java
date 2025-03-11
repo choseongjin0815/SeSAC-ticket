@@ -1,7 +1,7 @@
 package com.onspring.onspring_customer.domain.user.entity;
 
 import com.onspring.onspring_customer.domain.common.entity.BaseEntity;
-import com.onspring.onspring_customer.domain.common.entity.GroupUser;
+import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
