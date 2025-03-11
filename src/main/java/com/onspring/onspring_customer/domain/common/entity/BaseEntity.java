@@ -1,4 +1,4 @@
-package com.onspring.onspring_customer.domain.common;
+package com.onspring.onspring_customer.domain.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
