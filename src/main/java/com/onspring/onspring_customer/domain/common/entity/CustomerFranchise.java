@@ -1,5 +1,6 @@
 package com.onspring.onspring_customer.domain.common.entity;
 
+import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class CustomerFranchise extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    private Long customer;
+    private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "franchise_id")
