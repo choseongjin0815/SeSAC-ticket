@@ -1,7 +1,7 @@
 package com.onspring.onspring_customer.domain.common.entity;
 
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
-import com.onspring.onspring_customer.domain.user.entity.User;
+import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -25,8 +25,8 @@ public class Transaction extends BaseEntity {
     private Franchise franchise;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "end_user_id")
+    private EndUser endUser;
 
     @NotNull
     private LocalDateTime transactionTime;

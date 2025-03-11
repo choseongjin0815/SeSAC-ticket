@@ -25,8 +25,8 @@ public class Point extends BaseEntity {
     private Party party;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "end_user_id")
+    private EndUser endUser;
 
     @NotNull
     private BigDecimal amount;

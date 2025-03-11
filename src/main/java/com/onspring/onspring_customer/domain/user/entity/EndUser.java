@@ -14,8 +14,8 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "user")
-public class User extends BaseEntity {
+@Table(name = "end_user")
+public class EndUser extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -30,13 +30,13 @@ public class User extends BaseEntity {
     @NotNull
     private String isActivated;
 
-    @OneToMany(mappedBy = "user")
-    private Set<GroupUser> groupUsers = new HashSet<>();
+    @OneToMany(mappedBy = "endUser")
+    private Set<PartyEndUser> partyEndUsers = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "endUser")
     private Set<Point> points = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "endUser")
     private Set<Transaction> transactions = new HashSet<>();
 
 }
