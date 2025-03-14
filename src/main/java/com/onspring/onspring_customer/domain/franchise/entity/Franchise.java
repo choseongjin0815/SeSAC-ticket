@@ -1,9 +1,8 @@
 package com.onspring.onspring_customer.domain.franchise.entity;
 
 import com.onspring.onspring_customer.domain.common.entity.BaseEntity;
-import com.onspring.onspring_customer.domain.common.entity.Transaction;
-import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.common.entity.CustomerFranchise;
+import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -32,10 +31,6 @@ public class Franchise extends BaseEntity {
     @NotNull
     @Column(unique = true)
     private String phone;
-
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
 
     @OneToMany(mappedBy = "franchise")
     private Set<CustomerFranchise> customerFranchises = new HashSet<>();

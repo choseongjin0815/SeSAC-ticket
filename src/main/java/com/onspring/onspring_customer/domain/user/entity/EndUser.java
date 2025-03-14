@@ -28,7 +28,7 @@ public class EndUser extends BaseEntity {
     private String phone;
 
     @NotNull
-    private String isActivated;
+    private boolean isActivated;
 
     @OneToMany(mappedBy = "endUser")
     private Set<PartyEndUser> partyEndUsers = new HashSet<>();
