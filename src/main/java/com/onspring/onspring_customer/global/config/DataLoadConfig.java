@@ -136,8 +136,8 @@ public class DataLoadConfig implements CommandLineRunner {
 
                 party.setAllowedTimeStart(startTime);
                 party.setAllowedTimeEnd(endTime);
-                party.setMaximumAmount(BigDecimal.valueOf(random.nextDouble() * 2000)); // 예: 최대 금액 0 ~ 2000
-                party.setMaximumTransaction((long) random.nextInt(100)); // 예: 0 ~ 100 트랜잭션
+                party.setMaximumAmount(BigDecimal.valueOf(random.nextDouble() * 15000));
+                party.setMaximumTransaction((long) random.nextInt(3));
 
                 return party;
             }).toList();
