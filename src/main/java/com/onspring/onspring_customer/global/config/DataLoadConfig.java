@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -112,6 +113,19 @@ public class DataLoadConfig implements CommandLineRunner {
                 party.setPeriod(LocalDateTime.now().plusDays(random.nextInt(30)));
                 party.setAmount(BigDecimal.valueOf(random.nextDouble() * 1000));
                 party.setActivated(faker.bool().bool());
+                party.setSunday(faker.bool().bool());
+                party.setMonday(faker.bool().bool());
+                party.setTuesday(faker.bool().bool());
+                party.setWednesday(faker.bool().bool());
+                party.setThursday(faker.bool().bool());
+                party.setFriday(faker.bool().bool());
+                party.setSaturday(faker.bool().bool());
+                party.setValidThru((long) random.nextInt(365)); // 예: 1~365일 내 유효
+                party.setAllowedTimeStart(LocalTime.of(random.nextInt(24), random.nextInt(60)));
+                party.setAllowedTimeEnd(LocalTime.of(random.nextInt(24), random.nextInt(60)));
+                party.setMaximumAmount(BigDecimal.valueOf(random.nextDouble() * 2000)); // 예: 최대 금액 0 ~ 2000
+                party.setMaximumTransaction((long) random.nextInt(100)); // 예: 0 ~ 100 트랜잭션
+
                 return party;
             }).toList();
             partyRepository.saveAll(parties);
