@@ -121,8 +121,21 @@ public class DataLoadConfig implements CommandLineRunner {
                 party.setFriday(faker.bool().bool());
                 party.setSaturday(faker.bool().bool());
                 party.setValidThru((long) random.nextInt(365)); // 예: 1~365일 내 유효
-                party.setAllowedTimeStart(LocalTime.of(random.nextInt(24), random.nextInt(60)));
-                party.setAllowedTimeEnd(LocalTime.of(random.nextInt(24), random.nextInt(60)));
+
+                // allowedTimeStart와 allowedTimeEnd 변수 선언
+                int startHour = random.nextInt(24);
+                int startMinute = random.nextInt(60);
+                LocalTime startTime = LocalTime.of(startHour, startMinute);
+
+                // allowedTimeEnd는 startTime 이후로 설정
+                int endHour = random.nextInt(24);
+                int endMinute = random.nextInt(60);
+
+                // Ensure end time is after start time
+                LocalTime endTime = startTime.plusMinutes(random.nextInt(24 * 60 - startTime.toSecondOfDay() / 60));
+
+                party.setAllowedTimeStart(startTime);
+                party.setAllowedTimeEnd(endTime);
                 party.setMaximumAmount(BigDecimal.valueOf(random.nextDouble() * 2000)); // 예: 최대 금액 0 ~ 2000
                 party.setMaximumTransaction((long) random.nextInt(100)); // 예: 0 ~ 100 트랜잭션
 
