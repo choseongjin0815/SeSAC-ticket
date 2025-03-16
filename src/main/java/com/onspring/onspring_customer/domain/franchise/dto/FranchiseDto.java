@@ -1,10 +1,12 @@
 package com.onspring.onspring_customer.domain.franchise.dto;
 
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
-@Value
+@Data
+@NoArgsConstructor(force = true)
 public class FranchiseDto implements Serializable {
     Long id;
     String name;
