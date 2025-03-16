@@ -44,7 +44,13 @@ public class PlatformAdminServiceImpl implements PlatformAdminService {
 
     @Override
     public boolean updatePlatformAdmin(PlatformAdminDto platformAdminDto) {
-        return false;
+        Optional<PlatformAdmin> result = platformAdminRepository.findById(platformAdminDto.getId());
+        PlatformAdmin platformAdmin = result.orElseThrow();
+
+        platformAdmin.setUserName(platformAdminDto.getUserName());
+        platformAdminRepository.save(platformAdmin);
+
+        return true;
     }
 
     @Override
