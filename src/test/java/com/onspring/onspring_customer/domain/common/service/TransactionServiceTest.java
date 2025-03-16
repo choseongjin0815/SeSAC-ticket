@@ -72,4 +72,22 @@ public class TransactionServiceTest {
         assertNotNull(transactions);
         assertFalse(transactions.isEmpty(), "No transactions found for the given date range.");
     }
+
+    /**
+     * 특정 트랜잭션 취소 테스트 (이미 DB에 있는 트랜잭션 데이터 사용)
+     */
+    @Test
+    public void testCancelTransaction() {
+        // 이미 DB에 있는 트랜잭션 ID와 가맹점 ID
+        Long franchiseId = 1L;
+        Long transactionId = 3L;
+
+        // 취소 메서드 실행
+        boolean result = transactionService.cancelTransaction(franchiseId, transactionId);
+
+        assert result;
+
+    }
+
+
 }
