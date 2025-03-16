@@ -12,7 +12,7 @@ public interface TransactionService {
 
     List<TransactionDto> findAllTransaction();
 
-    TransactionDto findTransactionByFranchiseId(Long franchiseId,
+    List<TransactionDto> findTransactionByFranchiseId(Long franchiseId,
                                                 LocalDate startDate,
                                                 LocalDate endDate,
                                                 String period);
