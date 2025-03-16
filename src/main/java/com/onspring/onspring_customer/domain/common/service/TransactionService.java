@@ -16,5 +16,8 @@ public interface TransactionService {
                                                 LocalDateTime startDate,
                                                 LocalDateTime endDate,
                                                 String period);
+
+    List<TransactionDto> findSettlementByFranchiseId(Long franchiseId, String month, String period, String customStartDate, String customEndDate);
+
     boolean cancelTransaction(Long franchiseId, Long transactionId);
 }
