@@ -16,5 +16,5 @@ public interface TransactionService {
                                                 LocalDateTime startDate,
                                                 LocalDateTime endDate,
                                                 String period);
-    
+    boolean cancelTransaction(Long franchiseId, Long transactionId);
 }

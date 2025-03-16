@@ -84,4 +84,34 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 특정 가맹점의 결제취소 처리
+     *
+     * @param franchiseId   가맹점의 id
+     * @param transactionId 결제 id
+     * @return  취소 성공여부를 담은 boolean
+     */
+    @Override
+    public boolean cancelTransaction(Long franchiseId, Long transactionId) {
+        // 트랜잭션을 찾음
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + transactionId));
+
+        // 가맹점 ID가 맞는지 확인
+        if (!transaction.getFranchise().getId().equals(franchiseId)) {
+            throw new RuntimeException("Franchise ID mismatch");
+        }
+
+        // 이미 취소된 트랜잭션이라면 취소 불가능
+        if (!transaction.isAccepted()) {
+            throw new RuntimeException("Transaction already cancelled");
+        }
+
+        // 취소 처리: isAccepted를 false로 변경
+        transaction.setAccepted(false);
+        transactionRepository.save(transaction);
+
+        return true;
+    }
 }
