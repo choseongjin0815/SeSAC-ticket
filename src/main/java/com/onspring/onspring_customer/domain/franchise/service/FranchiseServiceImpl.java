@@ -48,9 +48,35 @@ public class FranchiseServiceImpl implements FranchiseService {
         return List.of();
     }
 
+    // 엔티티의 필드를 업데이트하는 메소드
+    public void updateFranchiseFields(Franchise franchise, FranchiseDto franchiseDto) {
+        if (franchiseDto.getName() != null) {
+            franchise.setName(franchiseDto.getName());
+        }
+        if (franchiseDto.getAddress() != null) {
+            franchise.setAddress(franchiseDto.getAddress());
+        }
+        if (franchiseDto.getPhone() != null) {
+            franchise.setPhone(franchiseDto.getPhone());
+        }
+    }
+
+    /**
+     * 프랜차이즈의 정보를 수정
+     *
+     * @param id 프랜차이즈의 로그인에 사용할 Id 후에 수정 필요
+     * @return 업데이트 성공 여부를 담은 boolean 객체
+     */
     @Override
-    public boolean updateFranchise(FranchiseDto franchiseDto) {
-        return false;
+    public boolean updateFranchise(Long id, FranchiseDto franchiseDto) {
+        Franchise franchise = franchiseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("ID " + id + "에 해당하는 프랜차이즈를 찾을 수 없습니다."));
+
+        updateFranchiseFields(franchise, franchiseDto);
+
+        franchiseRepository.save(franchise);
+
+        return true;
     }
 
     @Override

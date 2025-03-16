@@ -21,4 +21,17 @@ public class FranchiseServiceTest {
         System.out.println("FranchiseDto: " + result);
         assert result != null;
     }
+
+    @Test
+    public void testUpdateFranchise_Success() {
+        Long id = 1L;
+        FranchiseDto franchiseDto = new FranchiseDto();
+        franchiseDto.setName("updateFranchise");
+        franchiseDto.setPhone("010-1234-5678");
+
+        boolean result = franchiseService.updateFranchise(id, franchiseDto);
+
+        assert result;
+
+    }
 }
