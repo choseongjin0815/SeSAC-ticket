@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Setter
 @Getter
@@ -30,7 +31,15 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto findCustomerById(Long id) {
-        return null;
+        Optional<Customer> result = customerRepository.findById(id);
+        Customer customer = result.orElseThrow();
+
+        return CustomerDto.builder()
+                .name(customer.getName())
+                .address(customer.getAddress())
+                .phone(customer.getPhone())
+                .isActivated(customer.isActivated())
+                .build();
     }
 
     @Override
