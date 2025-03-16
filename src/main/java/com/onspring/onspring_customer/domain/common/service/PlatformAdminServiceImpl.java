@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Setter
 @Getter
@@ -27,7 +28,13 @@ public class PlatformAdminServiceImpl implements PlatformAdminService {
 
     @Override
     public PlatformAdminDto findPlatformAdminById(Long id) {
-        return null;
+        Optional<PlatformAdmin> result = platformAdminRepository.findById(id);
+        PlatformAdmin platformAdmin = result.orElseThrow();
+
+        return PlatformAdminDto.builder()
+                .id(platformAdmin.getId())
+                .userName(platformAdmin.getUserName())
+                .build();
     }
 
     @Override
