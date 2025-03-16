@@ -1,6 +1,7 @@
 package com.onspring.onspring_customer.domain.customer.service;
 
 import com.onspring.onspring_customer.domain.customer.dto.CustomerDto;
+import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,15 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Long saveCustomer(CustomerDto customerDto) {
-        return 0L;
+        Customer customer = Customer.builder()
+                .name(customerDto.getName())
+                .address(customerDto.getAddress())
+                .phone(customerDto.getPhone())
+                .isActivated(customerDto.isActivated())
+                .build();
+
+        return customerRepository.save(customer)
+                .getId();
     }
 
     @Override
