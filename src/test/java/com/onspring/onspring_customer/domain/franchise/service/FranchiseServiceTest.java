@@ -15,7 +15,7 @@ public class FranchiseServiceTest {
     public void findFranchiseByIdTest() {
         Long id = 1L;
         FranchiseDto result = franchiseService.findFranchiseById(id);
-        System.out.println("Found FranchiseDto: " + result);
+        System.out.println("FranchiseDto: " + result);
         assert result != null;
     }
 }

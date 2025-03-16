@@ -27,7 +27,7 @@ public class FranchiseServiceImpl implements FranchiseService {
      * 특정 ID에 해당하는 프랜차이즈 정보를 조회
      *
      * @param id 프랜차이즈의 ID
-     * @return 해당 ID의 프랜차이즈 정보를 담은 FranchiseDto 객체
+     * @return 해당 ID의 프랜차이즈 정보를 담은 FranchiseDto 객체 반환
      */
     @Override
     public FranchiseDto findFranchiseById(Long id) {
