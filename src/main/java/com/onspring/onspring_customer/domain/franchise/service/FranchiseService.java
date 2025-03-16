@@ -11,7 +11,7 @@ public interface FranchiseService {
 
     List<FranchiseDto> findAllFranchise();
 
-    boolean updateFranchise(FranchiseDto franchiseDto);
+    boolean updateFranchise(String Phone, FranchiseDto franchiseDto);
 
     boolean deleteFranchiseById(Long id);
 }

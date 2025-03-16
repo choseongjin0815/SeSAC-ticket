@@ -11,6 +11,9 @@ public class FranchiseServiceTest {
     @Autowired
     private FranchiseService franchiseService;
 
+    /**
+     * franchise 조회 기능 테스트
+     */
     @Test
     public void findFranchiseByIdTest() {
         Long id = 1L;
