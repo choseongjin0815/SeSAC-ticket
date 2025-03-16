@@ -8,8 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class TransactionServiceTest {
@@ -88,6 +87,52 @@ public class TransactionServiceTest {
         assert result;
 
     }
+
+    @Test
+    public void testFindSettlementByFranchiseIdFor2025March() {
+        // 2025년 3월 1일부터 15일까지 조회
+        String month = null;
+        String period = null;  // period는 사용하지 않음
+        String customStartDate = "2025-03-15";  // 2025년 3월 1일
+        String customEndDate = "2025-03-15";  // 2025년 3월 15일
+
+        List<TransactionDto> transactions = transactionService.findSettlementByFranchiseId(1L, month, period, customStartDate, customEndDate);
+
+        System.out.println(transactions);
+        assertNotNull(transactions);
+        assertTrue(transactions.size() > 0, "No transactions found for the given date range");
+    }
+    @Test
+    public void testFindSettlementByFranchiseIdForLastWeek() {
+        // 최근 1주 조회
+        String month = null;
+        String period = "최근1주"; // 최근 1주
+        String customStartDate = null;
+        String customEndDate = null;
+
+        List<TransactionDto> transactions = transactionService.findSettlementByFranchiseId(1L, month, period, customStartDate, customEndDate);
+
+        System.out.println(transactions);
+        assertNotNull(transactions);
+        assertTrue(transactions.size() > 0, "No transactions found for the given date range");
+    }
+
+    @Test
+    public void testFindSettlementByFranchiseIdForMonth() {
+        // 최근 1주 조회
+        String month = "2025-03";
+        String period = null; // 최근 1주
+        String customStartDate = null;
+        String customEndDate = null;
+
+        List<TransactionDto> transactions = transactionService.findSettlementByFranchiseId(1L, month, period, customStartDate, customEndDate);
+
+        System.out.println(transactions);
+        assertNotNull(transactions);
+        assertTrue(transactions.size() > 0, "No transactions found for the given date range");
+    }
+
+
 
 
 }
