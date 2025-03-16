@@ -3,13 +3,15 @@ package com.onspring.onspring_customer.domain.customer.entity;
 import com.onspring.onspring_customer.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "admin")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Admin extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
