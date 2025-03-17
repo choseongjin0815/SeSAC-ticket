@@ -82,7 +82,27 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public boolean updateParty(PartyDto partyDto) {
-        return false;
+        Optional<Party> result = partyRepository.findById(partyDto.getId());
+        Party party = result.orElseThrow();
+
+        party.setName(partyDto.getName());
+        party.setPeriod(partyDto.getPeriod());
+        party.setAmount(partyDto.getAmount());
+        party.setAllowedTimeStart(partyDto.getAllowedTimeStart());
+        party.setAllowedTimeEnd(party.getAllowedTimeEnd());
+        party.setValidThru(partyDto.getValidThru());
+        party.setSunday(partyDto.isSunday());
+        party.setMonday(partyDto.isMonday());
+        party.setTuesday(partyDto.isTuesday());
+        party.setWednesday(partyDto.isWednesday());
+        party.setThursday(partyDto.isThursday());
+        party.setFriday(partyDto.isFriday());
+        party.setSaturday(partyDto.isSaturday());
+        party.setMaximumAmount(partyDto.getMaximumAmount());
+        party.setMaximumTransaction(partyDto.getMaximumTransaction());
+        partyRepository.save(party);
+
+        return true;
     }
 
     @Override
