@@ -5,7 +5,7 @@ import com.onspring.onspring_customer.domain.customer.dto.AdminDto;
 import java.util.List;
 
 public interface AdminService {
-    Long createAdmin(AdminDto adminDto);
+    Long saveAdmin(AdminDto adminDto);
 
     AdminDto findAdminById(Long id);
 

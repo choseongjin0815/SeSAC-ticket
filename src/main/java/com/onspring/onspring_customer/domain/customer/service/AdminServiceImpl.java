@@ -20,7 +20,7 @@ public class AdminServiceImpl implements AdminService {
     private CustomerRepository customerRepository;
 
     @Override
-    public Long createAdmin(AdminDto adminDto) {
+    public Long saveAdmin(AdminDto adminDto) {
         Customer customer = customerRepository.findById(adminDto.getCustomerId())
                 .orElseThrow();
         Admin admin = Admin.builder()
