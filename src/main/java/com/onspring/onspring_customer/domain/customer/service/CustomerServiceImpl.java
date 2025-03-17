@@ -56,6 +56,7 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setAddress(customerDto.getAddress());
         customer.setPhone(customerDto.getPhone());
         customer.setActivated(customerDto.isActivated());
+        customerRepository.save(customer);
 
         return true;
     }
