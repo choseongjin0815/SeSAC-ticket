@@ -1,6 +1,7 @@
 package com.onspring.onspring_customer.domain.common.service;
 
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -86,6 +87,25 @@ public class TransactionServiceTest {
 
         assert result;
 
+    }
+
+    /**
+     * 이미 정산된 내역에 대한 결제 취소 테스트
+     */
+    @Transactional
+    @Test
+    public void testCancelTransactionIsClosed() {
+        // 실제 DB에 있는 franchiseId와 transactionId 사용 (존재하는 데이터여야 함)
+        Long franchiseId = 1L;
+        Long transactionId = 286L;
+
+        // 예외 발생 여부 테스트
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            transactionService.cancelTransaction(franchiseId, transactionId);
+        });
+
+        // 예외 메시지가 "Cannot cancel a closed transaction"인지 확인
+        assertEquals("Cannot cancel a closed transaction", exception.getMessage());
     }
 
     @Test
