@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Setter
 @Getter
@@ -48,7 +49,30 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public PartyDto findPartyById(Long id) {
-        return null;
+        Optional<Party> result = partyRepository.findById(id);
+        Party party = result.orElseThrow();
+
+        return PartyDto.builder()
+                .id(party.getId())
+                .customerId(party.getCustomer()
+                        .getId())
+                .name(party.getName())
+                .period(party.getPeriod())
+                .amount(party.getAmount())
+                .allowedTimeStart(party.getAllowedTimeStart())
+                .allowedTimeEnd(party.getAllowedTimeEnd())
+                .validThru(party.getValidThru())
+                .sunday(party.isSunday())
+                .monday(party.isMonday())
+                .tuesday(party.isTuesday())
+                .wednesday(party.isWednesday())
+                .thursday(party.isThursday())
+                .friday(party.isFriday())
+                .saturday(party.isSaturday())
+                .maximumAmount(party.getMaximumAmount())
+                .maximumTransaction(party.getMaximumTransaction())
+                .isActivated(party.isActivated())
+                .build();
     }
 
     @Override
