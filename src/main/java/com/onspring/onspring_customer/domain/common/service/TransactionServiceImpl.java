@@ -160,7 +160,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * 특정 가맹점의 결제취소 처리
-     *
+     * 정산 완료된 결제 내역은 취소 불가
      * @param franchiseId   가맹점의 id
      * @param transactionId 결제 id
      * @return  취소 성공여부를 담은 boolean
@@ -176,9 +176,14 @@ public class TransactionServiceImpl implements TransactionService {
             throw new RuntimeException("Franchise ID mismatch");
         }
 
-        // 이미 취소된 트랜잭션이라면 취소 불가능
+        // 이미 취소된 트랜잭션인지 확인
         if (!transaction.isAccepted()) {
             throw new RuntimeException("Transaction already cancelled");
+        }
+
+        // 트랜잭션이 닫혀 있으면 취소 불가능
+        if (transaction.isClosed()) {
+            throw new RuntimeException("Cannot cancel a closed transaction");
         }
 
         // 취소 처리: isAccepted를 false로 변경
