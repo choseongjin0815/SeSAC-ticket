@@ -58,6 +58,9 @@ dependencies {
 
 	//file thumbnail
 	implementation 'net.coobird:thumbnailator:0.4.19'
+
+	//Faker Library
+	implementation 'net.datafaker:datafaker:2.0.2'
 }
 
 tasks.named('test') {
