@@ -12,6 +12,7 @@ import java.time.LocalTime;
 @Builder
 public class PartyDto implements Serializable {
     Long id;
+    Long customerId;
     String name;
     LocalDateTime period;
     BigDecimal amount;
