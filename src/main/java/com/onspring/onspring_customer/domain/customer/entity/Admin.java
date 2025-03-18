@@ -9,9 +9,6 @@ import lombok.*;
 @Setter
 @Entity
 @Table(name = "admin")
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Admin extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
