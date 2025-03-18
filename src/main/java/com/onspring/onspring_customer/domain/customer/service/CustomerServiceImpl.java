@@ -1,8 +1,10 @@
 package com.onspring.onspring_customer.domain.customer.service;
 
+import com.onspring.onspring_customer.domain.common.repository.CustomerFranchiseRepository;
 import com.onspring.onspring_customer.domain.customer.dto.CustomerDto;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
+import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import java.util.Optional;
 @Service
 public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
+    private final FranchiseRepository franchiseRepository;
+    private final CustomerFranchiseRepository customerFranchiseRepository;
     private final ModelMapper modelMapper;
 
     @Override
