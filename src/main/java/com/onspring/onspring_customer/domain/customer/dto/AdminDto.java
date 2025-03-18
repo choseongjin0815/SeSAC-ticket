@@ -12,6 +12,8 @@ public class AdminDto implements Serializable {
 
     Long customerId;
 
+    @NotNull
+    @Size(min = 1)
     String userName;
 
     String password;
