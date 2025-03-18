@@ -41,13 +41,7 @@ public class AdminServiceImpl implements AdminService {
         Optional<Admin> result = adminRepository.findById(id);
         Admin admin = result.orElseThrow();
 
-        return AdminDto.builder()
-                .id(admin.getId())
-                .customerId(admin.getCustomer()
-                        .getId())
-                .userName(admin.getUserName())
-                .isSuperAdmin(admin.isSuperAdmin())
-                .build();
+        return modelMapper.map(admin, AdminDto.class);
     }
 
     @Override
