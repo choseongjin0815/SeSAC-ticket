@@ -20,6 +20,13 @@ public class CustomerServiceImpl implements CustomerService {
     private final FranchiseRepository franchiseRepository;
     private final CustomerFranchiseRepository customerFranchiseRepository;
     private final ModelMapper modelMapper;
+
+    private Customer getCustomer(Long id) {
+        Optional<Customer> result = customerRepository.findById(id);
+
+        return result.orElseThrow(() -> new EntityNotFoundException("Customer with ID " + id + " not found"));
+    }
+
     @Autowired
     public CustomerServiceImpl(CustomerRepository customerRepository, FranchiseRepository franchiseRepository,
                                CustomerFranchiseRepository customerFranchiseRepository, ModelMapper modelMapper) {
@@ -44,8 +51,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto findCustomerById(Long id) {
-        Optional<Customer> result = customerRepository.findById(id);
-        Customer customer = result.orElseThrow();
+        Customer customer = getCustomer(id);
 
         return CustomerDto.builder()
                 .name(customer.getName())
@@ -62,8 +68,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public boolean updateCustomer(CustomerDto customerDto) {
-        Optional<Customer> result = customerRepository.findById(customerDto.getId());
-        Customer customer = result.orElseThrow();
+        Customer customer = getCustomer(customerDto.getId());
+        Customer customer = getCustomer(customerId);
 
         customer.setName(customerDto.getName());
         customer.setAddress(customerDto.getAddress());
