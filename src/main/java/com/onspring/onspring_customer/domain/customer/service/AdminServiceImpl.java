@@ -46,7 +46,10 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<AdminDto> findAllAdmin() {
-        return List.of();
+        return adminRepository.findAll()
+                .stream()
+                .map(element -> modelMapper.map(element, AdminDto.class))
+                .toList();
     }
 
     @Override
