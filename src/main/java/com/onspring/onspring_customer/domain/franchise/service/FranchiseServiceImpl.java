@@ -92,6 +92,20 @@ public class FranchiseServiceImpl implements FranchiseService {
     }
 
     @Override
+    public boolean activateFranchiseById(Long id) {
+        log.info("Activating franchise with id {}", id);
+
+        Franchise franchise = getFranchise(id);
+
+        franchise.setActivated(true);
+        franchiseRepository.save(franchise);
+
+        log.info("Successfully activated franchise with id {}", id);
+
+        return true;
+    }
+
+    @Override
     public boolean deactivateFranchiseById(Long id) {
         log.info("Deactivating franchise with id {}", id);
 
