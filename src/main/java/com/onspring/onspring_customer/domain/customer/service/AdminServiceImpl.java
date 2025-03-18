@@ -2,7 +2,6 @@ package com.onspring.onspring_customer.domain.customer.service;
 
 import com.onspring.onspring_customer.domain.customer.dto.AdminDto;
 import com.onspring.onspring_customer.domain.customer.entity.Admin;
-import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.repository.AdminRepository;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -26,16 +25,15 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Long saveAdmin(AdminDto adminDto) {
-        Customer customer = customerRepository.findById(adminDto.getCustomerId())
-                .orElseThrow();
-        Admin admin = Admin.builder()
-                .customer(customer)
-                .userName(adminDto.getUserName())
-                .isSuperAdmin(adminDto.isSuperAdmin())
-                .build();
+        log.info("Saving admin with user name {}", adminDto.getUserName());
 
-        return adminRepository.save(admin)
+        Admin admin = modelMapper.map(adminDto, Admin.class);
+        Long id = adminRepository.save(admin)
                 .getId();
+
+        log.info("Successfully saved admin with user name {}", adminDto.getUserName());
+
+        return id;
     }
 
     @Override
