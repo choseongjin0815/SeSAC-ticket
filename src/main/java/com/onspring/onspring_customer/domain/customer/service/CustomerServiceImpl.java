@@ -59,7 +59,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDto> findAllCustomer() {
-        return List.of();
+        return customerRepository.findAll()
+                .stream()
+                .map(element -> modelMapper.map(element, CustomerDto.class))
+                .toList();
     }
 
     @Override
