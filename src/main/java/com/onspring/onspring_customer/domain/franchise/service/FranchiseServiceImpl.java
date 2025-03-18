@@ -80,7 +80,7 @@ public class FranchiseServiceImpl implements FranchiseService {
     }
 
     @Override
-    public boolean deleteFranchiseById(Long id) {
         return false;
+    public boolean deactivateFranchiseById(Long id) {
     }
 }
