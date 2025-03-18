@@ -53,8 +53,18 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public boolean updateAdmin(AdminDto adminDto) {
-        return false;
+    public boolean changeAdminPasswordById(Long id, String password) {
+        log.info("Updating password for admin with ID {}", id);
+
+        Optional<Admin> result = adminRepository.findById(id);
+        Admin admin = result.orElseThrow();
+
+        admin.setPassword(password);
+        adminRepository.save(admin);
+
+        log.info("Successfully updated password for admin with ID {}", id);
+
+        return true;
     }
 
     @Override

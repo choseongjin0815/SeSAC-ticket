@@ -11,7 +11,7 @@ public interface AdminService {
 
     List<AdminDto> findAllAdmin();
 
-    boolean updateAdmin(AdminDto adminDto);
+    boolean changeAdminPasswordById(Long id, String password);
 
     boolean deleteAdminById(Long id);
 
