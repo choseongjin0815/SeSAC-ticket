@@ -24,6 +24,12 @@ public class Admin extends BaseEntity {
     private String userName;
 
     @NotNull
+    private String password;
+
+    @NotNull
     private boolean isSuperAdmin;
+
+    @NotNull
+    private boolean isActivated;
 
 }
