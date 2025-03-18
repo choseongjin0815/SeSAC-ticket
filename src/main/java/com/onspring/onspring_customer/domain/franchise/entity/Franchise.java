@@ -41,7 +41,7 @@ public class Franchise extends BaseEntity {
     @OneToMany(mappedBy = "franchise")
     private Set<Transaction> transactions = new HashSet<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     List<FranchiseMenuImages> menuImages = new ArrayList<>();
 
     public void addImage(FranchiseMenuImages image) {
