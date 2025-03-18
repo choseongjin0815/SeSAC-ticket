@@ -13,7 +13,7 @@ public interface AdminService {
 
     boolean changeAdminPasswordById(Long id, String password);
 
-    boolean deleteAdminById(Long id);
+    boolean activateAdminById(Long id);
 
     boolean deleteAllAdmin(List<Long> ids);
 }

@@ -68,8 +68,18 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public boolean deleteAdminById(Long id) {
-        return false;
+    public boolean activateAdminById(Long id) {
+        log.info("Activating admin with ID {}", id);
+
+        Optional<Admin> result = adminRepository.findById(id);
+        Admin admin = result.orElseThrow();
+
+        admin.setActivated(true);
+        adminRepository.save(admin);
+
+        log.info("Successfully activated admin with ID {}", id);
+
+        return true;
     }
 
     @Override
