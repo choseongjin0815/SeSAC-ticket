@@ -4,9 +4,7 @@ import com.onspring.onspring_customer.domain.customer.dto.AdminDto;
 import com.onspring.onspring_customer.domain.customer.entity.Admin;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.repository.AdminRepository;
-import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,8 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Setter
-@Getter
+@Log4j2
 @Service
 public class AdminServiceImpl implements AdminService {
     private final AdminRepository adminRepository;
