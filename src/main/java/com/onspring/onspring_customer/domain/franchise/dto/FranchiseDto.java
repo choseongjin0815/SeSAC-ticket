@@ -12,4 +12,6 @@ public class FranchiseDto implements Serializable {
     String name;
     String address;
     String phone;
+
+    boolean isActivated;
 }
