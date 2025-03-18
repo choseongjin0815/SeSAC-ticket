@@ -7,6 +7,7 @@ import com.onspring.onspring_customer.domain.customer.repository.AdminRepository
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import lombok.Getter;
 import lombok.Setter;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class AdminServiceImpl implements AdminService {
     private AdminRepository adminRepository;
     private CustomerRepository customerRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public Long saveAdmin(AdminDto adminDto) {
