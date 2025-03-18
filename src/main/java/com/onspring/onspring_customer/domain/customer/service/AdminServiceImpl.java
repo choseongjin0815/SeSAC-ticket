@@ -8,6 +8,7 @@ import com.onspring.onspring_customer.domain.customer.repository.CustomerReposit
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,9 +18,14 @@ import java.util.Optional;
 @Getter
 @Service
 public class AdminServiceImpl implements AdminService {
-    private AdminRepository adminRepository;
-    private CustomerRepository customerRepository;
+    private final AdminRepository adminRepository;
     private final ModelMapper modelMapper;
+
+    @Autowired
+    public AdminServiceImpl(AdminRepository adminRepository, ModelMapper modelMapper) {
+        this.adminRepository = adminRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @Override
     public Long saveAdmin(AdminDto adminDto) {
