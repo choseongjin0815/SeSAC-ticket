@@ -5,6 +5,7 @@ import com.onspring.onspring_customer.domain.customer.dto.CustomerDto;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
