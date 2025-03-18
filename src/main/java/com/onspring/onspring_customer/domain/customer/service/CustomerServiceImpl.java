@@ -16,10 +16,18 @@ import java.util.Optional;
 @Log4j2
 @Service
 public class CustomerServiceImpl implements CustomerService {
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
     private final FranchiseRepository franchiseRepository;
     private final CustomerFranchiseRepository customerFranchiseRepository;
     private final ModelMapper modelMapper;
+    @Autowired
+    public CustomerServiceImpl(CustomerRepository customerRepository, FranchiseRepository franchiseRepository,
+                               CustomerFranchiseRepository customerFranchiseRepository, ModelMapper modelMapper) {
+        this.customerRepository = customerRepository;
+        this.franchiseRepository = franchiseRepository;
+        this.customerFranchiseRepository = customerFranchiseRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @Override
     public Long saveCustomer(CustomerDto customerDto) {
