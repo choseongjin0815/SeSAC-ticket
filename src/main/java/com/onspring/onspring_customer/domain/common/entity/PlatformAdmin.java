@@ -8,9 +8,6 @@ import lombok.*;
 @Setter
 @Entity
 @Table(name = "platform_admin")
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class PlatformAdmin extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +17,14 @@ public class PlatformAdmin extends BaseEntity {
     @NotNull
     @Column(unique = true)
     private String userName;
+
+    @NotNull
+    private String password;
+
+    @NotNull
+    private boolean isSuperAdmin;
+
+    @NotNull
+    private boolean isActivated;
 
 }

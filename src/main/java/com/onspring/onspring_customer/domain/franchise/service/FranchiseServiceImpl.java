@@ -80,7 +80,6 @@ public class FranchiseServiceImpl implements FranchiseService {
     }
 
     @Override
-        return false;
     public boolean deactivateFranchiseById(Long id) {
         log.info("Deactivating franchise with id {}", id);
 
