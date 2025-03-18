@@ -83,7 +83,23 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public boolean deleteAllAdmin(List<Long> ids) {
-        return false;
+    public boolean deactivateAdminById(Long id) {
+        log.info("Deactivating admin with ID {}", id);
+
+        Optional<Admin> result = adminRepository.findById(id);
+        Admin admin = result.orElseThrow();
+
+        if (admin.isSuperAdmin()) {
+            log.warn("Attempted to deactivate a super admin with ID {}", id);
+
+            return false;
+        }
+
+        admin.setActivated(false);
+        adminRepository.save(admin);
+
+        log.info("Successfully deactivated admin with ID {}", id);
+
+        return true;
     }
 }

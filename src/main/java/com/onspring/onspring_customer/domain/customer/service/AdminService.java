@@ -15,5 +15,5 @@ public interface AdminService {
 
     boolean activateAdminById(Long id);
 
-    boolean deleteAllAdmin(List<Long> ids);
+    boolean deactivateAdminById(Long id);
 }
