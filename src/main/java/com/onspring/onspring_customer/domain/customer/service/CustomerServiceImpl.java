@@ -1,9 +1,11 @@
 package com.onspring.onspring_customer.domain.customer.service;
 
+import com.onspring.onspring_customer.domain.common.entity.CustomerFranchise;
 import com.onspring.onspring_customer.domain.common.repository.CustomerFranchiseRepository;
 import com.onspring.onspring_customer.domain.customer.dto.CustomerDto;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
+import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
@@ -99,11 +101,38 @@ public class CustomerServiceImpl implements CustomerService {
 
         log.info("Successfully added franchise with user ID {} to customer id {}", franchiseId, customerId);
 
-        customer.setName(customerDto.getName());
-        customer.setAddress(customerDto.getAddress());
-        customer.setPhone(customerDto.getPhone());
-        customer.setActivated(customerDto.isActivated());
+        return id;
+    }
+
+    @Override
+    public boolean deleteFranchiseFromCustomer(Long id) {
+        log.info("Deleting franchise from customer id {}", id);
+
+        Optional<CustomerFranchise> result = customerFranchiseRepository.findById(id);
+        CustomerFranchise customerFranchise = result.orElseThrow(() -> new EntityNotFoundException("CustomerFranchise"
+                + " with ID " + id + " not found"));
+
+        Long customerId = customerFranchise.getCustomer()
+                .getId();
+        Long franchiseId = customerFranchise.getFranchise()
+                .getId();
+        customerFranchiseRepository.delete(customerFranchise);
+
+        log.info("Successfully deleted franchise id {} from customer id {}", franchiseId, customerId);
+
+        return true;
+    }
+
+    @Override
+    public boolean activateCustomer(Long id) {
+        log.info("Activating customer with ID {}", id);
+
+        Customer customer = getCustomer(id);
+        customer.setActivated(true);
+
         customerRepository.save(customer);
+
+        log.info("Successfully activated customer with ID {}", id);
 
         return true;
     }
