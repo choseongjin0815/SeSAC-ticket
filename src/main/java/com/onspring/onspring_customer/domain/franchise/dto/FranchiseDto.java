@@ -9,6 +9,8 @@ import java.io.Serializable;
 @NoArgsConstructor(force = true)
 public class FranchiseDto implements Serializable {
     Long id;
+    String userName;
+
     String name;
     String address;
     String phone;
