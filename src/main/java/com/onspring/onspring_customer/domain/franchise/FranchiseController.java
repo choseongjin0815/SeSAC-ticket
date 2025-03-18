@@ -39,6 +39,7 @@ public class FranchiseController {
         Long id = 1L; // 테스트용 ID
 
         FranchiseDto oldFranchiseDto = franchiseService.findFranchiseById(id);
+        log.info(oldFranchiseDto);
 
         //기존 데이터베이스에 존재하는 파일들
         List<String> oldFileNames = oldFranchiseDto.getUploadFileNames();
@@ -56,13 +57,14 @@ public class FranchiseController {
         //화면에서 유지할 파일들
         List<String> uploadFileNames = franchiseDto.getUploadFileNames();
 
-        //유질될 파일들 + 새로만든 파일 이름들
+        //유지될 파일들 + 새로만든 파일 이름들
         if(currentFileNames != null && currentFileNames.size() > 0) {
             uploadFileNames.addAll(currentFileNames);
         }
 
         franchiseService.updateMenuImage(franchiseDto);
 
+        log.info(oldFileNames);
 
         if(oldFileNames != null && !oldFileNames.isEmpty()){
             //지울 파일 목록 찾기
@@ -73,6 +75,7 @@ public class FranchiseController {
                     .filter(fileName -> !uploadFileNames.contains(fileName)).collect(Collectors.toList());
 
             customFileUtil.deleteFiles(removeFiles);
+            log.info("files : " + removeFiles);
         }
 
         return ResponseEntity.ok("메뉴 이미지 업데이트가 완료되었습니다.");
