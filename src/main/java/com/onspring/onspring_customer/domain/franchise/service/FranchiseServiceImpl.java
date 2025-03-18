@@ -18,6 +18,11 @@ public class FranchiseServiceImpl implements FranchiseService {
     private final FranchiseRepository franchiseRepository;
     private final ModelMapper modelMapper;
 
+    private Franchise getFranchise(Long id) {
+        return franchiseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("ID " + id + "에 해당하는 프랜차이즈를 찾을 수 없습니다."));
+    }
+
     @Override
     public Long saveFranchise(FranchiseDto franchiseDto) {
         return 0L;
@@ -35,8 +40,7 @@ public class FranchiseServiceImpl implements FranchiseService {
             throw new IllegalArgumentException("프랜차이즈 ID는 null일 수 없습니다.");
         }
 
-        Franchise franchise = franchiseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID " + id + "에 해당하는 프랜차이즈를 찾을 수 없습니다."));
+        Franchise franchise = getFranchise(id);
 
         log.info(franchise.getId());
 
@@ -69,8 +73,7 @@ public class FranchiseServiceImpl implements FranchiseService {
      */
     @Override
     public boolean updateFranchise(Long id, FranchiseDto franchiseDto) {
-        Franchise franchise = franchiseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID " + id + "에 해당하는 프랜차이즈를 찾을 수 없습니다."));
+        Franchise franchise = getFranchise(id);
 
         updateFranchiseFields(franchise, franchiseDto);
 
