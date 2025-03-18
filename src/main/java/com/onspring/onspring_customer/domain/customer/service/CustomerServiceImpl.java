@@ -38,15 +38,15 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Long saveCustomer(CustomerDto customerDto) {
-        Customer customer = Customer.builder()
-                .name(customerDto.getName())
-                .address(customerDto.getAddress())
-                .phone(customerDto.getPhone())
-                .isActivated(customerDto.isActivated())
-                .build();
+        log.info("Saving customer with name {}", customerDto.getName());
 
-        return customerRepository.save(customer)
+        Customer customer = modelMapper.map(customerDto, Customer.class);
+        Long id = customerRepository.save(customer)
                 .getId();
+
+        log.info("Successfully saved customer with name {}", customer.getName());
+
+        return id;
     }
 
     @Override
@@ -68,8 +68,37 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public boolean updateCustomer(CustomerDto customerDto) {
+        log.info("Updating customer with ID {}", customerDto.getId());
+
         Customer customer = getCustomer(customerDto.getId());
+
+        modelMapper.map(customerDto, customer);
+        customerRepository.save(customer);
+
+        log.info("Successfully updated customer with ID {}", customerDto.getId());
+
+        return true;
+    }
+
+    @Override
+    public Long addFranchiseToCustomer(Long customerId, Long franchiseId) {
+        log.info("Adding franchise with franchise ID {} to customer id {}", franchiseId, customerId);
+
         Customer customer = getCustomer(customerId);
+
+        Optional<Franchise> franchiseResult = franchiseRepository.findById(franchiseId);
+        Franchise franchise =
+                franchiseResult.orElseThrow(() -> new EntityNotFoundException("Franchise with ID " + franchiseId + " "
+                        + "not found"));
+
+        CustomerFranchise customerFranchise = new CustomerFranchise();
+        customerFranchise.setCustomer(customer);
+        customerFranchise.setFranchise(franchise);
+
+        Long id = customerFranchiseRepository.save(customerFranchise)
+                .getId();
+
+        log.info("Successfully added franchise with user ID {} to customer id {}", franchiseId, customerId);
 
         customer.setName(customerDto.getName());
         customer.setAddress(customerDto.getAddress());
@@ -81,7 +110,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public boolean deleteCustomerById(Long id) {
+    public boolean deactivateCustomer(Long id) {
+        log.info("Deactivating customer with ID {}", id);
+
+        Customer customer = getCustomer(id);
+        customer.setActivated(false);
+
+        customerRepository.save(customer);
+
+        log.info("Successfully deactivated customer with ID {}", id);
+
         return false;
     }
 }
