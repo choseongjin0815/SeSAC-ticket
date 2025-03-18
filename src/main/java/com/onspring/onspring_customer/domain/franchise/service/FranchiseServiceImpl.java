@@ -40,7 +40,9 @@ public class FranchiseServiceImpl implements FranchiseService {
 
         log.info(franchise.getId());
 
-        return modelMapper.map(franchise, FranchiseDto.class);
+        FranchiseDto franchiseDto = franchise.entityToDto();
+
+        return franchiseDto;
     }
 
     @Override
