@@ -1,5 +1,6 @@
 package com.onspring.onspring_customer.domain.common.service;
 
+import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
@@ -8,8 +9,10 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -155,6 +158,27 @@ public class TransactionServiceImpl implements TransactionService {
         return transactions.stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
                 .collect(Collectors.toList());
+    }
+
+
+    /**
+     * 특정 가맹점의 월별 정산 합산 조회
+     * @param franchiseId   가맹점의 id
+     * @return  월별 정산의 총 거래량, 금액을 담은 SettlmentSummaryDto
+     */
+    @Override
+    public List<SettlmentSummaryDto> getMonthlySettlementSummaries(Long franchiseId) {
+        List<Object[]> results = transactionRepository.getMonthlyTransactionSummary(franchiseId);
+        List<SettlmentSummaryDto> summaries = new ArrayList<>();
+        for (Object[] result : results) {
+            int month = (int) result[0];
+            int year = (int) result[1];
+            long totalTransactions = (long) result[2];
+            BigDecimal totalAmount = (BigDecimal) result[3];
+
+            summaries.add(new SettlmentSummaryDto(year, month, totalTransactions, totalAmount));
+        }
+        return summaries;
     }
 
 
