@@ -25,7 +25,16 @@ public class FranchiseServiceImpl implements FranchiseService {
 
     @Override
     public Long saveFranchise(FranchiseDto franchiseDto) {
-        return 0L;
+        log.info("Saving franchise with user name {}", franchiseDto.getName());
+
+        Franchise franchise = modelMapper.map(franchiseDto, Franchise.class);
+
+        Long id = franchiseRepository.save(franchise)
+                .getId();
+
+        log.info("Successfully saved franchise with user name {}", franchiseDto.getName());
+
+        return id;
     }
 
     /**
