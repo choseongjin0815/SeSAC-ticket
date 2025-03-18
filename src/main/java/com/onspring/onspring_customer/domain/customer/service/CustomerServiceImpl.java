@@ -53,12 +53,7 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerDto findCustomerById(Long id) {
         Customer customer = getCustomer(id);
 
-        return CustomerDto.builder()
-                .name(customer.getName())
-                .address(customer.getAddress())
-                .phone(customer.getPhone())
-                .isActivated(customer.isActivated())
-                .build();
+        return modelMapper.map(customer, CustomerDto.class);
     }
 
     @Override
