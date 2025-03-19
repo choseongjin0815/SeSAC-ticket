@@ -1,13 +1,17 @@
 package com.onspring.onspring_customer.domain.customer.dto;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PartyDto implements Serializable {
     Long id;
     Long customerId;
