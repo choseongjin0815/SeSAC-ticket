@@ -104,7 +104,16 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-        return false;
     public boolean deactivatePartyById(Long id) {
+        log.info("Deactivating party with ID {}", id);
+
+        Party party = getParty(id);
+
+        party.setActivated(false);
+        partyRepository.save(party);
+
+        log.info("Successfully deactivated party with ID {}", id);
+
+        return true;
     }
 }
