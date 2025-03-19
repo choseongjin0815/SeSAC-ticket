@@ -89,7 +89,6 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-        return false;
     public boolean activatePartyById(Long id) {
         log.info("Activating party with ID {}", id);
 
