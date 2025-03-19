@@ -23,6 +23,12 @@ public class AdminServiceImpl implements AdminService {
         this.modelMapper = modelMapper;
     }
 
+    private Admin getAdmin(Long id) {
+        Optional<Admin> result = adminRepository.findById(id);
+
+        return result.orElseThrow(() -> new EntityNotFoundException("Admin with ID " + id + " not found"));
+    }
+
     @Override
     public Long saveAdmin(AdminDto adminDto) {
         log.info("Saving admin with user name {}", adminDto.getUserName());
@@ -38,8 +44,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public AdminDto findAdminById(Long id) {
-        Optional<Admin> result = adminRepository.findById(id);
-        Admin admin = result.orElseThrow();
+        Admin admin = getAdmin(id);
 
         return modelMapper.map(admin, AdminDto.class);
     }
@@ -56,8 +61,7 @@ public class AdminServiceImpl implements AdminService {
     public boolean updateAdminPasswordById(Long id, String password) {
         log.info("Updating password for admin with ID {}", id);
 
-        Optional<Admin> result = adminRepository.findById(id);
-        Admin admin = result.orElseThrow();
+        Admin admin = getAdmin(id);
 
         admin.setPassword(password);
         adminRepository.save(admin);
@@ -71,8 +75,7 @@ public class AdminServiceImpl implements AdminService {
     public boolean activateAdminById(Long id) {
         log.info("Activating admin with ID {}", id);
 
-        Optional<Admin> result = adminRepository.findById(id);
-        Admin admin = result.orElseThrow();
+        Admin admin = getAdmin(id);
 
         admin.setActivated(true);
         adminRepository.save(admin);
@@ -86,8 +89,7 @@ public class AdminServiceImpl implements AdminService {
     public boolean deactivateAdminById(Long id) {
         log.info("Deactivating admin with ID {}", id);
 
-        Optional<Admin> result = adminRepository.findById(id);
-        Admin admin = result.orElseThrow();
+        Admin admin = getAdmin(id);
 
         if (admin.isSuperAdmin()) {
             log.warn("Attempted to deactivate a super admin with ID {}", id);
