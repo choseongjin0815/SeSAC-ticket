@@ -31,4 +31,16 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("franchiseId") Long franchiseId,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
+
+
+    // 새 쿼리메서드 추가. isClosed false인 것만 불러오기
+    @Query("SELECT t FROM Transaction t WHERE t.franchise.id = :franchiseId " +
+            "AND t.transactionTime BETWEEN :startDate AND :endDate " +
+            "AND t.isClosed = :isClosed " +
+            "ORDER BY t.transactionTime DESC")
+    List<Transaction> findTransactionsByFranchiseIdAndDateRangeAndClosedStatus(
+            @Param("franchiseId") Long franchiseId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("isClosed") boolean isClosed);
 }
