@@ -1,5 +1,6 @@
 package com.onspring.onspring_customer.domain.common.service;
 
+import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,8 @@ public interface TransactionService {
                                                 String period);
 
     List<TransactionDto> findSettlementByFranchiseId(Long franchiseId, String month, String period, String customStartDate, String customEndDate);
+
+    List<SettlmentSummaryDto> getMonthlySettlementSummaries(Long franchiseId);
 
     boolean cancelTransaction(Long franchiseId, Long transactionId);
 }
