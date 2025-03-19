@@ -1,5 +1,7 @@
 package com.onspring.onspring_customer.domain.user.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Value;
 
 import java.io.Serializable;
@@ -13,8 +15,12 @@ public class EndUserDto implements Serializable {
 
     String password;
 
+    @NotNull
+    @Size(min = 1)
     String name;
 
+    @NotNull
+    @Size(min = 1)
     String phone;
 
     boolean isActivated;
