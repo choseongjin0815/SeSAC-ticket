@@ -37,30 +37,22 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public Long saveParty(PartyDto partyDto) {
-        Customer customer = customerRepository.findById(partyDto.getCustomerId())
-                .orElseThrow();
-        Party party = Party.builder()
-                .customer(customer)
-                .name(partyDto.getName())
-                .period(partyDto.getPeriod())
-                .amount(partyDto.getAmount())
-                .allowedTimeStart(partyDto.getAllowedTimeStart())
-                .allowedTimeEnd(partyDto.getAllowedTimeEnd())
-                .validThru(partyDto.getValidThru())
-                .sunday(partyDto.isSunday())
-                .monday(partyDto.isMonday())
-                .tuesday(partyDto.isTuesday())
-                .wednesday(partyDto.isWednesday())
-                .thursday(partyDto.isThursday())
-                .friday(partyDto.isFriday())
-                .saturday(partyDto.isSaturday())
-                .maximumAmount(partyDto.getMaximumAmount())
-                .maximumTransaction(partyDto.getMaximumTransaction())
-                .isActivated(partyDto.isActivated())
-                .build();
+        log.info("Saving party with name {} associated with customer ID {}", partyDto.getName(),
+                partyDto.getCustomerId());
 
-        return partyRepository.save(party)
+        Customer customer = customerRepository.findById(partyDto.getCustomerId())
+                .orElseThrow(() -> new EntityNotFoundException("Customer with ID " + partyDto.getCustomerId() + " not"
+                        + " found"));
+
+        Party party = modelMapper.map(partyDto, Party.class);
+        party.setCustomer(customer);
+
+        Long id = partyRepository.save(party)
                 .getId();
+
+        log.info("Successfully saved party with name {}", partyDto.getName());
+
+        return id;
     }
 
     @Override
@@ -97,23 +89,11 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public boolean updateParty(PartyDto partyDto) {
+        log.info("Updating party with ID {}", partyDto.getId());
 
-        party.setName(partyDto.getName());
-        party.setPeriod(partyDto.getPeriod());
-        party.setAmount(partyDto.getAmount());
-        party.setAllowedTimeStart(partyDto.getAllowedTimeStart());
-        party.setAllowedTimeEnd(party.getAllowedTimeEnd());
-        party.setValidThru(partyDto.getValidThru());
-        party.setSunday(partyDto.isSunday());
-        party.setMonday(partyDto.isMonday());
-        party.setTuesday(partyDto.isTuesday());
-        party.setWednesday(partyDto.isWednesday());
-        party.setThursday(partyDto.isThursday());
-        party.setFriday(partyDto.isFriday());
-        party.setSaturday(partyDto.isSaturday());
-        party.setMaximumAmount(partyDto.getMaximumAmount());
-        party.setMaximumTransaction(partyDto.getMaximumTransaction());
         Party party = getParty(partyDto.getId());
+
+        modelMapper.map(partyDto, party);
         partyRepository.save(party);
 
         return true;
@@ -122,6 +102,16 @@ public class PartyServiceImpl implements PartyService {
     @Override
         return false;
     public boolean activatePartyById(Long id) {
+        log.info("Activating party with ID {}", id);
+
+        Party party = getParty(id);
+
+        party.setActivated(true);
+        partyRepository.save(party);
+
+        log.info("Successfully activated party with ID {}", id);
+
+        return true;
     }
 
     @Override
