@@ -106,12 +106,12 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public boolean deletePartyById(Long id) {
         return false;
+    public boolean activatePartyById(Long id) {
     }
 
     @Override
-    public boolean deleteAllParty(List<Long> ids) {
         return false;
+    public boolean deactivatePartyById(Long id) {
     }
 }
