@@ -68,7 +68,10 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public List<PartyDto> findAllParty() {
-        return List.of();
+        return partyRepository.findAll()
+                .stream()
+                .map(element -> modelMapper.map(element, PartyDto.class))
+                .toList();
     }
 
     @Override
