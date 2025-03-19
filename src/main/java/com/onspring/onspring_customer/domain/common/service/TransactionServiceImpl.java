@@ -53,6 +53,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionDto findTransactionById(Long id) {
         return null;
+        Transaction transaction = transactionRepository.findByIdAndIsClosedFalse(id)
+                .orElseThrow(() -> new RuntimeException("Open transaction not found with ID: " + id));
+
+        return modelMapper.map(transaction, TransactionDto.class);
     }
 
     @Override
