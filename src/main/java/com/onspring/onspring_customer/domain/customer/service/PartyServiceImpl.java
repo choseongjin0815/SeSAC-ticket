@@ -8,6 +8,8 @@ import com.onspring.onspring_customer.domain.customer.repository.PartyRepository
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class PartyServiceImpl implements PartyService {
     private CustomerRepository customerRepository;
     private final PartyRepository partyRepository;
     private final CustomerRepository customerRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public Long saveParty(PartyDto partyDto) {
