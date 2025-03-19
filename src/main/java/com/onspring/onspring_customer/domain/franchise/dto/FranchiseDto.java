@@ -1,5 +1,7 @@
 package com.onspring.onspring_customer.domain.franchise.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,8 +19,23 @@ import java.util.List;
 @NoArgsConstructor(force = true)
 public class FranchiseDto implements Serializable {
     Long id;
+
+    @NotNull
+    @Size(min = 1)
+    String userName;
+
+    String password;
+
+    @NotNull
+    @Size(min = 1)
     String name;
+
+    @NotNull
+    @Size(min = 1)
     String address;
+
+    @NotNull
+    @Size(min = 1)
     String phone;
 
     @Builder.Default
@@ -42,4 +59,6 @@ public class FranchiseDto implements Serializable {
 
         return franchise;
     }
+
+    boolean isActivated;
 }

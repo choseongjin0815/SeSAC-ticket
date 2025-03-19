@@ -13,5 +13,11 @@ public interface CustomerService {
 
     boolean updateCustomer(CustomerDto customerDto);
 
-    boolean deleteCustomerById(Long id);
+    Long addFranchiseToCustomer(Long customerId, Long franchiseId);
+
+    boolean deleteFranchiseFromCustomer(Long id);
+
+    boolean activateCustomer(Long id);
+
+    boolean deactivateCustomer(Long id);
 }

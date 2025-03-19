@@ -1,7 +1,6 @@
 package com.onspring.onspring_customer.domain.user.service;
 
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
-import com.onspring.onspring_customer.domain.user.entity.EndUser;
 
 import java.util.List;
 
@@ -10,11 +9,11 @@ public interface EndUserService {
 
     EndUserDto findEndUserById(Long id);
 
-    List<EndUser> findAllEndUser();
+    List<EndUserDto> findAllEndUser();
 
-    boolean updateEndUser(EndUserDto endUserDto);
+    boolean updateEndUserPasswordById(Long id, String password);
 
-    boolean deleteEndUserById(Long id);
+    boolean activateEndUserById(Long id);
 
-    boolean deleteAllEndUser(List<Long> ids);
+    boolean deactivateEndUserById(Long id);
 }

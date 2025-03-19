@@ -35,6 +35,9 @@ public class Franchise extends BaseEntity {
     @Column(unique = true)
     private String phone;
 
+    @NotNull
+    private boolean isActivated;
+
     @OneToMany(mappedBy = "franchise")
     private Set<CustomerFranchise> customerFranchises = new HashSet<>();
 
