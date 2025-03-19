@@ -59,27 +59,11 @@ public class PartyServiceImpl implements PartyService {
     public PartyDto findPartyById(Long id) {
         Party party = getParty(id);
 
-        return PartyDto.builder()
-                .id(party.getId())
-                .customerId(party.getCustomer()
-                        .getId())
-                .name(party.getName())
-                .period(party.getPeriod())
-                .amount(party.getAmount())
-                .allowedTimeStart(party.getAllowedTimeStart())
-                .allowedTimeEnd(party.getAllowedTimeEnd())
-                .validThru(party.getValidThru())
-                .sunday(party.isSunday())
-                .monday(party.isMonday())
-                .tuesday(party.isTuesday())
-                .wednesday(party.isWednesday())
-                .thursday(party.isThursday())
-                .friday(party.isFriday())
-                .saturday(party.isSaturday())
-                .maximumAmount(party.getMaximumAmount())
-                .maximumTransaction(party.getMaximumTransaction())
-                .isActivated(party.isActivated())
-                .build();
+        PartyDto partyDto = modelMapper.map(party, PartyDto.class);
+        partyDto.setCustomerId(party.getCustomer()
+                .getId());
+
+        return partyDto;
     }
 
     @Override
