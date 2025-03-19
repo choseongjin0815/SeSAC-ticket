@@ -63,7 +63,6 @@ public class TransactionServiceImpl implements TransactionService {
     // 거래된 모든 것들 중 false인 (정산되지 않는 것만) 찾아서 리스트로 보여주기
     @Override
     public List<TransactionDto> findAllTransaction() {
-        return List.of();
         List<Transaction> transactions = transactionRepository.findByIsClosed(false);
 
         return transactions.stream()
