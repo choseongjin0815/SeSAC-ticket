@@ -21,6 +21,7 @@ public class PartyServiceImpl implements PartyService {
     private PartyRepository partyRepository;
     private CustomerRepository customerRepository;
     private final PartyRepository partyRepository;
+    private final CustomerRepository customerRepository;
 
     @Override
     public Long saveParty(PartyDto partyDto) {
