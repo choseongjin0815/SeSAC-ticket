@@ -69,6 +69,7 @@ public class TransactionServiceTest {
     public void testFindTransactionByFranchiseIdWithDateRange() {
         Long franchiseId = 1L;
 
+
         LocalDateTime startDate = LocalDateTime.now().minusDays(3).withHour(0).withMinute(0).withSecond(0).withNano(0);  // 예: 3일전
         LocalDateTime endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999);  // 예: 오늘
 
