@@ -10,7 +10,7 @@ public interface EndUserService {
 
     EndUserDto findEndUserById(Long id);
 
-    List<EndUser> findAllEndUser();
+    List<EndUserDto> findAllEndUser();
 
     boolean updateEndUser(EndUserDto endUserDto);
 
