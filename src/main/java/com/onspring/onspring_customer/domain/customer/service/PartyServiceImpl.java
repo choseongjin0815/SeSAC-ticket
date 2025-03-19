@@ -20,6 +20,7 @@ import java.util.Optional;
 public class PartyServiceImpl implements PartyService {
     private PartyRepository partyRepository;
     private CustomerRepository customerRepository;
+    private final PartyRepository partyRepository;
 
     @Override
     public Long saveParty(PartyDto partyDto) {
