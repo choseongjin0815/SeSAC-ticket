@@ -3,6 +3,7 @@ package com.onspring.onspring_customer.domain.customer.service;
 import com.onspring.onspring_customer.domain.customer.dto.AdminDto;
 import com.onspring.onspring_customer.domain.customer.entity.Admin;
 import com.onspring.onspring_customer.domain.customer.repository.AdminRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
