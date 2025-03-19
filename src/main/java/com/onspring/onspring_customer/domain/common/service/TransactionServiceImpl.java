@@ -20,10 +20,35 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final ModelMapper modelMapper;
 
+
+    // isclosed가 false인 거 찾아서 true로 바꾸는 메소드
     @Override
     public Long saveTransaction(TransactionDto transactionDto) {
         return 0L;
     }
+
+        // 현재 월의 첫날 00시 00분 00초 000밀리초로 시작 시간 설정.
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        // 다음 달의 첫날에서 1나노초를 뺀 값으로 끝 시간 설정 (현재 월의 마지막 순간)
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusNanos(1);
+
+        // 정산 처리할 가맹점 ID를 DTO에서 가져오기
+        Long franchiseId = transactionDto.getId();
+
+        // 해당 가맹점의 현재 월에 대한 미정산내역(isClosed=false) 조회
+        List<Transaction> transactions = transactionRepository.findTransactionsByFranchiseIdAndDateRangeAndClosedStatus(
+                franchiseId, startOfMonth, endOfMonth, false
+        );
+
+        // 미정산 내역이 없으면 예외
+        if (transactions.isEmpty()) {
+            throw new RuntimeException("No open transactions found for franchise ID: " + franchiseId + " in current month");
+        }
+
+
+        LocalDateTime closedAt = LocalDateTime.now();
+        for (Transaction transaction : transactions) {
+            transaction.setClosed(true);
 
     @Override
     public TransactionDto findTransactionById(Long id) {
