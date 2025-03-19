@@ -12,7 +12,7 @@ public interface EndUserService {
 
     List<EndUserDto> findAllEndUser();
 
-    boolean updateEndUser(EndUserDto endUserDto);
+    boolean updateEndUserPasswordById(Long id, String password);
 
     boolean deleteEndUserById(Long id);
 
