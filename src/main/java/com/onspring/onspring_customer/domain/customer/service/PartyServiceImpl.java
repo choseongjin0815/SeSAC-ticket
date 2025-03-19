@@ -83,6 +83,8 @@ public class PartyServiceImpl implements PartyService {
         modelMapper.map(partyDto, party);
         partyRepository.save(party);
 
+        log.info("Successfully updated party with ID {}", partyDto.getId());
+
         return true;
     }
 
