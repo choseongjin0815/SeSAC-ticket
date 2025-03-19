@@ -5,8 +5,7 @@ import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
 import com.onspring.onspring_customer.domain.user.entity.Point;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,6 +17,9 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "party")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Party extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

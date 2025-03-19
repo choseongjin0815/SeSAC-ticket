@@ -11,9 +11,11 @@ public interface PlatformAdminService {
 
     List<PlatformAdminDto> findAllPlatformAdmin();
 
-    boolean updatePlatformAdmin(PlatformAdminDto platformAdminDto);
+    boolean updatePlatformAdminPasswordById(Long id, String password);
 
-    boolean deletePlatformAdminByID(Long id);
+    boolean activatePlatformAdminById(Long id);
 
-    boolean deleteAllPlatformAdmin(List<Long> ids);
+    boolean deactivatePlatformAdminById(Long id);
+
+    boolean deletePlatformAdminById(Long id);
 }

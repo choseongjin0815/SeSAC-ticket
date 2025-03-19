@@ -61,6 +61,8 @@ dependencies {
 
 	//Faker Library
 	implementation 'net.datafaker:datafaker:2.0.2'
+
+	testImplementation "org.mockito:mockito-core:5.+"
 }
 
 tasks.named('test') {

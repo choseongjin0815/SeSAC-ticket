@@ -18,9 +18,23 @@ public class FranchiseServiceImpl implements FranchiseService {
     private final FranchiseRepository franchiseRepository;
     private final ModelMapper modelMapper;
 
+    private Franchise getFranchise(Long id) {
+        return franchiseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("ID " + id + "에 해당하는 프랜차이즈를 찾을 수 없습니다."));
+    }
+
     @Override
     public Long saveFranchise(FranchiseDto franchiseDto) {
-        return 0L;
+        log.info("Saving franchise with user name {}", franchiseDto.getName());
+
+        Franchise franchise = modelMapper.map(franchiseDto, Franchise.class);
+
+        Long id = franchiseRepository.save(franchise)
+                .getId();
+
+        log.info("Successfully saved franchise with user name {}", franchiseDto.getName());
+
+        return id;
     }
 
     /**
@@ -35,8 +49,7 @@ public class FranchiseServiceImpl implements FranchiseService {
             throw new IllegalArgumentException("프랜차이즈 ID는 null일 수 없습니다.");
         }
 
-        Franchise franchise = franchiseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID " + id + "에 해당하는 프랜차이즈를 찾을 수 없습니다."));
+        Franchise franchise = getFranchise(id);
 
         log.info(franchise.getId());
 
@@ -69,8 +82,7 @@ public class FranchiseServiceImpl implements FranchiseService {
      */
     @Override
     public boolean updateFranchise(Long id, FranchiseDto franchiseDto) {
-        Franchise franchise = franchiseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ID " + id + "에 해당하는 프랜차이즈를 찾을 수 없습니다."));
+        Franchise franchise = getFranchise(id);
 
         updateFranchiseFields(franchise, franchiseDto);
 
@@ -80,7 +92,30 @@ public class FranchiseServiceImpl implements FranchiseService {
     }
 
     @Override
-    public boolean deleteFranchiseById(Long id) {
-        return false;
+    public boolean activateFranchiseById(Long id) {
+        log.info("Activating franchise with id {}", id);
+
+        Franchise franchise = getFranchise(id);
+
+        franchise.setActivated(true);
+        franchiseRepository.save(franchise);
+
+        log.info("Successfully activated franchise with id {}", id);
+
+        return true;
+    }
+
+    @Override
+    public boolean deactivateFranchiseById(Long id) {
+        log.info("Deactivating franchise with id {}", id);
+
+        Franchise franchise = getFranchise(id);
+
+        franchise.setActivated(false);
+        franchiseRepository.save(franchise);
+
+        log.info("Successfully deactivated franchise with id {}", id);
+
+        return true;
     }
 }
