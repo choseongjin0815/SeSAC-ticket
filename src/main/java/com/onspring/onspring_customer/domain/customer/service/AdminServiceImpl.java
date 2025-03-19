@@ -53,7 +53,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public boolean changeAdminPasswordById(Long id, String password) {
+    public boolean updateAdminPasswordById(Long id, String password) {
         log.info("Updating password for admin with ID {}", id);
 
         Optional<Admin> result = adminRepository.findById(id);
