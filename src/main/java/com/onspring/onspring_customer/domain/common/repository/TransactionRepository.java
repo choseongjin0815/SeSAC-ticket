@@ -47,5 +47,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
 
     Optional<Transaction> findByIdAndIsClosedFalse(Long id);
+
     List<Transaction> findByIsClosed(boolean closed);
+
 }
