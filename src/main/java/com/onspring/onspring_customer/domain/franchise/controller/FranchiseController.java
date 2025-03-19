@@ -1,5 +1,7 @@
-package com.onspring.onspring_customer.domain.franchise;
+package com.onspring.onspring_customer.domain.franchise.controller;
 
+import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
+import com.onspring.onspring_customer.domain.common.service.TransactionService;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.service.FranchiseService;
 import com.onspring.onspring_customer.global.util.file.CustomFileUtil;
@@ -20,11 +22,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/franchise")
 public class FranchiseController {
     private final FranchiseService franchiseService;
+    private final TransactionService transactionService;
     private final CustomFileUtil customFileUtil;
 
     //프랜차이즈 정보 보기
     @GetMapping("/info")
-    public ResponseEntity<FranchiseDto> info() {
+    public ResponseEntity<FranchiseDto> getFranchiseInfo() {
         Long id = 1L;// 테스트용 ID
 
         FranchiseDto franchiseDto = franchiseService.findFranchiseById(id);
@@ -82,11 +85,23 @@ public class FranchiseController {
     }
 
     //메뉴 사진 조회
-    @GetMapping("menu/{fileName}")
+    @GetMapping("/menu/{fileName}")
     public ResponseEntity<Resource> getMenu(@PathVariable String fileName) {
         return customFileUtil.getFile(fileName);
     }
 
+    //정산 요약 조회
+    @GetMapping("/settlements")
+    public ResponseEntity<List<SettlmentSummaryDto>> getSettlementsSummary() {
+        Long id = 1L; //테스트용 아이디
+
+        List<SettlmentSummaryDto> settlementSummaryDto = transactionService.getMonthlySettlementSummaries(id);
+
+        log.info("settlementSummaryDto : " + settlementSummaryDto);
+
+        return ResponseEntity.ok(settlementSummaryDto);
+
+    }
 
 
 }
