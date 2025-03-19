@@ -117,6 +117,11 @@ public class FranchiseServiceImpl implements FranchiseService {
         return true;
     }
 
+    @Override
+    public boolean deleteFranchiseById(Long id) {
+        return false;
+    }
+
 
     @Override
     public boolean activateFranchiseById(Long id) {
