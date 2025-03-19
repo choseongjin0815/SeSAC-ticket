@@ -5,6 +5,7 @@ import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,12 @@ public class PartyServiceImpl implements PartyService {
         this.partyRepository = partyRepository;
         this.customerRepository = customerRepository;
         this.modelMapper = modelMapper;
+    }
+
+    private Party getParty(Long id) {
+        Optional<Party> result = partyRepository.findById(id);
+
+        return result.orElseThrow(() -> new EntityNotFoundException("Party with ID " + id + " not found"));
     }
 
     @Override
@@ -58,8 +65,7 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public PartyDto findPartyById(Long id) {
-        Optional<Party> result = partyRepository.findById(id);
-        Party party = result.orElseThrow();
+        Party party = getParty(id);
 
         return PartyDto.builder()
                 .id(party.getId())
@@ -91,8 +97,6 @@ public class PartyServiceImpl implements PartyService {
 
     @Override
     public boolean updateParty(PartyDto partyDto) {
-        Optional<Party> result = partyRepository.findById(partyDto.getId());
-        Party party = result.orElseThrow();
 
         party.setName(partyDto.getName());
         party.setPeriod(partyDto.getPeriod());
@@ -109,6 +113,7 @@ public class PartyServiceImpl implements PartyService {
         party.setSaturday(partyDto.isSaturday());
         party.setMaximumAmount(partyDto.getMaximumAmount());
         party.setMaximumTransaction(partyDto.getMaximumTransaction());
+        Party party = getParty(partyDto.getId());
         partyRepository.save(party);
 
         return true;
