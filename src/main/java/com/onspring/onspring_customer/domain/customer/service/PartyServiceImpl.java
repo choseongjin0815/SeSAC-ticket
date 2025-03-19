@@ -16,11 +16,17 @@ import java.util.Optional;
 @Log4j2
 @Service
 public class PartyServiceImpl implements PartyService {
-    private PartyRepository partyRepository;
-    private CustomerRepository customerRepository;
     private final PartyRepository partyRepository;
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
+
+    @Autowired
+    public PartyServiceImpl(PartyRepository partyRepository, CustomerRepository customerRepository,
+                            ModelMapper modelMapper) {
+        this.partyRepository = partyRepository;
+        this.customerRepository = customerRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @Override
     public Long saveParty(PartyDto partyDto) {
