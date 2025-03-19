@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,9 +60,15 @@ public class TransactionServiceImpl implements TransactionService {
         return modelMapper.map(transaction, TransactionDto.class);
     }
 
+    // 거래된 모든 것들 중 false인 (정산되지 않는 것만) 찾아서 리스트로 보여주기
     @Override
     public List<TransactionDto> findAllTransaction() {
         return List.of();
+        List<Transaction> transactions = transactionRepository.findByIsClosed(false);
+
+        return transactions.stream()
+                .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
+                .collect(Collectors.toList());
     }
 
     /**
