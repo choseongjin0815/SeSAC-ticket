@@ -25,8 +25,6 @@ public class TransactionServiceImpl implements TransactionService {
     // isclosed가 false인 거 찾아서 true로 바꾸는 메소드
     @Override
     public Long saveTransaction(TransactionDto transactionDto) {
-        return 0L;
-    }
 
         // 현재 월의 첫날 00시 00분 00초 000밀리초로 시작 시간 설정.
         LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -50,14 +48,21 @@ public class TransactionServiceImpl implements TransactionService {
         LocalDateTime closedAt = LocalDateTime.now();
         for (Transaction transaction : transactions) {
             transaction.setClosed(true);
+        }
 
+        transactionRepository.saveAll(transactions);
+
+        return Long.valueOf(transactions.size());
+    }
+
+    // 정산되지 않은 리스트 중 선택된 하나의 리스트 정보 띄우기
     @Override
     public TransactionDto findTransactionById(Long id) {
-        return null;
         Transaction transaction = transactionRepository.findByIdAndIsClosedFalse(id)
                 .orElseThrow(() -> new RuntimeException("Open transaction not found with ID: " + id));
 
         return modelMapper.map(transaction, TransactionDto.class);
+
     }
 
     // 거래된 모든 것들 중 false인 (정산되지 않는 것만) 찾아서 리스트로 보여주기
