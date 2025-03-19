@@ -14,7 +14,7 @@ public interface EndUserService {
 
     boolean updateEndUserPasswordById(Long id, String password);
 
-    boolean deleteEndUserById(Long id);
+    boolean activateEndUserById(Long id);
 
-    boolean deleteAllEndUser(List<Long> ids);
+    boolean deactivateEndUserById(Long id);
 }
