@@ -90,6 +90,25 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
+     * 사용자의 결제 내역을 조회
+     * @param userId 사용자의 id
+     * @return 해당하는 TransactionDto의 List 객체
+     */
+    @Override
+    public List<TransactionDto> findTransactionByEndUserId(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("userId는 null일 수 없습니다.");
+        }
+        List<Transaction> transactionList = transactionRepository.findByEndUserIdOrderByTransactionTimeDesc(userId);
+
+        List<TransactionDto> transactionDtoList = transactionList.stream()
+                .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
+                .collect(Collectors.toList());
+
+        return transactionDtoList;
+    }
+
+    /**
      * 특정 가맹점의 해당 월에 대한 정산내역 조회 (이후 페이징등 추가 고려 필요)
      *
      * @param franchiseId     조회할 가맹점의 id
