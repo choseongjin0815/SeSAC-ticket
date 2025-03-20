@@ -22,6 +22,12 @@ public class Franchise extends BaseEntity {
     private Long id;
 
     @NotNull
+    private String userName;
+
+    @NotNull
+    private String password;
+
+    @NotNull
     private String name;
 
     @NotNull
