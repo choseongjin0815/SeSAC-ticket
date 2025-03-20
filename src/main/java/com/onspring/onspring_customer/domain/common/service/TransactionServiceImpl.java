@@ -4,6 +4,10 @@ import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
+import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
+import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
+import com.onspring.onspring_customer.domain.user.entity.EndUser;
+import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -21,11 +25,42 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
+    private final FranchiseRepository franchiseRepository;
+    private final EndUserRepository endUserRepository;
     private final ModelMapper modelMapper;
 
+    /**
+     * 사용자의 결제
+     * @param transactionDto    결제 정보를 담은 transactionDto
+     * @return transaction id
+     */
     @Override
     public Long saveTransaction(TransactionDto transactionDto) {
-        return 0L;
+        log.info("Saving transaction: {}", transactionDto);
+
+        // FranchiseId와 UserId를 통해 가맹점과 사용자 정보를 조회
+        Franchise franchise = franchiseRepository.findById(transactionDto.getFranchiseId())
+                .orElseThrow(() -> new RuntimeException("Franchise not found"));
+
+        EndUser endUser = endUserRepository.findById(transactionDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("EndUser not found"));
+
+        // TransactionDto -> Transaction 엔티티로 변환
+        Transaction transaction = new Transaction();
+        transaction.setFranchise(franchise);
+        transaction.setEndUser(endUser);
+        transaction.setTransactionTime(transactionDto.getTransactionTime());
+        transaction.setAmount(transactionDto.getAmount());
+        transaction.setAccepted(transactionDto.isAccepted());
+        transaction.setClosed(transactionDto.isClosed());
+
+        log.info("Saving transaction: {}", transaction);
+
+        // 트랜잭션 저장
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        // 저장된 트랜잭션 ID 반환
+        return savedTransaction.getId();
     }
 
     @Override
