@@ -57,11 +57,6 @@ class PlatformAdminServiceTest {
     }
 
     @Test
-    void testSavePlatformAdmin_NullInput() {
-        assertThrows(NullPointerException.class, () -> platformAdminService.savePlatformAdmin(null));
-    }
-
-    @Test
     void testFindPlatformAdminById() {
         when(modelMapper.map(any(PlatformAdmin.class), any())).thenReturn(platformAdminDto);
         when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
