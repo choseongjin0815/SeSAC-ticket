@@ -9,6 +9,8 @@ public interface FranchiseService {
 
     FranchiseDto findFranchiseById(Long id);
 
+    List<FranchiseDto> findFranchiseListByUserId(Long userId);
+
     List<FranchiseDto> findAllFranchise();
 
     boolean updateFranchise(Long id, FranchiseDto franchiseDto);
