@@ -11,13 +11,21 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     // 특정 기간 동안의 트랜잭션을 조회하는 JPQL 쿼리
-    @Query("SELECT t FROM Transaction t WHERE t.franchise.id = :franchiseId AND t.transactionTime BETWEEN :startDate AND :endDate ORDER BY t.transactionTime DESC")
+    @Query("SELECT t FROM Transaction t " +
+            "WHERE t.franchise.id = :franchiseId " +
+            "AND t.transactionTime BETWEEN :startDate " +
+            "AND :endDate " +
+            "ORDER BY t.transactionTime DESC")
     List<Transaction> findTransactionsByFranchiseIdAndDateRange(@Param("franchiseId") Long franchiseId,
                                                                 @Param("startDate") LocalDateTime startDate,
                                                                 @Param("endDate") LocalDateTime endDate);
 
     // 특정 period에 맞는 트랜잭션을 조회하는 JPQL 쿼리
-    @Query("SELECT t FROM Transaction t WHERE t.franchise.id = :franchiseId AND t.transactionTime BETWEEN :startDate AND :endDate ORDER BY t.transactionTime DESC")
+    @Query("SELECT t FROM Transaction t " +
+            "WHERE t.franchise.id = :franchiseId " +
+            "AND t.transactionTime BETWEEN :startDate " +
+            "AND :endDate " +
+            "ORDER BY t.transactionTime DESC")
     List<Transaction> findTransactionsByFranchiseIdAndPeriod(@Param("franchiseId") Long franchiseId,
                                                              @Param("startDate") LocalDateTime startDate,
                                                              @Param("endDate") LocalDateTime endDate);
@@ -32,8 +40,14 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT MONTH(t.transactionTime) AS month, YEAR(t.transactionTime) AS year, COUNT(t) AS totalTransactions, SUM(t.amount) AS totalAmount " +
-            "FROM Transaction t WHERE t.isClosed = true AND t.franchise.id = :franchiseId " +
+
+    List<Transaction> findByEndUserIdOrderByTransactionTimeDesc(Long endUserId);
+
+    @Query("SELECT MONTH(t.transactionTime) AS month, YEAR(t.transactionTime) AS year, " +
+            "COUNT(t) AS totalTransactions, SUM(t.amount) AS totalAmount " +
+            "FROM Transaction t " +
+            "WHERE t.isClosed = true " +
+            "AND t.franchise.id = :franchiseId " +
             "GROUP BY YEAR(t.transactionTime), MONTH(t.transactionTime) " +
             "ORDER BY YEAR(t.transactionTime) DESC, MONTH(t.transactionTime) DESC")
     List<Object[]> getMonthlyTransactionSummary(@Param("franchiseId") Long franchiseId);
