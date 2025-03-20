@@ -87,4 +87,32 @@ class PlatformAdminServiceTest {
 
         assertEquals("password1", platformAdmin.getPassword());
     }
+
+    @Test
+    void testActivatePlatformAdminById() {
+        platformAdmin.setActivated(false);
+
+        when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
+
+        boolean result = platformAdminService.activatePlatformAdminById(1L);
+
+        assertTrue(result);
+
+        verify(platformAdminRepository).save(any(PlatformAdmin.class));
+
+        assertTrue(platformAdmin.isActivated());
+    }
+
+    @Test
+    void testDeactivatedPlatformAdminById() {
+        when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
+
+        boolean result = platformAdminService.deactivatePlatformAdminById(1L);
+
+        assertTrue(result);
+
+        verify(platformAdminRepository).save(any(PlatformAdmin.class));
+
+        assertFalse(platformAdmin.isActivated());
+    }
 }
