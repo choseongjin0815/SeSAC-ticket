@@ -148,6 +148,6 @@ public class CustomerServiceImpl implements CustomerService {
 
         log.info("Successfully deactivated customer with ID {}", id);
 
-        return false;
+        return true;
     }
 }
