@@ -29,7 +29,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     // 선택된 미정산 거래 내역(단 한개)가 정산으로 저장됨 isClosed = False -> True => Figma 홈_정산관리_정산확인
     @Override
-    public Long saveTransaction(TransactionDto transactionDto) {
+    public Long saveFalseTransaction(TransactionDto transactionDto) {
         log.info("Saving transaction with ID: {}", transactionDto.getId());
 
         Transaction existingTransaction = transactionRepository.findById(transactionDto.getId())
@@ -54,7 +54,7 @@ public class TransactionServiceImpl implements TransactionService {
     // 선택된 미정산 거래 내역(여러 개)가 정산으로 저장됨 isClosed = False -> True => Figma 홈_정산관리_정산확인
     @Override
     @Transactional
-    public List<Long> saveTransactions(List<Long> transactionIds) {
+    public List<Long> saveFalseTransactions(List<Long> transactionIds) {
         log.info("Processing multiple transactions: {}", transactionIds);
 
         List<Long> processedIds = new ArrayList<>();
