@@ -3,6 +3,7 @@ package com.onspring.onspring_customer.domain.common.service;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -44,6 +45,11 @@ public class TransactionServiceImpl implements TransactionService {
             throw new RuntimeException("No open transactions found for franchise ID: " + franchiseId + " in current month");
         }
 
+    // 선택된 미정산 거래 내역(여러 개)가 정산으로 저장됨 isClosed = False -> True => Figma 홈_정산관리_정산확인
+    @Override
+    @Transactional
+    public List<Long> saveTransactions(List<Long> transactionIds) {
+        log.info("Processing multiple transactions: {}", transactionIds);
 
         LocalDateTime closedAt = LocalDateTime.now();
         for (Transaction transaction : transactions) {
@@ -51,8 +57,38 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         transactionRepository.saveAll(transactions);
+        List<Long> processedIds = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Long id : transactionIds) {
+            try {
+                Transaction transaction = transactionRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + id));
+
+                // 이미 정산 처리된 거래는 건너뜀
+                if (transaction.isClosed()) {
+                    log.warn("Transaction is already closed with ID: {}", id);
+                    continue;
+                }
+
+                // 정산 처리로 상태 변경 (isClosed = true)
+                transaction.setClosed(true);
+
+
+                // 변경된 내용 저장
+                Transaction savedTransaction = transactionRepository.save(transaction);
+                log.info("Transaction successfully closed: {}", savedTransaction.getId());
+
+                processedIds.add(savedTransaction.getId());
+            } catch (Exception e) {
+                log.error("Error processing transaction with ID {}: {}", id, e.getMessage());
+                // 개별 트랜잭션 처리 실패 시에도 나머지 작업은 계속 진행
+            }
+        }
 
         return Long.valueOf(transactions.size());
+        log.info("Successfully closed {} transactions", processedIds.size());
+        return processedIds;
     }
 
     // 정산되지 않은 리스트 중 선택된 하나의 리스트 정보 띄우기

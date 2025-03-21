@@ -8,6 +8,9 @@ import java.util.List;
 public interface TransactionService {
     Long saveTransaction(TransactionDto transactionDto);
 
+    // 미정산 내역 일괄 처리 메소드 추가
+    List<Long> saveTransactions(List<Long> transactionIds);
+
     TransactionDto findTransactionById(Long id);
 
     List<TransactionDto> findAllTransaction();
