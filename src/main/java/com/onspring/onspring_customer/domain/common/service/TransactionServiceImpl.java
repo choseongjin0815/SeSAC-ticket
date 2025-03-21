@@ -107,11 +107,15 @@ public class TransactionServiceImpl implements TransactionService {
         return processedIds;
     }
 
-    // 정산되지 않은 리스트 중 선택된 하나의 리스트 정보 띄우기
     @Override
     public TransactionDto findTransactionById(Long id) {
         Transaction transaction = transactionRepository.findByIdAndIsClosedFalse(id)
                 .orElseThrow(() -> new RuntimeException("Open transaction not found with ID: " + id));
+        return null;
+    }
+
+
+
 
         return modelMapper.map(transaction, TransactionDto.class);
 
