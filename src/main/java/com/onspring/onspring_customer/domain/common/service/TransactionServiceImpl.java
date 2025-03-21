@@ -123,17 +123,14 @@ public class TransactionServiceImpl implements TransactionService {
     public List<TransactionDto> findMonthlySettlementSummary() {
         log.info("Finding monthly settlement summary by franchise");
 
-        return modelMapper.map(transaction, TransactionDto.class);
         // 정산 완료된(isClosed=true) 모든 트랜잭션 조회
         List<Transaction> closedTransactions = transactionRepository.findByIsClosed(true);
 
-    }
         if (closedTransactions.isEmpty()) {
             log.info("No closed transactions found");
             return new ArrayList<>();
         }
 
-    // 거래된 모든 것들 중 false인 (정산되지 않는 것만) 찾아서 리스트로 보여주기
         // 가맹점 ID와 월별로 트랜잭션 그룹화
         Map<String, List<Transaction>> groupedTransactions = closedTransactions.stream()
                 .collect(Collectors.groupingBy(transaction -> {
@@ -205,10 +202,17 @@ public class TransactionServiceImpl implements TransactionService {
         return summaries;
     }
 
+    // 거래내역 중 미정산된 (isClosed = False) 모든 거래 내역 띄우기 => Figma 홈_정산관리_정산
     @Override
     public List<TransactionDto> findAllTransaction() {
         List<Transaction> transactions = transactionRepository.findByIsClosed(false);
 
+        if (transactions.isEmpty()) {
+            log.info("No open transactions found");
+            return new ArrayList<>();
+        }
+
+        // Entity를 DTO로 변환하여 반환
         return transactions.stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
                 .collect(Collectors.toList());
