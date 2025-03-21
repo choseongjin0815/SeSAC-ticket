@@ -13,6 +13,9 @@ public interface TransactionService {
 
     TransactionDto findTransactionById(Long id);
 
+    // 정산처리가 완료된 가맹점별 월별 정리 요약 표시 메소드 추가
+    List<TransactionDto> findMonthlySettlementSummary();
+
     List<TransactionDto> findAllTransaction();
 
     List<TransactionDto> findTransactionByFranchiseId(Long franchiseId,
