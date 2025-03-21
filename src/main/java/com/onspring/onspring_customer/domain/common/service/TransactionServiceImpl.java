@@ -35,32 +35,18 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction existingTransaction = transactionRepository.findById(transactionDto.getId())
                 .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + transactionDto.getId()));
 
-        // 현재 월의 첫날 00시 00분 00초 000밀리초로 시작 시간 설정.
-        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        // 다음 달의 첫날에서 1나노초를 뺀 값으로 끝 시간 설정 (현재 월의 마지막 순간)
-        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusNanos(1);
         // 이미 정산 처리된 거래인지 확인
         if (existingTransaction.isClosed()) {
             throw new RuntimeException("Transaction is already closed with ID: " + transactionDto.getId());
         }
 
-        // 정산 처리할 가맹점 ID를 DTO에서 가져오기
-        Long franchiseId = transactionDto.getId();
         // 정산 처리로 상태 변경 (isClosed = true)
         existingTransaction.setClosed(true);
 
-        // 해당 가맹점의 현재 월에 대한 미정산내역(isClosed=false) 조회
-        List<Transaction> transactions = transactionRepository.findTransactionsByFranchiseIdAndDateRangeAndClosedStatus(
-                franchiseId, startOfMonth, endOfMonth, false
-        );
         // 변경된 내용 저장
         Transaction savedTransaction = transactionRepository.save(existingTransaction);
         log.info("Transaction successfully closed: {}", savedTransaction.getId());
 
-        // 미정산 내역이 없으면 예외
-        if (transactions.isEmpty()) {
-            throw new RuntimeException("No open transactions found for franchise ID: " + franchiseId + " in current month");
-        }
         return savedTransaction.getId();
 
     }
@@ -71,12 +57,6 @@ public class TransactionServiceImpl implements TransactionService {
     public List<Long> saveTransactions(List<Long> transactionIds) {
         log.info("Processing multiple transactions: {}", transactionIds);
 
-        LocalDateTime closedAt = LocalDateTime.now();
-        for (Transaction transaction : transactions) {
-            transaction.setClosed(true);
-        }
-
-        transactionRepository.saveAll(transactions);
         List<Long> processedIds = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
 
@@ -106,7 +86,6 @@ public class TransactionServiceImpl implements TransactionService {
             }
         }
 
-        return Long.valueOf(transactions.size());
         log.info("Successfully closed {} transactions", processedIds.size());
         return processedIds;
     }
