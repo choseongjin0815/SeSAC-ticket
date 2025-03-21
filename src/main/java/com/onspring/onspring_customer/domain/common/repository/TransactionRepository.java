@@ -33,6 +33,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
+    @Query("SELECT MONTH(t.transactionTime) AS month, YEAR(t.transactionTime) AS year, COUNT(t) AS totalTransactions, SUM(t.amount) AS totalAmount " +
+            "FROM Transaction t WHERE t.isClosed = true AND t.franchise.id = :franchiseId " +
+            "GROUP BY YEAR(t.transactionTime), MONTH(t.transactionTime) " +
+            "ORDER BY YEAR(t.transactionTime) DESC, MONTH(t.transactionTime) DESC")
+    List<Object[]> getMonthlyTransactionSummary(@Param("franchiseId") Long franchiseId);
+
 
     List<Transaction> findByIsClosed(boolean closed);
 

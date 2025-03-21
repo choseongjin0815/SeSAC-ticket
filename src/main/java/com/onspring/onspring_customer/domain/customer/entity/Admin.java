@@ -3,8 +3,7 @@ package com.onspring.onspring_customer.domain.customer.entity;
 import com.onspring.onspring_customer.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -25,6 +24,12 @@ public class Admin extends BaseEntity {
     private String userName;
 
     @NotNull
+    private String password;
+
+    @NotNull
     private boolean isSuperAdmin;
+
+    @NotNull
+    private boolean isActivated;
 
 }
