@@ -13,7 +13,7 @@ public interface PartyService {
 
     boolean updateParty(PartyDto partyDto);
 
-    boolean deletePartyById(Long id);
+    boolean activatePartyById(Long id);
 
-    boolean deleteAllParty(List<Long> ids);
+    boolean deactivatePartyById(Long id);
 }

@@ -4,8 +4,7 @@ import com.onspring.onspring_customer.domain.common.entity.BaseEntity;
 import com.onspring.onspring_customer.domain.common.entity.CustomerFranchise;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +13,9 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "customer")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Customer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
