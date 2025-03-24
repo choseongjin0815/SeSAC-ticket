@@ -33,7 +33,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query("SELECT t FROM Transaction t WHERE t.franchise.id = :franchiseId " +
             "AND t.transactionTime BETWEEN :startDate AND :endDate " +
-            "AND t.isClosed = true " +
             "ORDER BY t.transactionTime DESC")
     List<Transaction> findTransactionsByFranchiseIdAndDateRangeAndClosed(
             @Param("franchiseId") Long franchiseId,
