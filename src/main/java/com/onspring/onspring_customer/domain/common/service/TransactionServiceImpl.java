@@ -39,11 +39,13 @@ public class TransactionServiceImpl implements TransactionService {
         log.info("Saving transaction: {}", transactionDto);
 
         // FranchiseId와 UserId를 통해 가맹점과 사용자 정보를 조회
-        Franchise franchise = franchiseRepository.findById(transactionDto.getFranchiseId())
+        Franchise franchise = franchiseRepository.findById(transactionDto.getFranchiseDto().getId())
                 .orElseThrow(() -> new RuntimeException("Franchise not found"));
+        log.info("franchise: " + franchise);
 
-        EndUser endUser = endUserRepository.findById(transactionDto.getUserId())
+        EndUser endUser = endUserRepository.findById(transactionDto.getEndUserDto().getId())
                 .orElseThrow(() -> new RuntimeException("EndUser not found"));
+        log.info("endUser: " + endUser);
 
         // TransactionDto -> Transaction 엔티티로 변환
         Transaction transaction = new Transaction();
@@ -82,14 +84,13 @@ public class TransactionServiceImpl implements TransactionService {
      * @param period        오늘, 최근 1주, 최근 2주, 최근 3주
      * @return  해당 가맹점의 기간 필터링을 적용한 TransactionDto 반환
      */
-    @Override
     public List<TransactionDto> findTransactionByFranchiseId(Long franchiseId, LocalDateTime startDate, LocalDateTime endDate, String period) {
-        // 기간이 주어지면 period를 사용하고, startDate와 endDate는 무시
+        // 제공된 경우 period를 사용하여 날짜 범위 결정
         if (period != null) {
             switch (period) {
                 case "오늘":
-                    startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);  // 오늘의 시작 시점
-                    endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999);  // 오늘의 끝 시점
+                    startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+                    endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999);
                     break;
                 case "최근1주":
                     startDate = LocalDateTime.now().minusWeeks(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -104,21 +105,20 @@ public class TransactionServiceImpl implements TransactionService {
                     endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999);
                     break;
                 default:
-                    throw new IllegalArgumentException("Invalid period value: " + period);
+                    throw new IllegalArgumentException("유효하지 않은 period 값: " + period);
             }
         }
 
-        List<Transaction> transactions;
+        List<Transaction> transactions = null;
 
-        // startDate와 endDate가 모두 주어졌을 때 해당 기간 내의 트랜잭션 조회
+        // 시작 및 종료 날짜가 모두 있는지 확인(period에서 또는 매개변수에서)
         if (startDate != null && endDate != null) {
+            log.info("날짜 범위로 트랜잭션 찾기 - startDate: " + startDate + ", endDate: " + endDate);
             transactions = transactionRepository.findTransactionsByFranchiseIdAndDateRange(franchiseId, startDate, endDate);
-        } else {
-            // period를 사용하여 트랜잭션 조회
-            transactions = transactionRepository.findTransactionsByFranchiseIdAndPeriod(franchiseId, startDate, endDate);
+
         }
 
-        // ModelMapper를 사용하여 List<Transaction>을 List<TransactionDto>로 변환
+        // 결과 변환 및 반환
         return transactions.stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
                 .collect(Collectors.toList());
