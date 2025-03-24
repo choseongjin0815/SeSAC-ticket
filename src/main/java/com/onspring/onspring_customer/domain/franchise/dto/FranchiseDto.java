@@ -1,8 +1,9 @@
 package com.onspring.onspring_customer.domain.franchise.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class FranchiseDto implements Serializable {
     @Size(min = 1)
     String phone;
 
+    @JsonIgnore
     @Builder.Default
     private List<MultipartFile> files = new ArrayList<>();
 
