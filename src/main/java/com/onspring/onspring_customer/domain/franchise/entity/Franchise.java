@@ -28,6 +28,12 @@ public class Franchise extends BaseEntity {
     private String name;
 
     @NotNull
+    private String ownerName;
+
+    @NotNull
+    private String businessNumber;
+
+    @NotNull
     @Column(unique = true)
     private String address;
 
