@@ -149,16 +149,13 @@ public class TransactionServiceImpl implements TransactionService {
      * @param franchiseId     조회할 가맹점의 id
      * @param month           정산 월
      * @param period          오늘, 최근1주, 최근2주, 최근3주 등
-     * @param customStartDate 조회 시작일
-     * @param customEndDate   조회 종료일
+     * @param startDate 조회 시작일
+     * @param endDate   조회 종료일
 
      * @return  해당 가맹점의 기간 필터링을 적용한 TransactionDto 반환
      */
     @Override
-    public List<TransactionDto> findSettlementByFranchiseId(Long franchiseId, String month, String period, String customStartDate, String customEndDate) {
-        // 기간을 처리하기 위한 startDate, endDate 선언
-        LocalDateTime startDate = null;
-        LocalDateTime endDate = null;
+    public List<TransactionDto> findSettlementByFranchiseId(Long franchiseId, String month, String period, LocalDateTime startDate, LocalDateTime endDate) {
 
         // period가 주어졌을 경우 해당 기간에 맞는 startDate와 endDate 계산
         if (period != null) {
@@ -184,16 +181,16 @@ public class TransactionServiceImpl implements TransactionService {
             }
         } else if (month != null) {
             // 월이 주어졌을 경우 해당 월의 startDate와 endDate 계산
-            if (!month.matches("\\d{4}-\\d{2}")) {
+            if (!month.matches("\\d{4}.\\d{2}")) {
                 throw new IllegalArgumentException("Invalid month format. Use 'YYYY-MM' format.");
             }
             startDate = LocalDateTime.parse(month + "-01T00:00:00");  // 해당 월의 첫 번째 날짜 (00:00:00)
             endDate = startDate.plusMonths(1).minusNanos(1);  // 해당 월의 마지막 날짜 (23:59:59.999999999)
-        } else if (customStartDate != null && customEndDate != null) {
-            // customStartDate와 customEndDate가 주어졌을 경우
+        } else if (startDate != null && endDate != null) {
+            // startDate와 endDate가 주어졌을 경우
             try {
-                startDate = LocalDateTime.parse(customStartDate + "T00:00:00");
-                endDate = LocalDateTime.parse(customEndDate + "T23:59:59.999999999");
+                startDate = LocalDateTime.parse(startDate + "T00:00:00");
+                endDate = LocalDateTime.parse(endDate + "T23:59:59.999999999");
             } catch (DateTimeParseException e) {
                 throw new IllegalArgumentException("Invalid date format. Use 'YYYY-MM-DD' format for start and end date.");
             }

@@ -22,8 +22,8 @@ public interface TransactionService {
     List<TransactionDto> findSettlementByFranchiseId(Long franchiseId,
                                                      String month,
                                                      String period,
-                                                     String customStartDate,
-                                                     String customEndDate);
+                                                     LocalDateTime startDate,
+                                                     LocalDateTime endDate);
 
     List<SettlmentSummaryDto> getMonthlySettlementSummaries(Long franchiseId);
 
