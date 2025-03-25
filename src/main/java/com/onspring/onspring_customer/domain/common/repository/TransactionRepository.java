@@ -15,7 +15,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "WHERE t.franchise.id = :franchiseId " +
             "AND t.transactionTime BETWEEN :startDate " +
             "AND :endDate " +
-            "ORDER BY t.transactionTime DESC")
+            "ORDER BY t.id DESC")
     List<Transaction> findTransactionsByFranchiseIdAndDateRange(@Param("franchiseId") Long franchiseId,
                                                                 @Param("startDate") LocalDateTime startDate,
                                                                 @Param("endDate") LocalDateTime endDate);
@@ -25,7 +25,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "WHERE t.franchise.id = :franchiseId " +
             "AND t.transactionTime BETWEEN :startDate " +
             "AND :endDate " +
-            "ORDER BY t.transactionTime DESC")
+            "ORDER BY t.id DESC")
     List<Transaction> findTransactionsByFranchiseIdAndPeriod(@Param("franchiseId") Long franchiseId,
                                                              @Param("startDate") LocalDateTime startDate,
                                                              @Param("endDate") LocalDateTime endDate);
@@ -33,7 +33,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query("SELECT t FROM Transaction t WHERE t.franchise.id = :franchiseId " +
             "AND t.transactionTime BETWEEN :startDate AND :endDate " +
-            "ORDER BY t.transactionTime DESC")
+            "ORDER BY t.id DESC")
     List<Transaction> findTransactionsByFranchiseIdAndDateRangeAndClosed(
             @Param("franchiseId") Long franchiseId,
             @Param("startDate") LocalDateTime startDate,
