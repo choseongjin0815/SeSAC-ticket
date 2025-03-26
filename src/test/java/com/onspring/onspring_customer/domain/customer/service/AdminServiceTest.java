@@ -3,7 +3,11 @@ package com.onspring.onspring_customer.domain.customer.service;
 import com.onspring.onspring_customer.domain.customer.dto.AdminDto;
 import com.onspring.onspring_customer.domain.customer.entity.Admin;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
+import com.onspring.onspring_customer.domain.customer.entity.QAdmin;
 import com.onspring.onspring_customer.domain.customer.repository.AdminRepository;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,6 +35,12 @@ class AdminServiceTest {
 
     @Mock
     private ModelMapper modelMapper;
+
+    @Mock
+    private JPAQueryFactory queryFactory;
+
+    @Mock
+    private JPAQuery<Admin> query;
 
     @InjectMocks
     private AdminServiceImpl adminService;
@@ -77,6 +92,34 @@ class AdminServiceTest {
         when(adminRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> adminService.findAdminById(1L));
+    }
+
+    @Test
+    void testFindAllAdminByQuery() {
+        Long customerId = 1L;
+        String userName = "admin";
+        boolean isActivated = true;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        List<Admin> admins = Collections.singletonList(admin);
+
+        when(queryFactory.selectFrom(QAdmin.admin)).thenReturn(query);
+        when(query.where(any(Predicate.class))).thenReturn(query);
+        when(query.offset(anyLong())).thenReturn(query);
+        when(query.limit(anyLong())).thenReturn(query);
+        when(query.fetch()).thenReturn(admins);
+
+        when(modelMapper.map(admin, AdminDto.class)).thenReturn(adminDto);
+
+        Page<AdminDto> result = adminService.findAllAdminByQuery(customerId, userName, isActivated, pageable);
+
+        assertEquals(1, result.getTotalElements());
+        assertEquals(adminDto, result.getContent()
+                .get(0));
+        verify(queryFactory).selectFrom(QAdmin.admin);
+        verify(query).where(QAdmin.admin.customer.id.eq(customerId));
+        verify(query).where(QAdmin.admin.userName.containsIgnoreCase(userName));
+        verify(query).where(QAdmin.admin.isActivated.eq(isActivated));
     }
 
     @Test
