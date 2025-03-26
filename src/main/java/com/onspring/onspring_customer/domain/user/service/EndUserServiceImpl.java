@@ -25,6 +25,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -152,6 +154,25 @@ public class EndUserServiceImpl implements EndUserService {
         endUserRepository.save(endUser);
 
         log.info("Successfully updated password for end user with ID {}", id);
+
+        return true;
+    }
+
+    @Override
+    public boolean assignPointToEndUserById(Long endUserId, Long partyId, BigDecimal amount, LocalDateTime validThru) {
+        log.info("Assigning point to end user with ID {} associated with party ID {}", endUserId, partyId);
+
+        EndUser endUser = getEndUser(endUserId);
+        Party party = getParty(partyId);
+
+        pointRepository.save(Point.builder()
+                .party(party)
+                .endUser(endUser)
+                .amount(amount)
+                .validThru(validThru)
+                .build());
+
+        log.info("Successfully assigned point to end user with ID {} associated with party ID {}", endUserId, partyId);
 
         return true;
     }
