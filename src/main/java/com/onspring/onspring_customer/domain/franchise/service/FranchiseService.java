@@ -16,4 +16,7 @@ public interface FranchiseService {
     boolean activateFranchiseById(Long id);
 
     boolean deactivateFranchiseById(Long id);
+    boolean updateMenuImage(FranchiseDto franchiseDto);
+
+    boolean deleteFranchiseById(Long id);
 }

@@ -53,7 +53,9 @@ public class FranchiseServiceImpl implements FranchiseService {
 
         log.info(franchise.getId());
 
-        return modelMapper.map(franchise, FranchiseDto.class);
+        FranchiseDto franchiseDto = franchise.entityToDto();
+
+        return franchiseDto;
     }
 
     @Override
@@ -90,6 +92,36 @@ public class FranchiseServiceImpl implements FranchiseService {
 
         return true;
     }
+
+    /**
+     * 프랜차이즈의 메뉴 이미지를 수정
+     *
+     * @param franchiseDto 프랜차이즈의 메뉴 이미지를 담은 dto객체
+     * @return 업데이트 성공 여부를 담은 boolean 객체
+     */
+    @Override
+    public boolean updateMenuImage(FranchiseDto franchiseDto) {
+        Franchise franchise = franchiseRepository.findById(franchiseDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("ID" + franchiseDto.getId() + "에 해당하는 프랜차이즈를 찾을 수 없습니다."));
+
+        //업로드 된 파일을 우선 지움
+        franchise.clearList();
+
+        List<String> uploadFileNames = franchiseDto.getUploadFileNames();
+
+        if (uploadFileNames != null && !uploadFileNames.isEmpty()) {
+            uploadFileNames.forEach(franchise::addImageString);
+        }
+        franchiseRepository.save(franchise);
+
+        return true;
+    }
+
+    @Override
+    public boolean deleteFranchiseById(Long id) {
+        return false;
+    }
+
 
     @Override
     public boolean activateFranchiseById(Long id) {
