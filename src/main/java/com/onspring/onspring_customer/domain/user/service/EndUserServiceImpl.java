@@ -6,10 +6,14 @@ import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.entity.QParty;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
+import com.onspring.onspring_customer.domain.user.dto.PointDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.entity.Point;
 import com.onspring.onspring_customer.domain.user.entity.QEndUser;
+import com.onspring.onspring_customer.domain.user.entity.QPoint;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
+import com.onspring.onspring_customer.domain.user.repository.PointRepository;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,16 +34,18 @@ public class EndUserServiceImpl implements EndUserService {
     private final EndUserRepository endUserRepository;
     private final PartyRepository partyRepository;
     private final PartyEndUserRepository partyEndUserRepository;
+    private final PointRepository pointRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
 
     @Autowired
     public EndUserServiceImpl(EndUserRepository endUserRepository, PartyRepository partyRepository,
-                              PartyEndUserRepository partyEndUserRepository, ModelMapper modelMapper) {
+                              PartyEndUserRepository partyEndUserRepository, PointRepository pointRepository,
                               ModelMapper modelMapper, JPAQueryFactory queryFactory) {
         this.endUserRepository = endUserRepository;
         this.partyRepository = partyRepository;
         this.partyEndUserRepository = partyEndUserRepository;
+        this.pointRepository = pointRepository;
         this.modelMapper = modelMapper;
         this.queryFactory = queryFactory;
     }
@@ -128,6 +134,12 @@ public class EndUserServiceImpl implements EndUserService {
                 .toList();
 
         return new PageImpl<>(endUserDtoList, pageable, endUserDtoList.size());
+    }
+
+    @Override
+    public Page<PointDto> findPointByEndUserId(Long id, Pageable pageable) {
+        return pointRepository.findByEndUser_Id(id, pageable)
+                .map(element -> modelMapper.map(element, PointDto.class));
     }
 
     @Override

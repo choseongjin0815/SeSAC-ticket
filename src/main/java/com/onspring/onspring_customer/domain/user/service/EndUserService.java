@@ -1,6 +1,7 @@
 package com.onspring.onspring_customer.domain.user.service;
 
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
+import com.onspring.onspring_customer.domain.user.dto.PointDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,6 +16,8 @@ public interface EndUserService {
 
     Page<EndUserDto> findAllEndUserByQuery(String name, String partyName, String phone, boolean isActivated,
                                            Pageable pageable);
+
+    Page<PointDto> findPointByEndUserId(Long id, Pageable pageable);
 
     boolean updateEndUserPasswordById(Long id, String password);
 
