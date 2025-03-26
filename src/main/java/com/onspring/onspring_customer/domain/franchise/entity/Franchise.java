@@ -35,6 +35,12 @@ public class Franchise extends BaseEntity {
     private String name;
 
     @NotNull
+    private String ownerName;
+
+    @NotNull
+    private String businessNumber;
+
+    @NotNull
     @Column(unique = true)
     private String address;
 
@@ -75,6 +81,8 @@ public class Franchise extends BaseEntity {
                 .name(this.name)
                 .address(this.address)
                 .phone(this.phone)
+                .businessNumber(this.businessNumber)
+                .ownerName(this.ownerName)
                 .build();
 
         // 이미지 파일 리스트 변환

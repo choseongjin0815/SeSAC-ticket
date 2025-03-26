@@ -4,6 +4,10 @@ import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
+import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
+import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
+import com.onspring.onspring_customer.domain.user.entity.EndUser;
+import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -21,11 +25,44 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
+    private final FranchiseRepository franchiseRepository;
+    private final EndUserRepository endUserRepository;
     private final ModelMapper modelMapper;
 
+    /**
+     * 사용자의 결제
+     * @param transactionDto    결제 정보를 담은 transactionDto
+     * @return transaction id
+     */
     @Override
     public Long saveTransaction(TransactionDto transactionDto) {
-        return 0L;
+        log.info("Saving transaction: {}", transactionDto);
+
+        // FranchiseId와 UserId를 통해 가맹점과 사용자 정보를 조회
+        Franchise franchise = franchiseRepository.findById(transactionDto.getFranchiseDto().getId())
+                .orElseThrow(() -> new RuntimeException("Franchise not found"));
+        log.info("franchise: " + franchise);
+
+        EndUser endUser = endUserRepository.findById(transactionDto.getEndUserDto().getId())
+                .orElseThrow(() -> new RuntimeException("EndUser not found"));
+        log.info("endUser: " + endUser);
+
+        // TransactionDto -> Transaction 엔티티로 변환
+        Transaction transaction = new Transaction();
+        transaction.setFranchise(franchise);
+        transaction.setEndUser(endUser);
+        transaction.setTransactionTime(transactionDto.getTransactionTime());
+        transaction.setAmount(transactionDto.getAmount());
+        transaction.setAccepted(transactionDto.isAccepted());
+        transaction.setClosed(transactionDto.isClosed());
+
+        log.info("Saving transaction: {}", transaction);
+
+        // 트랜잭션 저장
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        // 저장된 트랜잭션 ID 반환
+        return savedTransaction.getId();
     }
 
     @Override
@@ -47,14 +84,13 @@ public class TransactionServiceImpl implements TransactionService {
      * @param period        오늘, 최근 1주, 최근 2주, 최근 3주
      * @return  해당 가맹점의 기간 필터링을 적용한 TransactionDto 반환
      */
-    @Override
     public List<TransactionDto> findTransactionByFranchiseId(Long franchiseId, LocalDateTime startDate, LocalDateTime endDate, String period) {
-        // 기간이 주어지면 period를 사용하고, startDate와 endDate는 무시
+        // 제공된 경우 period를 사용하여 날짜 범위 결정
         if (period != null) {
             switch (period) {
                 case "오늘":
-                    startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);  // 오늘의 시작 시점
-                    endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999);  // 오늘의 끝 시점
+                    startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+                    endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999);
                     break;
                 case "최근1주":
                     startDate = LocalDateTime.now().minusWeeks(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -69,24 +105,42 @@ public class TransactionServiceImpl implements TransactionService {
                     endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999);
                     break;
                 default:
-                    throw new IllegalArgumentException("Invalid period value: " + period);
+                    throw new IllegalArgumentException("유효하지 않은 period 값: " + period);
             }
         }
 
-        List<Transaction> transactions;
+        List<Transaction> transactions = null;
 
-        // startDate와 endDate가 모두 주어졌을 때 해당 기간 내의 트랜잭션 조회
+        // 시작 및 종료 날짜가 모두 있는지 확인(period에서 또는 매개변수에서)
         if (startDate != null && endDate != null) {
+            log.info("날짜 범위로 트랜잭션 찾기 - startDate: " + startDate + ", endDate: " + endDate);
             transactions = transactionRepository.findTransactionsByFranchiseIdAndDateRange(franchiseId, startDate, endDate);
-        } else {
-            // period를 사용하여 트랜잭션 조회
-            transactions = transactionRepository.findTransactionsByFranchiseIdAndPeriod(franchiseId, startDate, endDate);
+
         }
 
-        // ModelMapper를 사용하여 List<Transaction>을 List<TransactionDto>로 변환
+        // 결과 변환 및 반환
         return transactions.stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 사용자의 결제 내역을 조회
+     * @param userId 사용자의 id
+     * @return 해당하는 TransactionDto의 List 객체
+     */
+    @Override
+    public List<TransactionDto> findTransactionByEndUserId(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("userId는 null일 수 없습니다.");
+        }
+        List<Transaction> transactionList = transactionRepository.findByEndUserIdOrderByTransactionTimeDesc(userId);
+
+        List<TransactionDto> transactionDtoList = transactionList.stream()
+                .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
+                .collect(Collectors.toList());
+
+        return transactionDtoList;
     }
 
     /**
@@ -95,16 +149,13 @@ public class TransactionServiceImpl implements TransactionService {
      * @param franchiseId     조회할 가맹점의 id
      * @param month           정산 월
      * @param period          오늘, 최근1주, 최근2주, 최근3주 등
-     * @param customStartDate 조회 시작일
-     * @param customEndDate   조회 종료일
+     * @param startDate 조회 시작일
+     * @param endDate   조회 종료일
 
      * @return  해당 가맹점의 기간 필터링을 적용한 TransactionDto 반환
      */
     @Override
-    public List<TransactionDto> findSettlementByFranchiseId(Long franchiseId, String month, String period, String customStartDate, String customEndDate) {
-        // 기간을 처리하기 위한 startDate, endDate 선언
-        LocalDateTime startDate = null;
-        LocalDateTime endDate = null;
+    public List<TransactionDto> findSettlementByFranchiseId(Long franchiseId, String month, String period, LocalDateTime startDate, LocalDateTime endDate) {
 
         // period가 주어졌을 경우 해당 기간에 맞는 startDate와 endDate 계산
         if (period != null) {
@@ -130,16 +181,16 @@ public class TransactionServiceImpl implements TransactionService {
             }
         } else if (month != null) {
             // 월이 주어졌을 경우 해당 월의 startDate와 endDate 계산
-            if (!month.matches("\\d{4}-\\d{2}")) {
+            if (!month.matches("\\d{4}.\\d{2}")) {
                 throw new IllegalArgumentException("Invalid month format. Use 'YYYY-MM' format.");
             }
             startDate = LocalDateTime.parse(month + "-01T00:00:00");  // 해당 월의 첫 번째 날짜 (00:00:00)
             endDate = startDate.plusMonths(1).minusNanos(1);  // 해당 월의 마지막 날짜 (23:59:59.999999999)
-        } else if (customStartDate != null && customEndDate != null) {
-            // customStartDate와 customEndDate가 주어졌을 경우
+        } else if (startDate != null && endDate != null) {
+            // startDate와 endDate가 주어졌을 경우
             try {
-                startDate = LocalDateTime.parse(customStartDate + "T00:00:00");
-                endDate = LocalDateTime.parse(customEndDate + "T23:59:59.999999999");
+                startDate = LocalDateTime.parse(startDate + "T00:00:00");
+                endDate = LocalDateTime.parse(endDate + "T23:59:59.999999999");
             } catch (DateTimeParseException e) {
                 throw new IllegalArgumentException("Invalid date format. Use 'YYYY-MM-DD' format for start and end date.");
             }

@@ -1,5 +1,6 @@
 package com.onspring.onspring_customer.domain.user.service;
 
+
 import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
 import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
@@ -15,17 +16,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-
 import java.math.BigDecimal;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+
 class EndUserServiceTest {
+
     @Mock
     private EndUserRepository endUserRepository;
 
@@ -45,7 +46,7 @@ class EndUserServiceTest {
     private EndUser endUser;
     private Party party;
     private PartyEndUser partyEndUser;
-
+  
     @BeforeEach
     void setUp() {
         party = Party.builder()
@@ -83,6 +84,7 @@ class EndUserServiceTest {
 
     @Test
     void testFindEndUserById() {
+
         when(endUserRepository.findById(1L)).thenReturn(Optional.of(endUser));
         when(modelMapper.map(any(EndUser.class), any())).thenReturn(endUserDto);
 
@@ -139,3 +141,4 @@ class EndUserServiceTest {
         assertFalse(endUser.isActivated());
     }
 }
+
