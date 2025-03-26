@@ -22,6 +22,7 @@ public class Franchise extends BaseEntity {
     private Long id;
 
     @NotNull
+    @Column(unique = true)
     private String userName;
 
     @NotNull
