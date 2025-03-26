@@ -39,14 +39,17 @@ public class EndUserServiceImpl implements EndUserService {
         return result.orElseThrow(() -> new EntityNotFoundException("EndUser with ID " + id + " not found"));
     }
 
+    private Party getParty(Long id) {
+        return partyRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Party with ID " + id + " not found"));
+    }
+
     @Override
     public Long saveEndUser(EndUserDto endUserDto) {
         log.info("Saving end user with name {} associated with party ID {}", endUserDto.getName(),
                 endUserDto.getPartyId());
 
-        Party party = partyRepository.findById(endUserDto.getPartyId())
-                .orElseThrow(() -> new EntityNotFoundException("Party with ID " + endUserDto.getPartyId() + " not" +
-                        " found"));
+        Party party = getParty(endUserDto.getPartyId());
 
         EndUser endUser = modelMapper.map(endUserDto, EndUser.class);
 
