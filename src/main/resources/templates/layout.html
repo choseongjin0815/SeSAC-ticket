@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SeSAC 관리자 페이지</title>
   <title th:replace="${title}">SeSAC 관리자 페이지</title>
 
   <!-- Google Fonts - Noto Sans KR -->
@@ -160,6 +159,83 @@
     .logout-icon {
       margin-bottom: 5px;
     }
+
+    /* 회원 추가 폼 스타일 */
+    .content-container {
+      padding: 20px;
+    }
+
+    .page-path {
+      margin-bottom: 20px;
+      font-size: 14px;
+
+    }
+
+    .path-item {
+      color: #555;
+    }
+
+    .path-item.current {
+      color: #4CAF50;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .path-separator {
+      margin: 0 8px;
+      color: #ccc;
+    }
+
+    .form-container {
+      padding-top:10px;
+      padding-bottom: 10px;
+      border-top: 1px solid #4CAF50;
+      border-bottom: 1px solid #4CAF50;
+
+    }
+
+    .form-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .form-table th {
+      width: 120px;
+      text-align: left;
+      padding: 12px 10px;
+      vertical-align: top;
+    }
+
+    .form-table td {
+      padding: 8px 10px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .btn-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .submit-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .submit-btn:hover {
+      background-color: #45a049;
+    }
   </style>
 </head>
 
@@ -177,37 +253,82 @@
   <!-- 메뉴 영역 -->
   <div class="menu-container">
     <a href="#" class="menu-item">
+    <!-- 회원 관리 메뉴 -->
+    <div id="member-menu" class="menu-item" onclick="toggleSubmenu('member-menu', 'member-submenu')">
       <span>회원 관리</span>
       <span class="arrow">›</span>
     </a>
     <a href="#" class="menu-item">
+    </div>
+    <div id="member-submenu" class="submenu">
+      <a href="/members/add" class="submenu-item">회원 추가</a>
+      <a href="#" class="submenu-item">회원 관리</a>
+      <a href="#" class="submenu-item">회원 활성화</a>
+    </div>
+
+    <!-- 포인트 관리 메뉴 -->
+    <div id="point-menu" class="menu-item" onclick="toggleSubmenu('point-menu', 'point-submenu')">
       <span>포인트 관리</span>
       <span class="arrow">›</span>
     </a>
     <a href="#" class="menu-item">
+    </div>
+    <div id="point-submenu" class="submenu">
+      <a href="#" class="submenu-item">포인트 지급</a>
+      <a href="#" class="submenu-item">포인트 수정</a>
+    </div>
+
+    <!-- 그룹 관리 메뉴 -->
+    <div id="party-menu" class="menu-item" onclick="toggleSubmenu('party-menu', 'party-submenu')">
       <span>그룹 관리</span>
       <span class="arrow">›</span>
     </a>
     <a href="#" class="menu-item">
+    </div>
+    <div id="party-submenu" class="submenu">
+      <a href="#" class="submenu-item">그룹 생성</a>
+      <a href="#" class="submenu-item">그룹 관리</a>
+      <a href="#" class="submenu-item">그룹 회원 관리</a>
+    </div>
+
+    <!-- 가맹점 관리 메뉴 -->
+    <div id="franchise-menu" class="menu-item" onclick="toggleSubmenu('franchise-menu', 'franchise-submenu')">
       <span>가맹점 관리</span>
       <span class="arrow">›</span>
     </a>
     <a href="#" class="menu-item">
+    </div>
+    <div id="franchise-submenu" class="submenu">
+      <a href="#" class="submenu-item">가맹점 추가</a>
+      <a href="#" class="submenu-item">가맹점 관리</a>
+      <a href="#" class="submenu-item">가맹점 활성화</a>
+    </div>
+
+    <!-- 거래 관리 메뉴 -->
+    <div id="transaction-menu" class="menu-item" onclick="toggleSubmenu('transaction-menu', 'transaction-submenu')">
       <span>거래 관리</span>
       <span class="arrow">›</span>
     </a>
     <a href="#" class="menu-item">
+    </div>
+    <div id="transaction-submenu" class="submenu">
+      <a href="#" class="submenu-item">가맹점 조회</a>
+      <a href="#" class="submenu-item">그룹 조회</a>
+      <a href="#" class="submenu-item">회원 조회</a>
+    </div>
+
+    <!-- 정산 관리 메뉴 -->
+    <div id="settlement-menu" class="menu-item" onclick="toggleSubmenu('settlement-menu', 'settlement-submenu')">
       <span>정산 관리</span>
       <span class="arrow">›</span>
     </a>
+    </div>
+    <div id="settlement-submenu" class="submenu">
+      <a href="#" class="submenu-item">정산</a>
+      <a href="#" class="submenu-item">정산 관리</a>
+    </div>
   </div>
 
-  <!-- 비밀번호 변경 영역 -->
-  <a href="#" class="menu-item">
-    <span>비밀번호 변경</span>
-    <span class="arrow">›</span>
-  </a>
-</div>
     <!-- 비밀번호 변경 영역 -->
     <a href="#" class="menu-item">
       <span>비밀번호 변경</span>
@@ -249,5 +370,57 @@
     </div>
   </div>
 </div>
+
+<!-- JavaScript -->
+<script>
+  // 메뉴를 토글하는 함수
+  function toggleSubmenu(menuId, submenuId) {
+    // 토글할 서브메뉴 요소 가져오기
+    const submenu = document.getElementById(submenuId);
+
+    // 메뉴 아이템 요소 가져오기
+    const menuItem = document.getElementById(menuId);
+
+    // 다른 모든 서브메뉴 닫기
+    const allSubmenus = document.querySelectorAll('.submenu');
+    const allMenuItems = document.querySelectorAll('.menu-item');
+
+    allSubmenus.forEach(item => {
+      if (item.id !== submenuId) {
+        item.classList.remove('open');
+      }
+    });
+
+    allMenuItems.forEach(item => {
+      if (item.id !== menuId) {
+        item.classList.remove('active');
+      }
+    });
+
+    // 서브메뉴 표시 상태 토글
+    if (submenu.classList.contains('open')) {
+      // 이미 열려있으면 닫기
+      submenu.classList.remove('open');
+      menuItem.classList.remove('active');
+    } else {
+      // 닫혀있으면 열기
+      submenu.classList.add('open');
+      menuItem.classList.add('active');
+    }
+  }
+  // activeMenu 파라미터를 활용하여 현재 메뉴 활성화
+  document.addEventListener('DOMContentLoaded', function() {
+    const activeMenu = "[[${activeMenu}]]";
+    if (activeMenu) {
+      if (activeMenu === 'member-add') {
+        const memberMenu = document.getElementById('member-menu');
+        const memberSubmenu = document.getElementById('member-submenu');
+        memberMenu.classList.add('active');
+        memberSubmenu.classList.add('open');
+      }
+      // 다른 메뉴도 필요하면 여기에 추가
+    }
+  });
+</script>
 </body>
 </html>
