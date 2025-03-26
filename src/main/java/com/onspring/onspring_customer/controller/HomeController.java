@@ -12,4 +12,11 @@ public class HomeController {
         model.addAttribute("userName", "홍길동");
         return "layout";
     }
+
+    @GetMapping("/members/add")
+    public String addMember(Model model) {
+
+        return "members/add";
+    }
+
 }
