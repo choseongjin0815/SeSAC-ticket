@@ -1,6 +1,5 @@
 package com.onspring.onspring_customer.domain.user.service;
 
-
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.user.dto.PointResponseDto;
 import com.onspring.onspring_customer.domain.user.entity.Point;
@@ -10,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,5 +59,23 @@ public class PointServiceImpl implements PointService {
                     );
                 })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 결제 시 사용자의 포인트에서 금액만킄 차감
+     * @param pointId 해당 포인트의 Id
+     * @param amount  차감할 포인트
+     * @return 성공여부
+     */
+    @Override
+    public boolean usePointOnPayment(Long pointId, BigDecimal amount) {
+        if (pointId == null) {
+            throw new IllegalArgumentException("pointId cannot be null");
+        }
+        Point point = pointRepository.findById(pointId).orElse(null);
+
+        point.setAmount(point.getAmount().subtract(amount));
+
+        return true;
     }
 }
