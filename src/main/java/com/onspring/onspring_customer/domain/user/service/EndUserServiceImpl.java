@@ -103,7 +103,7 @@ public class EndUserServiceImpl implements EndUserService {
 
         endUserRepository.save(endUser);
 
-        log.info("Successfully updated admin with ID {}", id);
+        log.info("Successfully activated end user with ID {}", id);
 
         return true;
     }
