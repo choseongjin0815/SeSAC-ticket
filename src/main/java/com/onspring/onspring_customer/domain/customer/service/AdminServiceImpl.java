@@ -2,11 +2,17 @@ package com.onspring.onspring_customer.domain.customer.service;
 
 import com.onspring.onspring_customer.domain.customer.dto.AdminDto;
 import com.onspring.onspring_customer.domain.customer.entity.Admin;
+import com.onspring.onspring_customer.domain.customer.entity.QAdmin;
 import com.onspring.onspring_customer.domain.customer.repository.AdminRepository;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +23,13 @@ import java.util.Optional;
 public class AdminServiceImpl implements AdminService {
     private final AdminRepository adminRepository;
     private final ModelMapper modelMapper;
+    private final JPAQueryFactory queryFactory;
 
     @Autowired
-    public AdminServiceImpl(AdminRepository adminRepository, ModelMapper modelMapper) {
+    public AdminServiceImpl(AdminRepository adminRepository, ModelMapper modelMapper, JPAQueryFactory queryFactory) {
         this.adminRepository = adminRepository;
         this.modelMapper = modelMapper;
+        this.queryFactory = queryFactory;
     }
 
     private Admin getAdmin(Long id) {
@@ -56,6 +64,32 @@ public class AdminServiceImpl implements AdminService {
                 .stream()
                 .map(element -> modelMapper.map(element, AdminDto.class))
                 .toList();
+    }
+
+    @Override
+    public Page<AdminDto> findAllAdminByQuery(Long customerId, String userName, boolean isActivated,
+                                              Pageable pageable) {
+        QAdmin admin = QAdmin.admin;
+        JPAQuery<Admin> query = queryFactory.selectFrom(admin);
+
+        query.where(admin.customer.id.eq(customerId));
+
+        if (userName != null) {
+            query.where(admin.userName.containsIgnoreCase(userName));
+        }
+
+        query.where(admin.isActivated.eq(isActivated));
+
+        query.offset(pageable.getOffset());
+        query.limit(pageable.getPageSize());
+
+        List<Admin> adminList = query.fetch();
+
+        List<AdminDto> adminDtoList = adminList.stream()
+                .map(element -> modelMapper.map(element, AdminDto.class))
+                .toList();
+
+        return new PageImpl<>(adminDtoList, pageable, adminDtoList.size());
     }
 
     @Override

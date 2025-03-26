@@ -1,5 +1,6 @@
 package com.onspring.onspring_customer.domain.common.entity;
 
+import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import jakarta.persistence.*;
@@ -25,6 +26,10 @@ public class Transaction extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "franchise_id")
     private Franchise franchise;
+
+    @ManyToOne
+    @JoinColumn(name = "party_id")
+    private Party party;
 
     @ManyToOne
     @JoinColumn(name = "end_user_id")
