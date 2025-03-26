@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
@@ -50,4 +51,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "GROUP BY YEAR(t.transactionTime), MONTH(t.transactionTime) " +
             "ORDER BY YEAR(t.transactionTime) DESC, MONTH(t.transactionTime) DESC")
     List<Object[]> getMonthlyTransactionSummary(@Param("franchiseId") Long franchiseId);
+
+
+    List<Transaction> findByIsClosed(boolean closed);
+
 }

@@ -7,9 +7,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionService {
-    Long saveTransaction(TransactionDto transactionDto);
+    Long saveFalseTransaction(TransactionDto transactionDto);
+
+    // 미정산 내역 일괄 처리 메소드 추가
+    List<Long> saveFalseTransactions(List<Long> transactionIds);
 
     TransactionDto findTransactionById(Long id);
+
+    // 정산처리가 완료된 가맹점별 월별 정리 요약 표시 메소드 추가
+    List<TransactionDto> findMonthlySettlementSummary();
 
     List<TransactionDto> findAllTransaction();
 
