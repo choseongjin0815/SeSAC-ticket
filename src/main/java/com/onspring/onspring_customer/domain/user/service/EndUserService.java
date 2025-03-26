@@ -21,6 +21,8 @@ public interface EndUserService {
 
     Page<PointDto> findPointByEndUserId(Long id, Pageable pageable);
 
+    PointDto findAvailablePointByEndUserIdAndPartyId(Long endUserId, Long partyId);
+
     boolean updateEndUserPasswordById(Long id, String password);
 
     boolean assignPointToEndUserById(Long endUserId, Long partyId, BigDecimal amount, LocalDateTime validThru);

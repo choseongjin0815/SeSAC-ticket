@@ -1,6 +1,7 @@
 package com.onspring.onspring_customer.domain.user.service;
 
 import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
+import com.onspring.onspring_customer.domain.common.entity.QTransaction;
 import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.entity.QParty;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
@@ -142,6 +144,48 @@ public class EndUserServiceImpl implements EndUserService {
     public Page<PointDto> findPointByEndUserId(Long id, Pageable pageable) {
         return pointRepository.findByEndUser_Id(id, pageable)
                 .map(element -> modelMapper.map(element, PointDto.class));
+    }
+
+    @Override
+    public PointDto findAvailablePointByEndUserIdAndPartyId(Long endUserId, Long partyId) {
+        EndUser endUser = getEndUser(endUserId);
+        Party party = getParty(partyId);
+
+//        find points and sum up if each point is valid
+        QPoint point = QPoint.point;
+        JPAQuery<Tuple> pointQuery = queryFactory.select(point.amount.sumBigDecimal(), point.validThru.min())
+                .from(point);
+
+        pointQuery.where(point.endUser.id.eq(endUserId))
+                .where(point.party.id.eq(partyId))
+                .where(point.validThru.goe(LocalDateTime.now()));
+
+        Tuple tuple = pointQuery.fetchOne();
+        BigDecimal totalPoint = Objects.requireNonNull(tuple)
+                .get(point.amount.sumBigDecimal());
+
+//        time for finding the oldest valid transaction for calculation
+        LocalDateTime startTimeFrom = Objects.requireNonNull(tuple)
+                .get(point.validThru.min());
+
+//        find points and sum up if the transaction is closed and the transaction time is later or identical to the
+//        closest point to be expired
+        QTransaction transaction = QTransaction.transaction;
+        JPAQuery<BigDecimal> transactionQuery = queryFactory.select(point.amount.sumBigDecimal())
+                .from(transaction);
+
+        transactionQuery.where(transaction.party.id.eq(partyId))
+                .where(transaction.endUser.id.eq(endUserId))
+                .where(transaction.isClosed)
+                .where(transaction.transactionTime.goe(startTimeFrom));
+
+        BigDecimal usedPoint = transactionQuery.fetchOne();
+
+        return modelMapper.map(Point.builder()
+                .party(party)
+                .endUser(endUser)
+                .amount(Objects.requireNonNull(totalPoint)
+                        .subtract(usedPoint)), PointDto.class);
     }
 
     @Override
