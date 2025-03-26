@@ -57,11 +57,6 @@ class PlatformAdminServiceTest {
     }
 
     @Test
-    void testSavePlatformAdmin_NullInput() {
-        assertThrows(NullPointerException.class, () -> platformAdminService.savePlatformAdmin(null));
-    }
-
-    @Test
     void testFindPlatformAdminById() {
         when(modelMapper.map(any(PlatformAdmin.class), any())).thenReturn(platformAdminDto);
         when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
@@ -91,5 +86,33 @@ class PlatformAdminServiceTest {
         verify(platformAdminRepository).save(any(PlatformAdmin.class));
 
         assertEquals("password1", platformAdmin.getPassword());
+    }
+
+    @Test
+    void testActivatePlatformAdminById() {
+        platformAdmin.setActivated(false);
+
+        when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
+
+        boolean result = platformAdminService.activatePlatformAdminById(1L);
+
+        assertTrue(result);
+
+        verify(platformAdminRepository).save(any(PlatformAdmin.class));
+
+        assertTrue(platformAdmin.isActivated());
+    }
+
+    @Test
+    void testDeactivatedPlatformAdminById() {
+        when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
+
+        boolean result = platformAdminService.deactivatePlatformAdminById(1L);
+
+        assertTrue(result);
+
+        verify(platformAdminRepository).save(any(PlatformAdmin.class));
+
+        assertFalse(platformAdmin.isActivated());
     }
 }

@@ -1,7 +1,12 @@
 package com.onspring.onspring_customer.domain.user.service;
 
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
+import com.onspring.onspring_customer.domain.user.dto.PointDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EndUserService {
@@ -11,7 +16,16 @@ public interface EndUserService {
 
     List<EndUserDto> findAllEndUser();
 
+    Page<EndUserDto> findAllEndUserByQuery(String name, String partyName, String phone, boolean isActivated,
+                                           Pageable pageable);
+
+    Page<PointDto> findPointByEndUserId(Long id, Pageable pageable);
+
+    PointDto findAvailablePointByEndUserIdAndPartyId(Long endUserId, Long partyId);
+
     boolean updateEndUserPasswordById(Long id, String password);
+
+    boolean assignPointToEndUserById(Long endUserId, Long partyId, BigDecimal amount, LocalDateTime validThru);
 
     boolean activateEndUserById(Long id);
 
