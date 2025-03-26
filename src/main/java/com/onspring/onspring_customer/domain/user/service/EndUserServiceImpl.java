@@ -3,14 +3,22 @@ package com.onspring.onspring_customer.domain.user.service;
 import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
 import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
+import com.onspring.onspring_customer.domain.customer.entity.QParty;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
+import com.onspring.onspring_customer.domain.user.entity.Point;
+import com.onspring.onspring_customer.domain.user.entity.QEndUser;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,14 +31,17 @@ public class EndUserServiceImpl implements EndUserService {
     private final PartyRepository partyRepository;
     private final PartyEndUserRepository partyEndUserRepository;
     private final ModelMapper modelMapper;
+    private final JPAQueryFactory queryFactory;
 
     @Autowired
     public EndUserServiceImpl(EndUserRepository endUserRepository, PartyRepository partyRepository,
                               PartyEndUserRepository partyEndUserRepository, ModelMapper modelMapper) {
+                              ModelMapper modelMapper, JPAQueryFactory queryFactory) {
         this.endUserRepository = endUserRepository;
         this.partyRepository = partyRepository;
         this.partyEndUserRepository = partyEndUserRepository;
         this.modelMapper = modelMapper;
+        this.queryFactory = queryFactory;
     }
 
     private EndUser getEndUser(Long id) {
@@ -81,6 +92,42 @@ public class EndUserServiceImpl implements EndUserService {
                 .stream()
                 .map(element -> modelMapper.map(element, EndUserDto.class))
                 .toList();
+    }
+
+    @Override
+    public Page<EndUserDto> findAllEndUserByQuery(String name, String partyName, String phone, boolean isActivated,
+                                                  Pageable pageable) {
+        QEndUser endUser = QEndUser.endUser;
+        JPAQuery<EndUser> query = queryFactory.selectFrom(endUser);
+
+        if (name != null) {
+            query.where(endUser.name.containsIgnoreCase(name));
+        }
+        if (partyName != null) {
+            QParty party = QParty.party;
+            List<Long> partyIds = queryFactory.select(party.id)
+                    .from(party)
+                    .where(party.name.containsIgnoreCase(partyName))
+                    .fetch();
+
+            query.where(endUser.partyEndUsers.any().party.id.in(partyIds));
+        }
+        if (phone != null) {
+            query.where(endUser.phone.contains(phone));
+        }
+
+        query.where(endUser.isActivated.eq(isActivated));
+
+        query.offset(pageable.getOffset());
+        query.limit(pageable.getPageSize());
+
+        List<EndUser> endUserList = query.fetch();
+
+        List<EndUserDto> endUserDtoList = endUserList.stream()
+                .map(element -> modelMapper.map(element, EndUserDto.class))
+                .toList();
+
+        return new PageImpl<>(endUserDtoList, pageable, endUserDtoList.size());
     }
 
     @Override
