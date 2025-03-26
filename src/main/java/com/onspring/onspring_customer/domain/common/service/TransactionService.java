@@ -23,8 +23,13 @@ public interface TransactionService {
                                                 LocalDateTime startDate,
                                                 LocalDateTime endDate,
                                                 String period);
+    List<TransactionDto> findTransactionByEndUserId(Long userId);
 
-    List<TransactionDto> findSettlementByFranchiseId(Long franchiseId, String month, String period, String customStartDate, String customEndDate);
+    List<TransactionDto> findSettlementByFranchiseId(Long franchiseId,
+                                                     String month,
+                                                     String period,
+                                                     LocalDateTime startDate,
+                                                     LocalDateTime endDate);
 
     List<SettlmentSummaryDto> getMonthlySettlementSummaries(Long franchiseId);
 

@@ -124,7 +124,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public boolean activateCustomer(Long id) {
+    public boolean activateCustomerById(Long id) {
         log.info("Activating customer with ID {}", id);
 
         Customer customer = getCustomer(id);
@@ -138,7 +138,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public boolean deactivateCustomer(Long id) {
+    public boolean deactivateCustomerById(Long id) {
         log.info("Deactivating customer with ID {}", id);
 
         Customer customer = getCustomer(id);
@@ -148,6 +148,6 @@ public class CustomerServiceImpl implements CustomerService {
 
         log.info("Successfully deactivated customer with ID {}", id);
 
-        return false;
+        return true;
     }
 }

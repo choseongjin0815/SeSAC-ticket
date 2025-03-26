@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -56,6 +57,27 @@ public class FranchiseServiceImpl implements FranchiseService {
         FranchiseDto franchiseDto = franchise.entityToDto();
 
         return franchiseDto;
+    }
+
+    /**
+     * 특정 사용자가 소속된 고객에 등록된 가맹점 리스트
+     *
+     * @param userId 사용자의 ID
+     * @return 해당 ID의 프랜차이즈 정보를 담은 FranchiseDto List 객체 반환
+     */
+    @Override
+    public List<FranchiseDto> findFranchiseListByUserId(Long userId) {
+        if(userId == null) {
+            throw new IllegalArgumentException("사용자의 ID는 null일 수 없습니다.");
+        }
+
+        List<Franchise> franchiseList = franchiseRepository.findAllFranchiseByEndUserId(userId);
+
+        List<FranchiseDto> franchiseDtoList = franchiseList.stream()
+                .map(franchise -> franchise.entityToDto())
+                .collect(Collectors.toList());
+
+        return franchiseDtoList;
     }
 
     @Override

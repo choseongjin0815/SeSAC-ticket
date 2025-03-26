@@ -17,7 +17,7 @@ public interface CustomerService {
 
     boolean deleteFranchiseFromCustomer(Long id);
 
-    boolean activateCustomer(Long id);
+    boolean activateCustomerById(Long id);
 
-    boolean deactivateCustomer(Long id);
+    boolean deactivateCustomerById(Long id);
 }
