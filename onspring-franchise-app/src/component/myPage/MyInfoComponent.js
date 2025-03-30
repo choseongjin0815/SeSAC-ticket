@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { getMyInfo } from '../../api/myPageApi';
+import { logoutUser } from '../../auth/loginSlice';
+import { useDispatch } from 'react-redux';
 
 const initState = {
     id : 0,
@@ -17,6 +19,12 @@ const MyInfoComponent = () => {
     const [franchise, setFranchise] = useState({...initState});
     
     const navigation = useNavigation();
+    const dispatch = useDispatch();
+
+    const handleLogout = async() => {
+       await dispatch(logoutUser()).unwrap();
+      
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -62,7 +70,7 @@ const MyInfoComponent = () => {
               <Text style={styles.buttonText}>수정하기</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Login")}>
+              <TouchableOpacity style={styles.button} onPress={handleLogout}>
               <Text style={styles.buttonText}>로그아웃</Text>
               </TouchableOpacity>
               
