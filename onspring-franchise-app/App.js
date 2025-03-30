@@ -9,7 +9,6 @@ import store from './src/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { restoreToken, refreshToken as refreshTokenAction } from './src/auth/loginSlice';
 import setupInterceptors from './src/auth/interceptor';
-import jwtDecode from 'jwt-decode';
 
 // 페이지 & 네비게이터
 import BillingStackNavigator from './src/Navigator/BillingStackNavigator';
