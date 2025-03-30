@@ -26,7 +26,7 @@ const LoadingScreen = () => (
     <ActivityIndicator size="large" color="#4a90e2" />
     <Text style={styles.loadingText}>로딩 중...</Text>
   </View>
-);
+); 
 
 // 네비게이터 설정
 const Tab = createBottomTabNavigator();
