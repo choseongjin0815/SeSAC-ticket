@@ -6,6 +6,7 @@ import com.onspring.onspring_customer.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -28,7 +29,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         // 로그인을 위한 경로는 모두 허용
-                        .requestMatchers("/api/franchise/login", "/api/user/login").permitAll()
+                        .requestMatchers("/api/franchise/login", "/api/user/login", "/api/token/refresh","/error", "/api/franchise/menu/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // user, franchise 경로에 필터 적용
                         // 단순 authenticated()하면 가맹점으로 로그인 시에도 사용자 경로도 사용가능
