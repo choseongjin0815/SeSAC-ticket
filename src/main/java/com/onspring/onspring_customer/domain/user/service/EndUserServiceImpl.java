@@ -161,25 +161,6 @@ public class EndUserServiceImpl implements EndUserService {
     }
 
     @Override
-    public boolean assignPointToEndUserById(Long endUserId, Long partyId, BigDecimal amount, LocalDateTime validThru) {
-        log.info("Assigning point to end user with ID {} associated with party ID {}", endUserId, partyId);
-
-        EndUser endUser = getEndUser(endUserId);
-        Party party = getParty(partyId);
-
-        pointRepository.save(Point.builder()
-                .party(party)
-                .endUser(endUser)
-                .amount(amount)
-                .validThru(validThru)
-                .build());
-
-        log.info("Successfully assigned point to end user with ID {} associated with party ID {}", endUserId, partyId);
-
-        return true;
-    }
-
-    @Override
     public boolean activateEndUserById(Long id) {
         log.info("Activating end user with ID {}", id);
 

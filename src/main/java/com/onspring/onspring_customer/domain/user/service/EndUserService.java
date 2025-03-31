@@ -23,8 +23,6 @@ public interface EndUserService {
 
     boolean updateEndUserPasswordById(Long id, String password);
 
-    boolean assignPointToEndUserById(Long endUserId, Long partyId, BigDecimal amount, LocalDateTime validThru);
-
     boolean activateEndUserById(Long id);
 
     boolean deactivateEndUserById(Long id);
