@@ -9,12 +9,14 @@ import com.onspring.onspring_customer.domain.user.entity.Point;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import com.onspring.onspring_customer.domain.user.repository.PointRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -93,7 +95,35 @@ public class PointServiceImpl implements PointService {
         }
         Point point = pointRepository.findById(pointId).orElse(null);
 
-        point.setAmount(point.getAmount().subtract(amount));
+    @Override
+    @Transactional
+    public boolean assignPointToEndUserById(Long endUserId, Long partyId, BigDecimal amount, LocalDateTime validThru) {
+        log.info("Assigning point to end user with ID {} associated with party ID {}", endUserId, partyId);
+
+        EndUser endUser = getEndUser(endUserId);
+        Party party = getParty(partyId);
+        Optional<Point> result = pointRepository.findByParty_IdAndEndUser_Id(partyId, endUserId);
+        BigDecimal assignedAmount = amount;
+        BigDecimal currentAmount = amount;
+
+        if (result.isPresent()) {
+            assignedAmount = amount.add(result.get()
+                    .getAssignedAmount());
+            currentAmount = amount.add(result.get()
+                    .getCurrentAmount());
+
+            log.info("Updating assigned amount to {} and current amount to {}", assignedAmount, currentAmount);
+        }
+
+        pointRepository.save(Point.builder()
+                .party(party)
+                .endUser(endUser)
+                .assignedAmount(assignedAmount)
+                .currentAmount(currentAmount)
+                .validThru(validThru)
+                .build());
+
+        log.info("Successfully assigned point to end user with ID {} associated with party ID {}", endUserId, partyId);
 
         return true;
     }
