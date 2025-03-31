@@ -129,6 +129,9 @@ public class EndUserServiceImpl implements EndUserService {
             query.where(endUser.isActivated);
         }
 
+        Long count = Objects.requireNonNull(query.clone()
+                .select(endUser.count())
+                .fetchOne());
 
         query.orderBy(endUser.id.desc());
         query.offset(pageable.getOffset());
@@ -140,7 +143,7 @@ public class EndUserServiceImpl implements EndUserService {
                 .map(element -> modelMapper.map(element, EndUserDto.class))
                 .toList();
 
-        return new PageImpl<>(endUserDtoList, pageable, endUserDtoList.size());
+        return new PageImpl<>(endUserDtoList, pageable, count);
     }
 
     @Override
