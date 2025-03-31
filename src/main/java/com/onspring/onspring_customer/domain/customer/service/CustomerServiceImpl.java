@@ -4,17 +4,23 @@ import com.onspring.onspring_customer.domain.common.entity.CustomerFranchise;
 import com.onspring.onspring_customer.domain.common.repository.CustomerFranchiseRepository;
 import com.onspring.onspring_customer.domain.customer.dto.CustomerDto;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
+import com.onspring.onspring_customer.domain.customer.entity.QCustomer;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
@@ -69,6 +75,43 @@ public class CustomerServiceImpl implements CustomerService {
                 .stream()
                 .map(element -> modelMapper.map(element, CustomerDto.class))
                 .toList();
+    }
+
+    @Override
+    public Page<CustomerDto> findAllCustomerByQuery(String name, String address, String phone, boolean isActivated,
+                                                    Pageable pageable) {
+        QCustomer customer = QCustomer.customer;
+        JPAQuery<Customer> query = queryFactory.selectFrom(customer);
+
+        if (name != null) {
+            query.where(customer.name.containsIgnoreCase(name));
+        }
+        if (address != null) {
+            query.where(customer.address.containsIgnoreCase(address));
+        }
+        if (phone != null) {
+            query.where(customer.phone.contains(phone));
+        }
+        if (isActivated) {
+            query.where(customer.isActivated);
+        }
+
+        Long count = Objects.requireNonNull(query.clone()
+                .select(customer.count())
+                .fetchOne());
+
+        query.orderBy(customer.id.desc());
+
+        query.offset(pageable.getOffset());
+        query.limit(pageable.getPageSize());
+
+        List<Customer> customerList = query.fetch();
+
+        List<CustomerDto> customerDtoList = customerList.stream()
+                .map(element -> modelMapper.map(element, CustomerDto.class))
+                .toList();
+
+        return new PageImpl<>(customerDtoList, pageable, count);
     }
 
     @Override
