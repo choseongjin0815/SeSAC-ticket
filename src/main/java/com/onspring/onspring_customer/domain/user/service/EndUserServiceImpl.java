@@ -125,8 +125,10 @@ public class EndUserServiceImpl implements EndUserService {
         if (phone != null) {
             query.where(endUser.phone.contains(phone));
         }
+        if (isActivated) {
+            query.where(endUser.isActivated);
+        }
 
-        query.where(endUser.isActivated.eq(isActivated));
 
         query.offset(pageable.getOffset());
         query.limit(pageable.getPageSize());
