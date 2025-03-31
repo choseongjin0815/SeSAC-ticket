@@ -1,16 +1,23 @@
 package com.onspring.onspring_customer.domain.franchise.service;
 
+import com.onspring.onspring_customer.domain.customer.entity.QCustomer;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
+import com.onspring.onspring_customer.domain.franchise.entity.QFranchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,6 +92,61 @@ public class FranchiseServiceImpl implements FranchiseService {
     @Override
     public List<FranchiseDto> findAllFranchise() {
         return List.of();
+    }
+
+    @Override
+    public Page<FranchiseDto> findAllFranchiseByQuery(String userName, String name, String ownerName,
+                                                      String businessNumber, String address, String phone,
+                                                      String customerName, boolean isActivated, Pageable pageable) {
+        QFranchise franchise = QFranchise.franchise;
+        JPAQuery<Franchise> query = queryFactory.selectFrom(franchise);
+
+        if (userName != null) {
+            query.where(franchise.userName.containsIgnoreCase(userName));
+        }
+        if (name != null) {
+            query.where(franchise.name.containsIgnoreCase(name));
+        }
+        if (ownerName != null) {
+            query.where(franchise.ownerName.containsIgnoreCase(ownerName));
+        }
+        if (businessNumber != null) {
+            query.where(franchise.businessNumber.containsIgnoreCase(businessNumber));
+        }
+        if (address != null) {
+            query.where(franchise.address.containsIgnoreCase(address));
+        }
+        if (phone != null) {
+            query.where(franchise.phone.contains(phone));
+        }
+        if (customerName != null) {
+            QCustomer customer = QCustomer.customer;
+            List<Long> customerIds = queryFactory.select(customer.id)
+                    .from(customer)
+                    .where(customer.name.containsIgnoreCase(customerName))
+                    .fetch();
+
+            query.where(franchise.customerFranchises.any().customer.id.in(customerIds));
+        }
+        if (isActivated) {
+            query.where(franchise.isActivated);
+        }
+
+        Long count = Objects.requireNonNull(query.clone()
+                .select(franchise.count())
+                .fetchOne());
+
+        query.orderBy(franchise.id.desc());
+        query.offset(pageable.getOffset());
+        query.limit(pageable.getPageSize());
+
+        List<Franchise> franchiseList = query.fetch();
+
+        List<FranchiseDto> franchiseDtoList = franchiseList.stream()
+                .map(element -> modelMapper.map(element, FranchiseDto.class))
+                .toList();
+
+        return new PageImpl<>(franchiseDtoList, pageable, count);
     }
 
     // 엔티티의 필드를 업데이트하는 메소드
