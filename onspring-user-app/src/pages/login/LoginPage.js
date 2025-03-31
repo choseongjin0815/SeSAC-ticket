@@ -9,22 +9,41 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Alert
 } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { loginUser } from '../../auth/loginSlice';
 
 
 const LoginPage = () => {
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
     
-  const navigation = useNavigation();
 
-  const handleLogin = (address) => {
-    // 로그인 로직 구현
-    console.log('로그인 시도:', phoneNumber, password);
-    // API 호출 또는 인증 처리 로직 추가
-    navigation.navigate(address);
+  const dispatch = useDispatch();
+
+  const handleLogin = async () => {
+    console.log('Login button pressed'); // 버튼 클릭 로그
+    console.log('phone:', phone);
+    console.log('Password:', password);
+    try {
+     
+      const result = await dispatch(loginUser({
+        credentials: {
+          phone: phone,
+          password: password
+        }
+      })).unwrap();
+
+      console.log(result);
+      // navigation.navigate('MainTab');
+    } catch (error) {
+      Alert.alert(
+        '로그인 실패', 
+        error.message || '로그인 중 오류가 발생했습니다.'
+      );
+    }
   };
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -38,8 +57,8 @@ const LoginPage = () => {
           <TextInput
             style={styles.input}
             placeholder="핸드폰 번호를 입력해주세요"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
+            value={phone}
+            onChangeText={setPhone}
             keyboardType="phone-pad"
           />
           
