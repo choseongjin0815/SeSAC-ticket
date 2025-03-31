@@ -42,7 +42,6 @@ public class PointServiceImpl implements PointService {
     }
 
     /**
-     *
      * @param endUserId 포인트를 조회할 사용자의 Id
      * @return Id에 해당하는 사용자의 그룹 별 포인트 내역, 정책
      */
@@ -62,28 +61,19 @@ public class PointServiceImpl implements PointService {
                 .map(point -> {
                     Party party = point.getParty();
 
-                    return new PointResponseDto(
-                            point.getAmount(),          // 사용 가능한 포인트
+                    return new PointResponseDto(point.getCurrentAmount(),          // 사용 가능한 포인트
                             party.getAmount(),            // 충전된 포인트 (추가 로직 필요)
                             party.getName(),            // 파티명
-                            party.isSunday(),
-                            party.isMonday(),
-                            party.isTuesday(),
-                            party.isWednesday(),
-                            party.isThursday(),
-                            party.isFriday(),
-                            party.isSaturday(),
-                            party.isActivated(),
-                            party.getAllowedTimeStart(),
-                            party.getAllowedTimeEnd(),
-                            point.getValidThru()
-                    );
+                            party.isSunday(), party.isMonday(), party.isTuesday(), party.isWednesday(),
+                            party.isThursday(), party.isFriday(), party.isSaturday(), party.isActivated(),
+                            party.getAllowedTimeStart(), party.getAllowedTimeEnd(), point.getValidThru());
                 })
                 .collect(Collectors.toList());
     }
 
     /**
      * 결제 시 사용자의 포인트에서 금액만킄 차감
+     *
      * @param pointId 해당 포인트의 Id
      * @param amount  차감할 포인트
      * @return 성공여부
@@ -93,7 +83,18 @@ public class PointServiceImpl implements PointService {
         if (pointId == null) {
             throw new IllegalArgumentException("pointId cannot be null");
         }
-        Point point = pointRepository.findById(pointId).orElse(null);
+        Point point = pointRepository.findById(pointId)
+                .orElse(null);
+
+        if (point.getCurrentAmount()
+                    .compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Cannot use the amount more than the current point");
+        }
+        point.setCurrentAmount(point.getCurrentAmount()
+                .subtract(amount));
+
+        return true;
+    }
 
     @Override
     @Transactional
