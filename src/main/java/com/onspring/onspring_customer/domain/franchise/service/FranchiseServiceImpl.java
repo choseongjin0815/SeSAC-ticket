@@ -3,6 +3,7 @@ package com.onspring.onspring_customer.domain.franchise.service;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class FranchiseServiceImpl implements FranchiseService {
     private final FranchiseRepository franchiseRepository;
     private final ModelMapper modelMapper;
+    private final JPAQueryFactory queryFactory;
 
     private Franchise getFranchise(Long id) {
         return franchiseRepository.findById(id)
