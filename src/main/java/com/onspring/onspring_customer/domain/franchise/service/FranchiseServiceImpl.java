@@ -69,7 +69,7 @@ public class FranchiseServiceImpl implements FranchiseService {
      */
     @Override
     public List<FranchiseDto> findFranchiseListByUserId(Long userId) {
-        if(userId == null) {
+        if (userId == null) {
             throw new IllegalArgumentException("사용자의 ID는 null일 수 없습니다.");
         }
 
