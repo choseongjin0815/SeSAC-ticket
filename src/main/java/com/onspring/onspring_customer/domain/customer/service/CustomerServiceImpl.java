@@ -90,7 +90,7 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<Franchise> franchiseResult = franchiseRepository.findById(franchiseId);
         Franchise franchise =
                 franchiseResult.orElseThrow(() -> new EntityNotFoundException("Franchise with ID " + franchiseId + " "
-                        + "not found"));
+                                                                              + "not found"));
 
         CustomerFranchise customerFranchise = new CustomerFranchise();
         customerFranchise.setCustomer(customer);
@@ -110,7 +110,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         Optional<CustomerFranchise> result = customerFranchiseRepository.findById(id);
         CustomerFranchise customerFranchise = result.orElseThrow(() -> new EntityNotFoundException("CustomerFranchise"
-                + " with ID " + id + " not found"));
+                                                                                                   + " with ID " + id + " not found"));
 
         Long customerId = customerFranchise.getCustomer()
                 .getId();
