@@ -7,6 +7,7 @@ import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -23,6 +24,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final FranchiseRepository franchiseRepository;
     private final CustomerFranchiseRepository customerFranchiseRepository;
     private final ModelMapper modelMapper;
+    private final JPAQueryFactory queryFactory;
 
     private Customer getCustomer(Long id) {
         Optional<Customer> result = customerRepository.findById(id);
@@ -32,11 +34,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     public CustomerServiceImpl(CustomerRepository customerRepository, FranchiseRepository franchiseRepository,
-                               CustomerFranchiseRepository customerFranchiseRepository, ModelMapper modelMapper) {
+                               CustomerFranchiseRepository customerFranchiseRepository, ModelMapper modelMapper,
+                               JPAQueryFactory queryFactory) {
         this.customerRepository = customerRepository;
         this.franchiseRepository = franchiseRepository;
         this.customerFranchiseRepository = customerFranchiseRepository;
         this.modelMapper = modelMapper;
+        this.queryFactory = queryFactory;
     }
 
     @Override
