@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
@@ -115,6 +116,10 @@ public class PartyServiceImpl implements PartyService {
             query.where(party.saturday.eq(saturday));
         }
 
+        Long count = Objects.requireNonNull(query.clone()
+                .select(party.count())
+                .fetchOne());
+
         query.offset(pageable.getOffset());
         query.limit(pageable.getPageSize());
 
@@ -124,7 +129,7 @@ public class PartyServiceImpl implements PartyService {
                 .map(element -> modelMapper.map(element, PartyDto.class))
                 .toList();
 
-        return new PageImpl<>(partyDtoList, pageable, partyDtoList.size());
+        return new PageImpl<>(partyDtoList, pageable, count);
     }
 
     @Override
