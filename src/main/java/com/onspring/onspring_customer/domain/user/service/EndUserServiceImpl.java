@@ -130,6 +130,7 @@ public class EndUserServiceImpl implements EndUserService {
         }
 
 
+        query.orderBy(endUser.id.desc());
         query.offset(pageable.getOffset());
         query.limit(pageable.getPageSize());
 
