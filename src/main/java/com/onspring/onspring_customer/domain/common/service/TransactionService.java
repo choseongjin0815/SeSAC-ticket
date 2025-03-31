@@ -12,6 +12,8 @@ public interface TransactionService {
     // 미정산 내역 일괄 처리 메소드 추가
     List<Long> saveFalseTransactions(List<Long> transactionIds);
 
+    Long saveTransaction(TransactionDto transactionDto);
+
     TransactionDto findTransactionById(Long id);
 
     // 정산처리가 완료된 가맹점별 월별 정리 요약 표시 메소드 추가

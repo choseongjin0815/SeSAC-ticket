@@ -96,6 +96,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         log.info("Successfully closed {} transactions", processedIds.size());
         return processedIds;
+    }
 
     /**
      * 사용자의 결제
@@ -131,7 +132,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         // 저장된 트랜잭션 ID 반환
         return savedTransaction.getId();
->>>
     }
 
     @Override
