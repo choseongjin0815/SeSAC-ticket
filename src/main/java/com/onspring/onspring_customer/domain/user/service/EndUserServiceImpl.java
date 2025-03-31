@@ -147,48 +147,6 @@ public class EndUserServiceImpl implements EndUserService {
     }
 
     @Override
-    public PointDto findAvailablePointByEndUserIdAndPartyId(Long endUserId, Long partyId) {
-        EndUser endUser = getEndUser(endUserId);
-        Party party = getParty(partyId);
-
-//        find points and sum up if each point is valid
-        QPoint point = QPoint.point;
-        JPAQuery<Tuple> pointQuery = queryFactory.select(point.amount.sumBigDecimal(), point.validThru.min())
-                .from(point);
-
-        pointQuery.where(point.endUser.id.eq(endUserId))
-                .where(point.party.id.eq(partyId))
-                .where(point.validThru.goe(LocalDateTime.now()));
-
-        Tuple tuple = pointQuery.fetchOne();
-        BigDecimal totalPoint = Objects.requireNonNull(tuple)
-                .get(point.amount.sumBigDecimal());
-
-//        time for finding the oldest valid transaction for calculation
-        LocalDateTime startTimeFrom = Objects.requireNonNull(tuple)
-                .get(point.validThru.min());
-
-//        find points and sum up if the transaction is closed and the transaction time is later or identical to the
-//        closest point to be expired
-        QTransaction transaction = QTransaction.transaction;
-        JPAQuery<BigDecimal> transactionQuery = queryFactory.select(point.amount.sumBigDecimal())
-                .from(transaction);
-
-        transactionQuery.where(transaction.party.id.eq(partyId))
-                .where(transaction.endUser.id.eq(endUserId))
-                .where(transaction.isClosed)
-                .where(transaction.transactionTime.goe(startTimeFrom));
-
-        BigDecimal usedPoint = transactionQuery.fetchOne();
-
-        return modelMapper.map(Point.builder()
-                .party(party)
-                .endUser(endUser)
-                .amount(Objects.requireNonNull(totalPoint)
-                        .subtract(usedPoint)), PointDto.class);
-    }
-
-    @Override
     public boolean updateEndUserPasswordById(Long id, String password) {
         log.info("Updating password for end user with ID {}", id);
 
