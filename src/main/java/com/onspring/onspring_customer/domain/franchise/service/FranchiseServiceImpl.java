@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class FranchiseServiceImpl implements FranchiseService {
     private final FranchiseRepository franchiseRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
     private Franchise getFranchise(Long id) {
         return franchiseRepository.findById(id)
@@ -113,6 +115,25 @@ public class FranchiseServiceImpl implements FranchiseService {
         franchiseRepository.save(franchise);
 
         return true;
+    }
+
+    /**
+     * 가맹점의 새 비밀번호 업데이트
+     *
+     * @param id            가맹점 id
+     * @param oldPassword   기존 password
+     * @param newPassword   새 password
+     * @return 성공여부
+     */
+    @Override
+    public boolean updateFranchisePassword(Long id, String oldPassword, String newPassword) {
+        Franchise franchise = getFranchise(id);
+        if (passwordEncoder.matches(oldPassword, franchise.getPassword())) {
+            franchise.setPassword(passwordEncoder.encode(newPassword));
+            franchiseRepository.save(franchise);
+            return true;
+        }
+        return false;
     }
 
     /**
