@@ -2,6 +2,7 @@ package com.onspring.onspring_customer.domain.user.service;
 
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
+import com.onspring.onspring_customer.domain.user.dto.PointDto;
 import com.onspring.onspring_customer.domain.user.dto.PointResponseDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.entity.Point;
@@ -95,5 +96,13 @@ public class PointServiceImpl implements PointService {
         point.setAmount(point.getAmount().subtract(amount));
 
         return true;
+    }
+
+    @Override
+    public PointDto findAvailablePointByEndUserIdAndPartyId(Long endUserId, Long partyId) {
+        Point point = pointRepository.findByParty_IdAndEndUser_Id(partyId, endUserId)
+                .orElseThrow(() -> new EntityNotFoundException("Point with Party ID " + partyId + " and EndUser ID " + endUserId + " not found"));
+
+        return modelMapper.map(point, PointDto.class);
     }
 }
