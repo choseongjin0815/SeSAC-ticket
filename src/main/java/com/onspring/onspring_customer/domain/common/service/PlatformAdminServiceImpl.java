@@ -3,6 +3,7 @@ package com.onspring.onspring_customer.domain.common.service;
 import com.onspring.onspring_customer.domain.common.dto.PlatformAdminDto;
 import com.onspring.onspring_customer.domain.common.entity.PlatformAdmin;
 import com.onspring.onspring_customer.domain.common.repository.PlatformAdminRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -17,11 +18,14 @@ import java.util.Optional;
 public class PlatformAdminServiceImpl implements PlatformAdminService {
     private final PlatformAdminRepository platformAdminRepository;
     private final ModelMapper modelMapper;
+    private final JPAQueryFactory queryFactory;
 
     @Autowired
-    public PlatformAdminServiceImpl(PlatformAdminRepository platformAdminRepository, ModelMapper modelMapper) {
+    public PlatformAdminServiceImpl(PlatformAdminRepository platformAdminRepository, ModelMapper modelMapper,
+                                    JPAQueryFactory queryFactory) {
         this.platformAdminRepository = platformAdminRepository;
         this.modelMapper = modelMapper;
+        this.queryFactory = queryFactory;
     }
 
     private PlatformAdmin getPlatformAdmin(Long id) {
