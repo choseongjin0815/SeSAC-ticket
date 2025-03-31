@@ -176,7 +176,7 @@ public class DataLoadConfig implements CommandLineRunner {
                 Point point = new Point();
                 point.setParty(partyRepository.findAll().get(random.nextInt(10)));
                 point.setEndUser(endUserRepository.findAll().get(random.nextInt(100)));
-                point.setAmount(BigDecimal.valueOf(random.nextDouble() * 100));
+                point.setCurrentAmount(BigDecimal.valueOf(random.nextDouble() * 100));
                 point.setValidThru(LocalDateTime.now().plusDays(random.nextInt(365)));
                 return point;
             }).toList();
