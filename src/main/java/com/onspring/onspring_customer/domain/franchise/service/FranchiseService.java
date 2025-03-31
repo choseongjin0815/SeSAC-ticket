@@ -15,6 +15,8 @@ public interface FranchiseService {
 
     boolean updateFranchise(Long id, FranchiseDto franchiseDto);
 
+    boolean updateFranchisePassword(Long id, String oldPassword, String newPassword);
+
     boolean activateFranchiseById(Long id);
 
     boolean deactivateFranchiseById(Long id);
