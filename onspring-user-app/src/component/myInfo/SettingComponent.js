@@ -1,17 +1,26 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { logoutUser } from '../../auth/loginSlice';
+import { useDispatch } from 'react-redux';
 
 const SettingComponent = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
   const handlePassword = () => {
     navigation.navigate('PasswordChangePage');
   }
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser()).unwrap();
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.phoneNumber}>01012341234</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleLogout}>
           <Text style={styles.loginText}>로그아웃</Text>
         </TouchableOpacity>
       </View>
