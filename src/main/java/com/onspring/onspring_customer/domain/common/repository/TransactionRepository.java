@@ -1,10 +1,11 @@
 package com.onspring.onspring_customer.domain.common.repository;
 
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("endDate") LocalDateTime endDate);
 
 
-    List<Transaction> findByEndUserIdOrderByTransactionTimeDesc(Long endUserId);
+    Page<Transaction> findByEndUserId(Long endUserId, Pageable pageable);
 
     @Query("SELECT MONTH(t.transactionTime) AS month, YEAR(t.transactionTime) AS year, " +
             "COUNT(t) AS totalTransactions, SUM(t.amount) AS totalAmount " +
