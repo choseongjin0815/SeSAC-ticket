@@ -33,11 +33,11 @@ public class FranchiseDto implements Serializable {
 
     @NotNull
     @Size(min = 1)
-    private String ownerName;
+    String ownerName;
 
     @NotNull
     @Size(min = 1)
-    private String businessNumber;
+    String businessNumber;
 
     @NotNull
     @Size(min = 1)
