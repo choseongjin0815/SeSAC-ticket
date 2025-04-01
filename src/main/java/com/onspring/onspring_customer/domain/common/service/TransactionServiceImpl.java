@@ -11,8 +11,9 @@ import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -65,10 +66,6 @@ public class TransactionServiceImpl implements TransactionService {
         return savedTransaction.getId();
     }
 
-    @Override
-    public TransactionDto findTransactionById(Long id) {
-        return null;
-    }
 
     @Override
     public List<TransactionDto> findAllTransaction() {
@@ -130,17 +127,10 @@ public class TransactionServiceImpl implements TransactionService {
      * @return 해당하는 TransactionDto의 List 객체
      */
     @Override
-    public List<TransactionDto> findTransactionByEndUserId(Long userId) {
-        if (userId == null) {
-            throw new IllegalArgumentException("userId는 null일 수 없습니다.");
-        }
-        List<Transaction> transactionList = transactionRepository.findByEndUserIdOrderByTransactionTimeDesc(userId);
+    public Page<TransactionDto> findTransactionByEndUserId(Long userId, Pageable pageable) {
+        return transactionRepository.findByEndUserId(userId, pageable)
+                .map(transaction -> modelMapper.map(transaction, TransactionDto.class));
 
-        List<TransactionDto> transactionDtoList = transactionList.stream()
-                .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
-                .collect(Collectors.toList());
-
-        return transactionDtoList;
     }
 
     /**

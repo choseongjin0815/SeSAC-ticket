@@ -2,14 +2,14 @@ package com.onspring.onspring_customer.domain.common.service;
 
 import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
+import org.springframework.data.domain.Page;
 
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionService {
     Long saveTransaction(TransactionDto transactionDto);
-
-    TransactionDto findTransactionById(Long id);
 
     List<TransactionDto> findAllTransaction();
 
@@ -17,7 +17,7 @@ public interface TransactionService {
                                                 LocalDateTime startDate,
                                                 LocalDateTime endDate,
                                                 String period);
-    List<TransactionDto> findTransactionByEndUserId(Long userId);
+    Page<TransactionDto> findTransactionByEndUserId(Long userId, Pageable pageable);
 
     List<TransactionDto> findSettlementByFranchiseId(Long franchiseId,
                                                      String month,
