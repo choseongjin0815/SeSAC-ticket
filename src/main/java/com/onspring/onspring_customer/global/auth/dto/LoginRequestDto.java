@@ -1,5 +1,8 @@
 package com.onspring.onspring_customer.global.auth.dto;
 
+import lombok.ToString;
+
+@ToString
 public class LoginRequestDto {
     private String userName;
     private String phone;
