@@ -1,67 +1,109 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { getTransactionList } from '../../api/transactionApi';
 
-const sampleData = [
-    { id: '1', name: '맛을찾아마라탕', price: '8800', state: '서울 은평구', time: '2025-03-25' },
-    { id: '2', name: '빵커피 꿈친2호점', price: '7200', state: '서울 은평구', time: '2025-03-24' },
-   
-  ];
-  const renderItem = ({ item}) => {
-      return (
-          <View
-              style={styles.itemContainer}
-              
-          >
-              <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.category}>{item.price}</Text>
-              <Text style={styles.location}>{item.state}</Text>
-              <Text style={styles.location}>{item.time}</Text>
-          </View>
-      );
+const TransactionListComponent = () => {
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(0);
+  const [isLast, setIsLast] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const loadMore = async () => {
+    if (loading || isLast) return;
+
+    setLoading(true);
+    const result = await getTransactionList(page, 10); // 페이지와 사이즈 전달
+
+    if (result && result.content) {
+      const mapped = result.content.map((item) => {
+        const date = new Date(item.transactionTime);
+        const formattedTime = `${date.getFullYear()}-${(date.getMonth() + 1)
+          .toString()
+          .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date
+          .getHours()
+          .toString()
+          .padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date
+          .getSeconds()
+          .toString()
+          .padStart(2, '0')}`;
+
+        return {
+          id: item.id.toString(),
+          name: item.franchiseDto.name,
+          price: item.amount.toLocaleString(),
+          state: item.accepted ? '결제완료' : '결제취소',
+          time: formattedTime,
+        };
+      });
+
+      setData((prev) => [...prev, ...mapped]);
+      setIsLast(result.last); // Page 객체의 last 플래그
+      setPage((prev) => prev + 1);
+    }
+
+    setLoading(false);
   };
-  
-  const TransactionListComponent = () => {
-     
-  
-      return (
-          <View style={styles.container}>
-              <FlatList
-                  data={sampleData} // 나중에 실제 데이터와 연결 가능
-                  keyExtractor={(item) => item.id}
-                  renderItem={(props) => renderItem({ ...props })} // navigation을 props로 전달
-              />
-          </View>
-      );
+
+  useEffect(() => {
+    loadMore(); // 컴포넌트 마운트 시 첫 페이지 로딩
+  }, []);
+
+  const renderItem = ({ item }) => (
+    <View style={styles.itemContainer}>
+      <Text style={styles.name}>{item.name}</Text>
+      <Text style={styles.category}>{item.price}</Text>
+      <Text style={styles.location}>
+        {item.state}
+      </Text>
+      <Text style={styles.location}>{item.time}</Text>
+    </View>
+  );
+
+  const renderFooter = () => {
+    if (!loading) return null;
+    return <ActivityIndicator size="small" style={{ marginVertical: 10 }} />;
   };
-  
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+      />
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      paddingHorizontal: 15,
-      paddingTop: 10,
-    },
-    itemContainer: {
-      paddingVertical: 15,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ddd',
-    },
-    name: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: '#333',
-    },
-    category: {
-      fontSize: 14,
-      color: '#666',
-      marginVertical: 3,
-    },
-    location: {
-      fontSize: 12,
-      color: '#999',
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 15,
+    paddingTop: 10,
+  },
+  itemContainer: {
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  category: {
+    fontSize: 14,
+    color: '#666',
+    marginVertical: 3,
+  },
+  location: {
+    fontSize: 12,
+    color: '#999',
+  },
+});
 
 export default TransactionListComponent;
