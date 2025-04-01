@@ -29,15 +29,18 @@ public class AuthController {
                 request.getUserName(),
                 request.getPassword()
         );
+        log.info("Franchise login response: {}", token);
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/api/user/login")
     public ResponseEntity<LoginResponseDto> userLogin(@RequestBody LoginRequestDto request) {
+        log.info("User login request: {}", request);
         LoginResponseDto token = authenticationService.userLogin(
                 request.getPhone(),
                 request.getPassword()
         );
+        log.info("User login response: {}", token);
         return ResponseEntity.ok(token);
     }
 
