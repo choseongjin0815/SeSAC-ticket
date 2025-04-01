@@ -1,10 +1,12 @@
 package com.onspring.onspring_customer.domain.franchise.controller;
 
 import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
+import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.service.TransactionService;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.service.FranchiseService;
 import com.onspring.onspring_customer.global.util.file.CustomFileUtil;
+import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
@@ -13,6 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,18 +35,32 @@ public class FranchiseController {
     //프랜차이즈 정보 보기
     @GetMapping("/info")
     public ResponseEntity<FranchiseDto> getFranchiseInfo() {
-        Long id = 1L;// 테스트용 ID
+        Long franchiseId = SecurityUtil.getCurrentUserId();
 
-        FranchiseDto franchiseDto = franchiseService.findFranchiseById(id);
+        FranchiseDto franchiseDto = franchiseService.findFranchiseById(franchiseId);
 
         return ResponseEntity.ok(franchiseDto);
+    }
+
+
+    // 가맹점 정보 업데이트
+    @PutMapping("/info")
+    public ResponseEntity<String> updateFranchise(@RequestBody FranchiseDto franchiseDto) {
+        Long franchiseId = SecurityUtil.getCurrentUserId();
+        boolean isUpdated = franchiseService.updateFranchise(franchiseId, franchiseDto);
+
+        if (isUpdated) {
+            return ResponseEntity.ok("Franchise updated successfully");
+        } else {
+            return ResponseEntity.status(400).body("Failed to update franchise");
+        }
     }
 
 
     //메뉴 사진 업로드
     @PutMapping(value = "/menu", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadMenu(@ModelAttribute FranchiseDto franchiseDto) {
-        Long id = 1L; // 테스트용 ID
+        Long id = 2L; // 테스트용 ID
 
         FranchiseDto oldFranchiseDto = franchiseService.findFranchiseById(id);
         log.info(oldFranchiseDto);
@@ -93,9 +114,9 @@ public class FranchiseController {
     //정산 요약 조회
     @GetMapping("/settlements")
     public ResponseEntity<List<SettlmentSummaryDto>> getSettlementsSummary() {
-        Long id = 1L; //테스트용 아이디
+        Long franchiseId = SecurityUtil.getCurrentUserId();
 
-        List<SettlmentSummaryDto> settlementSummaryDto = transactionService.getMonthlySettlementSummaries(id);
+        List<SettlmentSummaryDto> settlementSummaryDto = transactionService.getMonthlySettlementSummaries(franchiseId);
 
         log.info("settlementSummaryDto : " + settlementSummaryDto);
 
@@ -103,5 +124,122 @@ public class FranchiseController {
 
     }
 
+    @GetMapping("/transactions")
+    public ResponseEntity<List<TransactionDto>> getFranchiseTransactions(
+            @RequestParam(required = false) String period,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
 
+        Long franchiseId = SecurityUtil.getCurrentUserId();
+
+        // period가 제공된 경우, 이를 사용(날짜 매개변수 무시)
+        if (period != null && !period.isEmpty()) {
+            List<TransactionDto> transactionDtoList = transactionService.findTransactionByFranchiseId(franchiseId, null, null, period);
+            return ResponseEntity.ok(transactionDtoList);
+        }
+
+        // 그렇지 않으면 날짜 매개변수 사용
+        ZonedDateTime startDateTime = null;
+        ZonedDateTime endDateTime = null;
+
+        // 제공된 경우 startDate 파싱
+        if (startDate != null) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+                LocalDate startLocalDate = LocalDate.parse(startDate, formatter);
+                startDateTime = startLocalDate.atTime(0, 0, 0, 0).atZone(ZoneId.of("Asia/Seoul"));
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다. 'yyyy.MM.dd' 형식이어야 합니다.");
+            }
+        }
+
+        // 제공된 경우 endDate 파싱
+        if (endDate != null) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+                LocalDate endLocalDate = LocalDate.parse(endDate, formatter);
+                endDateTime = endLocalDate.atTime(23, 59, 59, 999999999).atZone(ZoneId.of("Asia/Seoul"));
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다. 'yyyy.MM.dd' 형식이어야 합니다.");
+            }
+        }
+
+        // 날짜와 null을 period로 서비스 호출
+        List<TransactionDto> transactionDtoList = transactionService.findTransactionByFranchiseId(
+                franchiseId,
+                startDateTime != null ? startDateTime.toLocalDateTime() : null,
+                endDateTime != null ? endDateTime.toLocalDateTime() : null,
+                null
+        );
+
+        return ResponseEntity.ok(transactionDtoList);
+    }
+
+    @GetMapping("/settlements/{month}")
+    public ResponseEntity<List<TransactionDto>> getFranchiseSettlements(
+            @PathVariable String month,
+            @RequestParam(required = false) String period,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        Long franchiseId = SecurityUtil.getCurrentUserId();
+
+        // period가 제공된 경우, 이를 사용(날짜 매개변수 무시)
+        if (period != null && !period.isEmpty()) {
+            List<TransactionDto> settlementDtoList = transactionService.findSettlementByFranchiseId(franchiseId, month,period, null, null);
+            return ResponseEntity.ok(settlementDtoList);
+        }
+
+        // 그렇지 않으면 날짜 매개변수 사용
+        ZonedDateTime startDateTime = null;
+        ZonedDateTime endDateTime = null;
+
+        // 제공된 경우 startDate 파싱
+        if (startDate != null) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+                LocalDate startLocalDate = LocalDate.parse(startDate, formatter);
+                startDateTime = startLocalDate.atTime(0, 0, 0, 0).atZone(ZoneId.of("Asia/Seoul"));
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다. 'yyyy.MM.dd' 형식이어야 합니다.");
+            }
+        }
+
+        // 제공된 경우 endDate 파싱
+        if (endDate != null) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+                LocalDate endLocalDate = LocalDate.parse(endDate, formatter);
+                endDateTime = endLocalDate.atTime(23, 59, 59, 999999999).atZone(ZoneId.of("Asia/Seoul"));
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다. 'yyyy.MM.dd' 형식이어야 합니다.");
+            }
+        }
+
+        // 날짜와 null을 period로 서비스 호출
+        List<TransactionDto> settlementDtoList = transactionService.findSettlementByFranchiseId(
+                franchiseId,
+                month,
+                period,
+                startDateTime != null ? startDateTime.toLocalDateTime() : null,
+                endDateTime != null ? endDateTime.toLocalDateTime() : null
+        );
+
+        return ResponseEntity.ok(settlementDtoList);
+    }
+
+    @PutMapping("/transactions/{transactionId}/cancel")
+    public ResponseEntity<String> cancelTransaction(@PathVariable Long transactionId) {
+        log.info(transactionId);
+        Long franchiseId = SecurityUtil.getCurrentUserId();
+        try {
+            boolean isCancelled = transactionService.cancelTransaction(franchiseId, transactionId);
+            if (isCancelled) {
+                return ResponseEntity.ok("Transaction successfully cancelled.");
+            } else {
+                return ResponseEntity.status(400).body("Failed to cancel the transaction.");
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body("Error: " + e.getMessage());
+        }
+    }
 }
