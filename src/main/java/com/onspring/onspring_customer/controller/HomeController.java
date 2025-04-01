@@ -19,4 +19,23 @@ public class HomeController {
         return "members/add";
     }
 
+    @GetMapping("/members/manage")
+    public String memberManagePage(Model model) {
+        model.addAttribute("activeMenu", "member-manage");
+        return "members/manage";
+    }
+
+    @GetMapping("/members/activated")
+    public String activatedMember(Model model) {
+        model.addAttribute("activeMenu", "member-activated");
+        return "members/activated";
+    }
+
+    @GetMapping("/manager/changepassword")
+    public String changePassword(Model model) {
+        return "manager/changepassword";
+    }
+
+
+
 }

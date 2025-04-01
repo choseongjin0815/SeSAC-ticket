@@ -234,7 +234,7 @@
     }
 
     .submit-btn:hover {
-      background-color: #45a049;
+      background-color: #4CAF50;
     }
   </style>
 </head>
@@ -259,8 +259,8 @@
     </div>
     <div id="member-submenu" class="submenu">
       <a href="/members/add" class="submenu-item">회원 추가</a>
-      <a href="#" class="submenu-item">회원 관리</a>
-      <a href="#" class="submenu-item">회원 활성화</a>
+      <a href="/members/manage" class="submenu-item">회원 관리</a>
+      <a href="/members/activated" class="submenu-item">회원 활성화</a>
     </div>
 
     <!-- 포인트 관리 메뉴 -->
@@ -269,8 +269,8 @@
       <span class="arrow">›</span>
     </div>
     <div id="point-submenu" class="submenu">
-      <a href="#" class="submenu-item">포인트 지급</a>
-      <a href="#" class="submenu-item">포인트 수정</a>
+      <a href="/points/issue" class="submenu-item">포인트 지급</a>
+      <a href="/points/modify" class="submenu-item">포인트 수정</a>
     </div>
 
     <!-- 그룹 관리 메뉴 -->
@@ -279,9 +279,9 @@
       <span class="arrow">›</span>
     </div>
     <div id="party-submenu" class="submenu">
-      <a href="#" class="submenu-item">그룹 생성</a>
-      <a href="#" class="submenu-item">그룹 관리</a>
-      <a href="#" class="submenu-item">그룹 회원 관리</a>
+      <a href="/party/add" class="submenu-item">그룹 생성</a>
+      <a href="/party/manage" class="submenu-item">그룹 관리</a>
+      <a href="/party/members" class="submenu-item">그룹 회원 관리</a>
     </div>
 
     <!-- 가맹점 관리 메뉴 -->
@@ -290,9 +290,9 @@
       <span class="arrow">›</span>
     </div>
     <div id="franchise-submenu" class="submenu">
-      <a href="#" class="submenu-item">가맹점 추가</a>
-      <a href="#" class="submenu-item">가맹점 관리</a>
-      <a href="#" class="submenu-item">가맹점 활성화</a>
+      <a href="/franchise/add" class="submenu-item">가맹점 추가</a>
+      <a href="/franchise/manage" class="submenu-item">가맹점 관리</a>
+      <a href="/franchise/activated" class="submenu-item">가맹점 활성화</a>
     </div>
 
     <!-- 거래 관리 메뉴 -->
@@ -301,9 +301,9 @@
       <span class="arrow">›</span>
     </div>
     <div id="transaction-submenu" class="submenu">
-      <a href="#" class="submenu-item">가맹점 조회</a>
-      <a href="#" class="submenu-item">그룹 조회</a>
-      <a href="#" class="submenu-item">회원 조회</a>
+      <a href="/transaction/franchise" class="submenu-item">가맹점 조회</a>
+      <a href="/transaction/party" class="submenu-item">그룹 조회</a>
+      <a href="/transaction/members" class="submenu-item">회원 조회</a>
     </div>
 
     <!-- 정산 관리 메뉴 -->
@@ -312,13 +312,13 @@
       <span class="arrow">›</span>
     </div>
     <div id="settlement-submenu" class="submenu">
-      <a href="#" class="submenu-item">정산</a>
-      <a href="#" class="submenu-item">정산 관리</a>
+      <a href="/settlement/registration" class="submenu-item">정산</a>
+      <a href="/settlement/history" class="submenu-item">정산 관리</a>
     </div>
   </div>
 
     <!-- 비밀번호 변경 영역 -->
-    <a href="#" class="menu-item">
+    <a href="/manager/changepassword" class="menu-item">
       <span>비밀번호 변경</span>
       <span class="arrow">›</span>
     </a>
@@ -351,6 +351,7 @@
 
   <!-- 실제 컨텐츠가 들어갈 영역 -->
   <div th:replace="${content}">
+
     <!-- 기본 컨텐츠 영역 -->
     <div style="padding: 20px;">
       <h1>서울 소프트웨어 아카데미 관리 시스템</h1>
@@ -400,13 +401,42 @@
   document.addEventListener('DOMContentLoaded', function() {
     const activeMenu = "[[${activeMenu}]]";
     if (activeMenu) {
-      if (activeMenu === 'member-add') {
+      if (activeMenu === 'member-add' || activeMenu === 'member-manage' || activeMenu === 'member-activated') {
         const memberMenu = document.getElementById('member-menu');
         const memberSubmenu = document.getElementById('member-submenu');
         memberMenu.classList.add('active');
         memberSubmenu.classList.add('open');
       }
-      // 다른 메뉴도 필요하면 여기에 추가
+      if (activeMenu === 'point-issue' || activeMenu === 'point-modify') {
+        const pointMenu = document.getElementById('point-menu');
+        const pointSubmenu = document.getElementById('point-submenu');
+        pointMenu.classList.add('active');
+        pointSubmenu.classList.add('open');
+      }
+      if (activeMenu === 'party-add' || activeMenu === 'party-manage' || activeMenu === 'party-members') {
+        const pointMenu = document.getElementById('party-menu');
+        const pointSubmenu = document.getElementById('party-submenu');
+        pointMenu.classList.add('active');
+        pointSubmenu.classList.add('open');
+      }
+      if (activeMenu === 'franchise-add' || activeMenu === 'franchise-manage' || activeMenu === 'franchise-activated') {
+        const pointMenu = document.getElementById('franchise-menu');
+        const pointSubmenu = document.getElementById('franchise-submenu');
+        pointMenu.classList.add('active');
+        pointSubmenu.classList.add('open');
+      }
+      if (activeMenu === 'transaction-franchise' || activeMenu === 'transaction-members' || activeMenu === 'transaction-party') {
+        const pointMenu = document.getElementById('transaction-menu');
+        const pointSubmenu = document.getElementById('transaction-submenu');
+        pointMenu.classList.add('active');
+        pointSubmenu.classList.add('open');
+      }
+      if (activeMenu === 'settlement-registration' || activeMenu === 'settlement-history' ) {
+        const pointMenu = document.getElementById('settlement-menu');
+        const pointSubmenu = document.getElementById('settlement-submenu');
+        pointMenu.classList.add('active');
+        pointSubmenu.classList.add('open');
+      }
     }
   });
 </script>
