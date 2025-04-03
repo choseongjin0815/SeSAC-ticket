@@ -39,7 +39,6 @@ const MyInfoComponent = () => {
         setUser(info);
         setPoints(pointsData.map(item => ({
           ...item,
-          // BigDecimal → 숫자 변환 (검색 결과[2][6][8] 참조)
           availableAmount: Number(item.availableAmount),
           chargedAmount: Number(item.chargedAmount)
         })));
@@ -71,7 +70,7 @@ const MyInfoComponent = () => {
       </View>
 
       <View style={styles.productContainer}>
-        {points.map((point, index) => (
+        {points.filter((point) => point.activated).map((point, index) => (
           <View key={index} style={styles.productItem}>
             <Text style={styles.productName}>{point.partyName}</Text>
             <View style={styles.productPriceContainer}>
