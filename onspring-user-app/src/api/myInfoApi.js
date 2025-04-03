@@ -24,3 +24,15 @@ export const getMyPoints = async () => {
       return [];
     }
   };
+
+  export const updatePassword = async ({ oldPassword, newPassword }) => {
+    try {
+      const res = await axios.put(`${prefix}/password`, {
+        oldPassword,
+        newPassword,
+      });
+      return res.data; 
+    } catch (error) {
+      throw error.response?.data || '비밀번호 변경 중 오류 발생';
+    }
+  };
