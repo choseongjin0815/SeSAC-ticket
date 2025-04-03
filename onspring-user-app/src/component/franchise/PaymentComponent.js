@@ -1,40 +1,109 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  SafeAreaView, 
-  Modal
+import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { getFranchiseInfo } from '../../api/franchiseApi';
+import { getMyPoints } from '../../api/myInfoApi';
+import { postTransaction } from '../../api/transactionApi';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Modal,
+  ScrollView
 } from 'react-native';
 
 const PaymentComponent = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { franchiseId } = route.params || {};
+
   const [selectedItem, setSelectedItem] = useState(null);
   const [totalAmount, setTotalAmount] = useState('');
   const [isFirstModalVisible, setIsFirstModalVisible] = useState(false);
   const [isSecondModalVisible, setIsSecondModalVisible] = useState(false);
   const [isThirdModalVisible, setIsThirdModalVisible] = useState(false);
-  const [storeName, setStoreName] = useState('압구정샌드위치 녹번점');
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [storeName, setStoreName] = useState('');
+  const [items, setItems] = useState([]);
 
-  const navigation = useNavigation();
+  useEffect(() => {
+    const fetchData = async () => {
+      if (franchiseId) {
+        const store = await getFranchiseInfo(franchiseId);
+        setStoreName(store?.name || '가맹점 이름 불러오기 실패');
+      }
 
-  const items = [
-    { name: '런치', price: 144300 },
-    { name: '러닝 메이트', price: 300000 }
-  ];
+      const result = await getMyPoints();
+      const now = new Date();
+      const currentDay = now.getDay();
+      const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
-  const handleInfo = () => {
-    navigation.navigate('FranchiseInfoPage');
-  };
+      const mapped = result.map((item) => {
+        const expiration = new Date(item.validThru);
+        const startTime = item.allowedTimeStart;
+        const endTime = item.allowedTimeEnd;
+        const availableDays = [
+          item.sunday,
+          item.monday,
+          item.tuesday,
+          item.wednesday,
+          item.thursday,
+          item.friday,
+          item.saturday,
+        ];
 
-  const toggleRadioButton = (itemName, price) => {
-    const newSelectedItem = itemName === selectedItem ? null : itemName;
-    setSelectedItem(newSelectedItem);
-  };
+        const isValid =
+          item.activated &&
+          now <= expiration &&
+          availableDays[currentDay] &&
+          currentTime >= startTime &&
+          currentTime <= endTime;
+
+        return {
+          name: item.partyName,
+          price: item.availableAmount,
+          maximumAmount: item.maximumAmount,
+          pointId: item.pointId, // 수정: id를 pointId로 사용
+          partyId: item.partyId, // RequestParam으로 넘겨야 함
+          disabled: !isValid,
+        };
+      });
+
+      setItems(mapped);
+    };
+    fetchData();
+  }, [franchiseId]);
+
+  const handleInfo = () => navigation.navigate('FranchiseInfoPage', {franchiseId: franchiseId});
+  const toggleRadioButton = (itemName) => setSelectedItem(itemName === selectedItem ? null : itemName);
+  const closeModal = (setter) => () => setter(false);
+  const handleTotalAmountChange = (text) => setTotalAmount(text.replace(/[^0-9]/g, '') || '0');
 
   const handlePayment = () => {
+    const selected = items.find((item) => item.name === selectedItem);
+    const amount = parseFloat(totalAmount);
+
+    if (!selected) {
+      setErrorMessage('포인트를 선택해주세요.');
+      setIsErrorModalVisible(true);
+      return;
+    }
+
+    if (amount > selected.price) {
+      setErrorMessage('가용 포인트보다 결제 금액이 큽니다.');
+      setIsErrorModalVisible(true);
+      return;
+    }
+
+    if (amount > selected.maximumAmount) {
+      setErrorMessage('1회 최대 사용금액을 초과했습니다.');
+      setIsErrorModalVisible(true);
+      return;
+    }
+
     setIsFirstModalVisible(true);
   };
 
@@ -43,153 +112,142 @@ const PaymentComponent = () => {
     setIsSecondModalVisible(true);
   };
 
-  const handleSecondModalConfirm = () => {
-    setIsSecondModalVisible(false);
-    setIsThirdModalVisible(true);
+  const handleSecondModalConfirm = async () => {
+    const selected = items.find((item) => item.name === selectedItem);
+    const transactionDto = { amount: parseFloat(totalAmount) };
+
+    try {
+      await postTransaction(franchiseId, selected.pointId, transactionDto, selected.partyId); // 수정됨
+      setIsSecondModalVisible(false);
+      setIsThirdModalVisible(true);
+    } catch (error) {
+      setIsSecondModalVisible(false);
+      setErrorMessage(error);
+      setIsErrorModalVisible(true);
+    }
   };
 
-  const closeFirstModal = () => {
-    setIsFirstModalVisible(false);
-  };
-
-  const closeSecondModal = () => {
-    setIsSecondModalVisible(false);
-  };
-
-  const closeThirdModal = () => {
+  const handleThirdModalClose = () => {
     setIsThirdModalVisible(false);
+    navigation.navigate('HomePage');
   };
 
-  const handleTotalAmountChange = (text) => {
-    const numericValue = text.replace(/[^0-9]/g, '');
-    setTotalAmount(numericValue ? numericValue : '0');
-  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerLocation}>
-          {storeName}
-        </Text>
-        <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.infoButton} onPress={handleInfo}>
-            <Text style={{color: 'grey'}}>메뉴 및 상세 정보</Text>
+      <ScrollView>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerLocation}>{storeName}</Text>
+          <View style={styles.headerRight}>
+            <TouchableOpacity style={styles.infoButton} onPress={handleInfo}>
+              <Text style={{ color: 'grey' }}>메뉴 및 상세 정보</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.voucherContainer}>
+          <Text style={styles.voucherTitle}>SeSAC 전자식권</Text>
+          <View style={styles.totalAmountContainer}>
+            <Text style={{ fontSize: 16 }}>합계금액</Text>
+            <TextInput
+              style={styles.totalAmountInput}
+              value={totalAmount.toString()}
+              onChangeText={handleTotalAmountChange}
+              editable={true}
+            />
+            <Text style={{ fontSize: 20 }}>원</Text>
+          </View>
+        </View>
+
+        {items.map((item) => (
+          <TouchableOpacity
+            key={item.name}
+            style={[styles.itemContainer, item.disabled && { opacity: 0.4 }]}
+            onPress={() => !item.disabled && toggleRadioButton(item.name)}
+            disabled={item.disabled}
+          >
+            <View
+              style={[styles.radioButton, selectedItem === item.name && styles.radioButtonSelected]}
+            />
+            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.itemPrice}>{item.price.toLocaleString()}P</Text>
           </TouchableOpacity>
-        </View>
-      </View>
+        ))}
 
-      <View style={styles.voucherContainer}>
-        <Text style={styles.voucherTitle}>SeSAC 전자식권</Text>
-        <View style={styles.totalAmountContainer}>
-          <Text style={{fontSize: 16}}>합계금액</Text>
-          <TextInput 
-            style={styles.totalAmountInput}
-            value={totalAmount.toString()}
-            onChangeText={handleTotalAmountChange}
-            editable={true}
-          /><Text style={{fontSize: 20}}>원</Text>
-        </View>
-      </View>
-
-      {items.map((item) => (
-        <TouchableOpacity 
-          key={item.name} 
-          style={styles.itemContainer}
-          onPress={() => toggleRadioButton(item.name, item.price)}
-        >
-          <View 
-            style={[
-              styles.radioButton, 
-              selectedItem === item.name && styles.radioButtonSelected
-            ]}
-          />
-          <Text style={styles.itemName}>{item.name}</Text>
-          <Text style={styles.itemPrice}>{item.price.toLocaleString()}P</Text>
+        <TouchableOpacity style={styles.paymentButton} onPress={handlePayment}>
+          <Text style={styles.paymentButtonText}>결제</Text>
         </TouchableOpacity>
-      ))}
 
-      <TouchableOpacity 
-        style={styles.paymentButton}
-        onPress={handlePayment} 
-      >
-        <Text style={styles.paymentButtonText}>결제</Text>
-      </TouchableOpacity>
+        {/* 첫 번째 모달 - 결제 확인 */}
+        <Modal transparent animationType="fade" visible={isFirstModalVisible} onRequestClose={closeModal(setIsFirstModalVisible)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.firstModalContainer}>
+              <Text style={styles.firstModalMessage}>다시 한번 확인해주세요</Text>
+              <Text style={styles.firstModalStoreName}>{storeName}</Text>
+              <Text style={styles.firstModalAmount}>{parseInt(totalAmount).toLocaleString()}원</Text>
+              <Text style={styles.firstModalItem}>{selectedItem}</Text>
 
-      {/* 첫 번째 모달 - 결제 확인 */}
-      <Modal
-        transparent={true}
-        animationType="fade"
-        visible={isFirstModalVisible}
-        onRequestClose={closeFirstModal}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.firstModalContainer}>
-            <Text style={styles.firstModalMessage}>다시 한번 확인해주세요</Text>
-            <Text style={styles.firstModalStoreName}>{storeName}</Text>
-            <Text style={styles.firstModalAmount}>{parseInt(totalAmount).toLocaleString()}원</Text>
-            <Text style={styles.firstModalItem}>{selectedItem}</Text>
+              <View style={styles.firstModalButtonContainer}>
+                <TouchableOpacity style={styles.firstModalConfirmButton} onPress={handleFirstModalConfirm}>
+                  <Text style={styles.firstModalConfirmButtonText}>결제하기</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.firstModalCancelButton} onPress={closeModal(setIsFirstModalVisible)}>
+                  <Text style={styles.firstModalCancelButtonText}>결제취소</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
 
-            <View style={styles.firstModalButtonContainer}>
-              <TouchableOpacity style={styles.firstModalConfirmButton} onPress={handleFirstModalConfirm}>
-                <Text style={styles.firstModalConfirmButtonText}>결제하기</Text>
+        {/* 두 번째 모달 - 결제 진행 */}
+        <Modal transparent animationType="fade" visible={isSecondModalVisible} onRequestClose={closeModal(setIsSecondModalVisible)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.secondModalContainer}>
+              <Text style={styles.secondModalTitle}>결제하기</Text>
+              <TouchableOpacity style={styles.secondModalAmountButton} onPress={handleSecondModalConfirm}>
+                <Text style={styles.secondModalAmountText}>{parseInt(totalAmount).toLocaleString()}</Text>
+                <Text style={styles.secondModalAmountSubtext}>사장님 눌러주세요!</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.firstModalCancelButton} onPress={closeFirstModal}>
-                <Text style={styles.firstModalCancelButtonText}>결제취소</Text>
+              <Text style={styles.secondModalStoreName}>{storeName}</Text>
+              <Text style={styles.secondModalItem}>{selectedItem}</Text>
+              <TouchableOpacity style={styles.secondModalCancelButton} onPress={closeModal(setIsSecondModalVisible)}>
+                <Text style={styles.secondModalCancelButtonText}>취소</Text>
               </TouchableOpacity>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
-      {/* 두 번째 모달 - 결제 진행 */}
-      <Modal
-        transparent={true}
-        animationType="fade"
-        visible={isSecondModalVisible}
-        onRequestClose={closeSecondModal}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.secondModalContainer}>
-            <Text style={styles.secondModalTitle}>결제하기</Text>
-            <TouchableOpacity 
-              style={styles.secondModalAmountButton} 
-              onPress={handleSecondModalConfirm}
-            >
-              <Text style={styles.secondModalAmountText}>{parseInt(totalAmount).toLocaleString()}</Text>
-              <Text style={styles.secondModalAmountSubtext}>사장님 눌러주세요!</Text>
-            </TouchableOpacity>
-            <Text style={styles.secondModalStoreName}>{storeName}</Text>
-            <Text style={styles.secondModalItem}>{selectedItem}</Text>
-            <TouchableOpacity style={styles.secondModalCancelButton} onPress={closeSecondModal}>
-              <Text style={styles.secondModalCancelButtonText}>취소</Text>
-            </TouchableOpacity>
+        {/* 세 번째 모달 - 결제 완료 */}
+        <Modal transparent animationType="fade" visible={isThirdModalVisible} onRequestClose={closeModal(setIsThirdModalVisible)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.thirdModalContainer}>
+              <Text style={styles.thirdModalTitle}>결제완료</Text>
+              <Text style={styles.thirdModalAmount}>{parseInt(totalAmount).toLocaleString()}</Text>
+              <Text style={styles.thirdModalStoreName}>{storeName}</Text>
+              <Text style={styles.thirdModalItem}>{selectedItem}</Text>
+              <TouchableOpacity style={styles.thirdModalCloseButton} onPress={handleThirdModalClose}>
+                <Text style={styles.thirdModalCloseButtonText}>닫기</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
-      {/* 세 번째 모달 - 결제 완료 */}
-      <Modal
-        transparent={true}
-        animationType="fade"
-        visible={isThirdModalVisible}
-        onRequestClose={closeThirdModal}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.thirdModalContainer}>
-            <Text style={styles.thirdModalTitle}>결제완료</Text>
-            <Text style={styles.thirdModalAmount}>{parseInt(totalAmount).toLocaleString()}</Text>
-            <Text style={styles.thirdModalStoreName}>{storeName}</Text>
-            <Text style={styles.thirdModalItem}>{selectedItem}</Text>
-            <TouchableOpacity style={styles.thirdModalCloseButton} onPress={closeThirdModal}>
-              <Text style={styles.thirdModalCloseButtonText}>닫기</Text>
-            </TouchableOpacity>
+        {/* 포인트 가용한지 확인하는 모달 */}
+        <Modal transparent animationType="fade" visible={isErrorModalVisible} onRequestClose={() => setIsErrorModalVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={[styles.firstModalContainer, { paddingVertical: 30 }]}>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' }}>{errorMessage}</Text>
+              <TouchableOpacity style={styles.errorModalButton} onPress={() => setIsErrorModalVisible(false)}>
+                <Text style={styles.errorModalButtonText}>확인</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+
+      </ScrollView>
     </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -434,6 +492,21 @@ const styles = StyleSheet.create({
   thirdModalCloseButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  errorModalButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 18,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 10,
+  },
+  
+  errorModalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 
