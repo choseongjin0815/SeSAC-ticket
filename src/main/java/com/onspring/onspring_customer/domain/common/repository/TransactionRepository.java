@@ -1,6 +1,8 @@
 package com.onspring.onspring_customer.domain.common.repository;
 
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -54,4 +56,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByIsClosed(boolean closed);
 
+    @Query("select t from Transaction t where t.isAccepted = true and t.isClosed = false")
+    Page<Transaction> findByIsAcceptedTrueAndIsClosedFalse(Pageable pageable);
 }
