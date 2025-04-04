@@ -85,9 +85,6 @@ public class UserViewController {
             };
         }
 
-    @PatchMapping("/deactivate")
-    String deactivateUser(@RequestParam(value = "id") Long id) {
-        endUserService.deactivateEndUserById(id);
         model.addAttribute("users", endUserDtoPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", endUserDtoPage.getTotalPages());
