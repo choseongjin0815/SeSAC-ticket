@@ -40,13 +40,22 @@ public class UserViewController {
     }
 
     @GetMapping("/list")
-    String getUsers(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "partyName",
-                            required = false) String partyName,
-                    @RequestParam(value = "phone", required = false) String phone,
-                    @RequestParam(value = "showDeactivated", defaultValue = "true", required = false) Boolean showDeactivated, @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
+    String getUsers(@RequestParam(value = "searchType", required = false) String searchType, @RequestParam(value =
+            "keyword", required = false) String keyword,
+                    @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size",
+                    defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<EndUserDto> endUserDtoPage = endUserService.findAllEndUserByQuery(name, partyName, phone,
-                showDeactivated, pageable);
+        Page<EndUserDto> endUserDtoPage;
+        if (searchType == null) {
+            endUserDtoPage = endUserService.findAllEndUserByQuery(null, null, null, true, pageable);
+        } else {
+            endUserDtoPage = switch (searchType) {
+                case "name" -> endUserService.findAllEndUserByQuery(keyword, null, null, true, pageable);
+                case "partyName" -> endUserService.findAllEndUserByQuery(null, keyword, null, true, pageable);
+                case "phone" -> endUserService.findAllEndUserByQuery(null, null, keyword, true, pageable);
+                default -> throw new IllegalStateException("Unexpected value: " + searchType);
+            };
+        }
 
         model.addAttribute("users", endUserDtoPage.getContent());
         model.addAttribute("currentPage", page);
