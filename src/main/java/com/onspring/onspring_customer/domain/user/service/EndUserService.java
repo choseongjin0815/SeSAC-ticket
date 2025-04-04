@@ -23,5 +23,9 @@ public interface EndUserService {
 
     boolean activateEndUserById(Long id);
 
+    List<Boolean> activateEndUserById(List<Long> ids);
+
     boolean deactivateEndUserById(Long id);
+
+    List<Boolean> deactivateEndUserById(List<Long> ids);
 }

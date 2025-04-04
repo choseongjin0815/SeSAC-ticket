@@ -175,6 +175,13 @@ public class EndUserServiceImpl implements EndUserService {
     }
 
     @Override
+    public List<Boolean> activateEndUserById(List<Long> ids) {
+        return ids.stream()
+                .map(this::activateEndUserById)
+                .toList();
+    }
+
+    @Override
     public boolean deactivateEndUserById(Long id) {
         log.info("Deactivating end user with ID {}", id);
 
@@ -186,5 +193,12 @@ public class EndUserServiceImpl implements EndUserService {
         log.info("Successfully deactivated end user with ID {}", id);
 
         return true;
+    }
+
+    @Override
+    public List<Boolean> deactivateEndUserById(List<Long> ids) {
+        return ids.stream()
+                .map(this::deactivateEndUserById)
+                .toList();
     }
 }
