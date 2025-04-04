@@ -26,4 +26,6 @@ public class EndUserDto implements Serializable {
     boolean isActivated;
 
     private List<Long> partyIds;
+
+    private List<Long> pointIds;
 }
