@@ -24,6 +24,11 @@ public class PartyViewController {
         this.partyService = partyService;
     }
 
+    @GetMapping("/add")
+    public String showSaveParty() {
+        return "parties/add";
+    }
+
     @PostMapping("/add")
     public String saveParty(@RequestParam(value = "customerId") Long customerId,
                             @RequestParam(value = "name") String name,
