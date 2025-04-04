@@ -55,12 +55,6 @@ public class UserViewController {
         return "users/list";
     }
 
-    @PatchMapping("/activate")
-    String activateUser(@RequestParam(value = "id") Long id) {
-        endUserService.activateEndUserById(id);
-
-        return "redirect:list";
-    }
 
     @PatchMapping("/deactivate")
     String deactivateUser(@RequestParam(value = "id") Long id) {
