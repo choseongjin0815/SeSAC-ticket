@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -132,9 +133,17 @@ public class PartyServiceImpl implements PartyService {
 
         List<Party> partyList = query.fetch();
 
-        List<PartyDto> partyDtoList = partyList.stream()
-                .map(element -> modelMapper.map(element, PartyDto.class))
-                .toList();
+        List<PartyDto> partyDtoList = new ArrayList<>();
+
+        for (Party element : partyList) {
+            PartyDto map = modelMapper.map(element, PartyDto.class);
+            map.setEndUserIds(element.getPartyEndUsers()
+                    .stream()
+                    .map(PartyEndUser::getEndUser)
+                    .map(EndUser::getId)
+                    .toList());
+            partyDtoList.add(map);
+        }
 
         return new PageImpl<>(partyDtoList, pageable, count);
     }
