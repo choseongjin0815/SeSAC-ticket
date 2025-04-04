@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -112,10 +113,24 @@ public class EndUserServiceImpl implements EndUserService {
 
     @Override
     public List<EndUserDto> findAllEndUser() {
-        return endUserRepository.findAll()
-                .stream()
-                .map(element -> modelMapper.map(element, EndUserDto.class))
-                .toList();
+        List<EndUser> endUserList = endUserRepository.findAll();
+        List<EndUserDto> endUserDtoList = new ArrayList<>();
+
+        for (EndUser element : endUserList) {
+            EndUserDto map = modelMapper.map(element, EndUserDto.class);
+            map.setPartyIds(element.getPartyEndUsers()
+                    .stream()
+                    .map(PartyEndUser::getParty)
+                    .map(Party::getId)
+                    .toList());
+            map.setPointIds(element.getPoints()
+                    .stream()
+                    .map(Point::getId)
+                    .toList());
+            endUserDtoList.add(map);
+        }
+
+        return endUserDtoList;
     }
 
     @Override
