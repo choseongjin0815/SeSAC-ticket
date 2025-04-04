@@ -128,9 +128,8 @@ public class FranchiseServiceImpl implements FranchiseService {
 
             query.where(franchise.customerFranchises.any().customer.id.in(customerIds));
         }
-        if (isActivated) {
-            query.where(franchise.isActivated);
-        }
+
+        query.where(franchise.isActivated.eq(isActivated));
 
         Long count = Objects.requireNonNull(query.clone()
                 .select(franchise.count())
