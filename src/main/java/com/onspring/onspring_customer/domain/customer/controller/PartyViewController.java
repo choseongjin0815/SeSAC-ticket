@@ -2,6 +2,7 @@ package com.onspring.onspring_customer.domain.customer.controller;
 
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.service.PartyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import java.time.LocalTime;
 public class PartyViewController {
     private final PartyService partyService;
 
+    @Autowired
     public PartyViewController(PartyService partyService) {
         this.partyService = partyService;
     }
