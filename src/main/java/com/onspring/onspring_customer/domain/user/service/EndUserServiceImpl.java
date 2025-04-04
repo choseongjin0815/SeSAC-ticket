@@ -62,11 +62,13 @@ public class EndUserServiceImpl implements EndUserService {
     @Override
     public Long saveEndUser(EndUserDto endUserDto) {
         log.info("Saving end user with name {} associated with party ID {}", endUserDto.getName(),
-                endUserDto.getPartyId());
-
-        Party party = getParty(endUserDto.getPartyId());
+                endUserDto.getPartyIds()
+                .get(0));
 
         EndUser endUser = modelMapper.map(endUserDto, EndUser.class);
+
+        Party party = getParty(endUserDto.getPartyIds()
+                .get(0));
 
         Long id = endUserRepository.save(endUser)
                 .getId();
@@ -78,7 +80,8 @@ public class EndUserServiceImpl implements EndUserService {
         partyEndUserRepository.save(partyEndUser);
 
         log.info("Successfully saved end user with name {} associated with party ID {}", endUserDto.getName(),
-                endUserDto.getPartyId());
+                endUserDto.getPartyIds()
+                .get(0));
 
         return id;
     }
