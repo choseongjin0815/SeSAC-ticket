@@ -36,17 +36,19 @@ public class PartyViewController {
                             @RequestParam(value = "amount") BigDecimal amount, @RequestParam(value =
                     "allowedTimeStart") LocalTime allowedTimeStart,
                             @RequestParam(value = "allowedTimeEnd") LocalTime allowedTimeEnd, @RequestParam(value =
-                    "validThru") Long validThru, @RequestParam(value = "sunday") Boolean sunday, @RequestParam(value
-                    = "monday") Boolean monday, @RequestParam(value = "tuesday") Boolean tuesday,
-                            @RequestParam(value = "wednesday") Boolean wednesday,
-                            @RequestParam(value = "thursday") Boolean thursday,
-                            @RequestParam(value = "friday") Boolean friday,
-                            @RequestParam(value = "saturday") Boolean saturday,
-                            @RequestParam(value = "maximumAmount") BigDecimal maximumAmount, @RequestParam(value =
-                    "maximumTransaction") Long maximumTransaction) {
+                    "validThru") Long validThru,
+                            @RequestParam(value = "sunday", defaultValue = "false") Boolean sunday,
+                            @RequestParam(value = "monday", defaultValue = "false") Boolean monday,
+                            @RequestParam(value = "tuesday", defaultValue = "false") Boolean tuesday,
+                            @RequestParam(value = "wednesday", defaultValue = "false") Boolean wednesday,
+                            @RequestParam(value = "thursday", defaultValue = "false") Boolean thursday,
+                            @RequestParam(value = "friday", defaultValue = "false") Boolean friday,
+                            @RequestParam(value = "saturday", defaultValue = "false") Boolean saturday,
+                            @RequestParam(value = "maximumAmount") BigDecimal maximumAmount,
+                            @RequestParam(value = "maximumTransaction") Long maximumTransaction) {
         PartyDto partyDto = new PartyDto(null, customerId, name, period, amount, allowedTimeStart, allowedTimeEnd,
                 validThru, sunday, monday, tuesday, wednesday, thursday, friday, saturday, maximumAmount,
-                maximumTransaction, true);
+                maximumTransaction, true, null);
         partyService.saveParty(partyDto);
 
         return "redirect:list";
