@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -33,4 +34,6 @@ public class PartyDto implements Serializable {
     BigDecimal maximumAmount;
     Long maximumTransaction;
     boolean isActivated;
+
+    private List<Long> endUserIds;
 }
