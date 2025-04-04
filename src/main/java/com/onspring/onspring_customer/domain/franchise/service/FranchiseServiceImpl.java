@@ -224,6 +224,13 @@ public class FranchiseServiceImpl implements FranchiseService {
     }
 
     @Override
+    public List<Boolean> activateFranchiseById(List<Long> ids) {
+        return ids.stream()
+                .map(this::activateFranchiseById)
+                .toList();
+    }
+
+    @Override
     public boolean deactivateFranchiseById(Long id) {
         log.info("Deactivating franchise with id {}", id);
 
@@ -235,5 +242,12 @@ public class FranchiseServiceImpl implements FranchiseService {
         log.info("Successfully deactivated franchise with id {}", id);
 
         return true;
+    }
+
+    @Override
+    public List<Boolean> deactivateFranchiseById(List<Long> ids) {
+        return ids.stream()
+                .map(this::deactivateFranchiseById)
+                .toList();
     }
 }
