@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -41,17 +42,19 @@ public class EndUserServiceImpl implements EndUserService {
     private final PointRepository pointRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public EndUserServiceImpl(EndUserRepository endUserRepository, PartyRepository partyRepository,
                               PartyEndUserRepository partyEndUserRepository, PointRepository pointRepository,
-                              ModelMapper modelMapper, JPAQueryFactory queryFactory) {
+                              ModelMapper modelMapper, JPAQueryFactory queryFactory, PasswordEncoder passwordEncoder) {
         this.endUserRepository = endUserRepository;
         this.partyRepository = partyRepository;
         this.partyEndUserRepository = partyEndUserRepository;
         this.pointRepository = pointRepository;
         this.modelMapper = modelMapper;
         this.queryFactory = queryFactory;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private EndUser getEndUser(Long id) {
@@ -200,6 +203,25 @@ public class EndUserServiceImpl implements EndUserService {
         log.info("Successfully updated password for end user with ID {}", id);
 
         return true;
+    }
+
+    /**
+     * 사용자의 새 비밀번호 업데이트
+     *
+     * @param id            가맹점 id
+     * @param oldPassword   기존 password
+     * @param newPassword   새 password
+     * @return 성공여부
+     */
+    @Override
+    public boolean updateEndUserPasswordById(Long id, String oldPassword, String newPassword) {
+        EndUser endUser = getEndUser(id);
+        if (passwordEncoder.matches(oldPassword, endUser.getPassword())) {
+            endUser.setPassword(passwordEncoder.encode(newPassword));
+            endUserRepository.save(endUser);
+            return true;
+        }
+        return false;
     }
 
     @Override

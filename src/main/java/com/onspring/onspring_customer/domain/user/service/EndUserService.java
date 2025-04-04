@@ -25,6 +25,8 @@ public interface EndUserService {
 
     boolean updateEndUserPasswordById(Long id, String password);
 
+    boolean updateEndUserPasswordById(Long id, String oldPassword, String newPassword);
+
     boolean assignPointToEndUserById(Long endUserId, Long partyId, BigDecimal amount, LocalDateTime validThru);
 
     boolean activateEndUserById(Long id);
