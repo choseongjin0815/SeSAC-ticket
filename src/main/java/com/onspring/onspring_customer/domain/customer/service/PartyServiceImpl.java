@@ -1,11 +1,13 @@
 package com.onspring.onspring_customer.domain.customer.service;
 
+import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.entity.QParty;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
+import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
@@ -73,6 +75,11 @@ public class PartyServiceImpl implements PartyService {
         PartyDto partyDto = modelMapper.map(party, PartyDto.class);
         partyDto.setCustomerId(party.getCustomer()
                 .getId());
+        partyDto.setEndUserIds(party.getPartyEndUsers()
+                .stream()
+                .map(PartyEndUser::getEndUser)
+                .map(EndUser::getId)
+                .toList());
 
         return partyDto;
     }
