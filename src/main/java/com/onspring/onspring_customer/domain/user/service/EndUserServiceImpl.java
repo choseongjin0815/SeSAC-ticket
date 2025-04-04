@@ -154,9 +154,8 @@ public class EndUserServiceImpl implements EndUserService {
         if (phone != null) {
             query.where(endUser.phone.contains(phone));
         }
-        if (isActivated) {
-            query.where(endUser.isActivated);
-        }
+
+        query.where(endUser.isActivated.eq(isActivated));
 
         Long count = Objects.requireNonNull(query.clone()
                 .select(endUser.count())
@@ -168,9 +167,22 @@ public class EndUserServiceImpl implements EndUserService {
 
         List<EndUser> endUserList = query.fetch();
 
-        List<EndUserDto> endUserDtoList = endUserList.stream()
-                .map(element -> modelMapper.map(element, EndUserDto.class))
-                .toList();
+        List<EndUserDto> endUserDtoList = new ArrayList<>();
+
+        for (EndUser element : endUserList) {
+            EndUserDto map = modelMapper.map(element, EndUserDto.class);
+            map.setPartyIds(element.getPartyEndUsers()
+                    .stream()
+                    .map(PartyEndUser::getParty)
+                    .map(Party::getId)
+                    .toList());
+            map.setPointIds(element.getPoints()
+                    .stream()
+                    .map(Point::getId)
+                    .toList());
+            endUserDtoList.add(map);
+        }
+
 
         return new PageImpl<>(endUserDtoList, pageable, count);
     }
