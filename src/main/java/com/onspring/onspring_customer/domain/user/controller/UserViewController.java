@@ -67,11 +67,31 @@ public class UserViewController {
         return "users/list";
     }
 
+    @GetMapping("/activate")
+    String getDeactivatedUsers(@RequestParam(value = "searchType", required = false) String searchType,
+                               @RequestParam(value = "keyword", required = false) String keyword,
+                               @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value =
+                    "size", defaultValue = "10") Integer size, Model model) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<EndUserDto> endUserDtoPage;
+        if (searchType == null) {
+            endUserDtoPage = endUserService.findAllEndUserByQuery(null, null, null, false, pageable);
+        } else {
+            endUserDtoPage = switch (searchType) {
+                case "name" -> endUserService.findAllEndUserByQuery(keyword, null, null, false, pageable);
+                case "partyName" -> endUserService.findAllEndUserByQuery(null, keyword, null, false, pageable);
+                case "phone" -> endUserService.findAllEndUserByQuery(null, null, keyword, false, pageable);
+                default -> throw new IllegalStateException("Unexpected value: " + searchType);
+            };
+        }
 
     @PatchMapping("/deactivate")
     String deactivateUser(@RequestParam(value = "id") Long id) {
         endUserService.deactivateEndUserById(id);
+        model.addAttribute("users", endUserDtoPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", endUserDtoPage.getTotalPages());
 
-        return "redirect:list";
+        return "users/activate";
     }
 }
