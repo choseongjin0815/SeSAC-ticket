@@ -51,12 +51,11 @@ public class FranchiseViewController {
                     "businessNumber", required = false) String businessNumber, @RequestParam(value = "address",
                     required = false) String address, @RequestParam(value = "phone", required = false) String phone,
                          @RequestParam(value = "customerName", required = false) String customerName,
-                         @RequestParam(value = "showDeactivated", defaultValue = "false") boolean showDeactivated,
                          @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size"
                     , defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<FranchiseDto> franchiseDtoPage = franchiseService.findAllFranchiseByQuery(userName, name, ownerName,
-                businessNumber, address, phone, customerName, showDeactivated, pageable);
+                businessNumber, address, phone, customerName, true, pageable);
 
         model.addAttribute("franchises", franchiseDtoPage.getContent());
         model.addAttribute("currentPage", page);
