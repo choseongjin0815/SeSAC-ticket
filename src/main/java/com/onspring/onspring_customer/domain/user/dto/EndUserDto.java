@@ -6,13 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @NoArgsConstructor(force = true)
 public class EndUserDto implements Serializable {
     Long id;
-
-    Long partyId;
 
     String password;
 
@@ -25,4 +24,6 @@ public class EndUserDto implements Serializable {
     String phone;
 
     boolean isActivated;
+
+    private List<Long> partyIds;
 }
