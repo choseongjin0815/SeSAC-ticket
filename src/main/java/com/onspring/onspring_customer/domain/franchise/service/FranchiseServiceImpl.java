@@ -7,11 +7,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -49,7 +50,7 @@ public class FranchiseServiceImpl implements FranchiseService {
     @Override
     public FranchiseDto findFranchiseById(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException("프랜차이즈 ID는 null일 수 없습니다.");
+            throw new IllegalArgumentException("franchise id cannot be null");
         }
 
         Franchise franchise = getFranchise(id);
@@ -68,18 +69,13 @@ public class FranchiseServiceImpl implements FranchiseService {
      * @return 해당 ID의 프랜차이즈 정보를 담은 FranchiseDto List 객체 반환
      */
     @Override
-    public List<FranchiseDto> findFranchiseListByUserId(Long userId) {
+    public Page<FranchiseDto> findFranchiseListByUserId(Long userId, Pageable pageable) {
         if(userId == null) {
-            throw new IllegalArgumentException("사용자의 ID는 null일 수 없습니다.");
+            throw new IllegalArgumentException("userId cannot be null");
         }
 
-        List<Franchise> franchiseList = franchiseRepository.findAllFranchiseByEndUserId(userId);
-
-        List<FranchiseDto> franchiseDtoList = franchiseList.stream()
-                .map(franchise -> franchise.entityToDto())
-                .collect(Collectors.toList());
-
-        return franchiseDtoList;
+        return franchiseRepository.findAllFranchiseByEndUserId(userId, pageable)
+                .map(franchise -> modelMapper.map(franchise, FranchiseDto.class));
     }
 
     @Override
