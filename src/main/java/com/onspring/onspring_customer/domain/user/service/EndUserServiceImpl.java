@@ -8,12 +8,14 @@ import com.onspring.onspring_customer.domain.customer.repository.PartyRepository
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.dto.PointDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
+import com.onspring.onspring_customer.domain.user.entity.Point;
 import com.onspring.onspring_customer.domain.user.entity.QEndUser;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import com.onspring.onspring_customer.domain.user.repository.PointRepository;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,9 +88,24 @@ public class EndUserServiceImpl implements EndUserService {
         return id;
     }
 
+    @Transactional
     @Override
     public EndUserDto findEndUserById(Long id) {
         EndUser endUser = getEndUser(id);
+
+        List<Long> partyIds = endUser.getPartyEndUsers()
+                .stream()
+                .map(PartyEndUser::getParty)
+                .map(Party::getId)
+                .toList();
+        List<Long> pointIds = endUser.getPoints()
+                .stream()
+                .map(Point::getId)
+                .toList();
+
+        EndUserDto endUserDto = modelMapper.map(endUser, EndUserDto.class);
+        endUserDto.setPartyIds(partyIds);
+        endUserDto.setPointIds(pointIds);
 
         return modelMapper.map(endUser, EndUserDto.class);
     }
