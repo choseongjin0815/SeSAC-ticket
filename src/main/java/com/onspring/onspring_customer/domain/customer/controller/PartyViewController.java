@@ -55,18 +55,20 @@ public class PartyViewController {
     }
 
     @GetMapping("/list")
-    public String getParties(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "name",
-            required = false) String name, @RequestParam(value = "period", required = false) LocalDateTime period,
-                             @RequestParam(value = "amount", required = false) BigDecimal amount,
+    public String getParties(@RequestParam(value = "customerId", required = false) Long customerId,
+                             @RequestParam(value = "name", required = false) String name, @RequestParam(value =
+                    "period", required = false) LocalDateTime period, @RequestParam(value = "amount", required =
+                    false) BigDecimal amount,
                              @RequestParam(value = "allowedTimeStart", required = false) LocalTime allowedTimeStart,
                              @RequestParam(value = "allowedTimeEnd", required = false) LocalTime allowedTimeEnd,
                              @RequestParam(value = "validThru", required = false) Long validThru,
-                             @RequestParam(value = "sunday", required = false) Boolean sunday, @RequestParam(value =
-                    "monday", required = false) Boolean monday,
-                             @RequestParam(value = "tuesday", required = false) Boolean tuesday, @RequestParam(value
-                    = "wednesday", required = false) Boolean wednesday, @RequestParam(value = "thursday", required =
-                    false) Boolean thursday, @RequestParam(value = "friday", required = false) Boolean friday,
-                             @RequestParam(value = "saturday", required = false) Boolean saturday,
+                             @RequestParam(value = "sunday", defaultValue = "false") Boolean sunday,
+                             @RequestParam(value = "monday", defaultValue = "false") Boolean monday,
+                             @RequestParam(value = "tuesday", defaultValue = "false") Boolean tuesday,
+                             @RequestParam(value = "wednesday", defaultValue = "false") Boolean wednesday,
+                             @RequestParam(value = "thursday", defaultValue = "false") Boolean thursday,
+                             @RequestParam(value = "friday", defaultValue = "false") Boolean friday,
+                             @RequestParam(value = "saturday", defaultValue = "false") Boolean saturday,
                              @RequestParam(value = "maximumAmount", required = false) BigDecimal maximumAmount,
                              @RequestParam(value = "maximumTransaction", required = false) Long maximumTransaction,
                              @RequestParam(value = "showDeactivated", defaultValue = "true", required = false) Boolean showDeactivated, @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
