@@ -42,6 +42,8 @@ public class PointServiceImpl implements PointService {
                     Party party = point.getParty();
 
                     return new PointResponseDto(
+                            point.getId(),
+                            party.getId(),
                             point.getAmount(),          // 사용 가능한 포인트
                             party.getAmount(),            // 충전된 포인트 (추가 로직 필요)
                             party.getName(),            // 파티명
@@ -53,6 +55,9 @@ public class PointServiceImpl implements PointService {
                             party.isFriday(),
                             party.isSaturday(),
                             party.isActivated(),
+                            party.getMaximumTransaction(),
+                            party.getMaximumAmount(),
+                            party.getCreatedAt(),
                             party.getAllowedTimeStart(),
                             party.getAllowedTimeEnd(),
                             point.getValidThru()
@@ -75,6 +80,8 @@ public class PointServiceImpl implements PointService {
         Point point = pointRepository.findById(pointId).orElse(null);
 
         point.setAmount(point.getAmount().subtract(amount));
+
+        pointRepository.save(point);
 
         return true;
     }
