@@ -93,14 +93,31 @@ public class FranchiseViewController {
     @PatchMapping("/activate")
     String activateFranchise(@RequestParam(value = "id") Long id) {
         franchiseService.activateFranchiseById(id);
+    @GetMapping("/activate")
+    String showActivateFranchise(@RequestParam(value = "userName", required = false) String userName,
+                                 @RequestParam(value = "name", required = false) String name, @RequestParam(value =
+                    "ownerName", required = false) String ownerName, @RequestParam(value = "businessNumber",
+                    required = false) String businessNumber,
+                                 @RequestParam(value = "address", required = false) String address,
+                                 @RequestParam(value = "phone", required = false) String phone, @RequestParam(value =
+                    "customerName", required = false) String customerName, @RequestParam(value = "page",
+                    defaultValue = "1") Integer page, @RequestParam(value = "size", defaultValue = "10") Integer size
+            , Model model) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<FranchiseDto> franchiseDtoPage = franchiseService.findAllFranchiseByQuery(userName, name, ownerName,
+                businessNumber, address, phone, customerName, false, pageable);
 
         return "redirect:list";
     }
+        model.addAttribute("franchises", franchiseDtoPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", franchiseDtoPage.getTotalPages());
 
     @PatchMapping("/deactivate")
     String deactivateFranchise(@RequestParam(value = "id") Long id) {
         franchiseService.deactivateFranchiseById(id);
 
         return "redirect:list";
+        return "franchises/activate";
     }
 }
