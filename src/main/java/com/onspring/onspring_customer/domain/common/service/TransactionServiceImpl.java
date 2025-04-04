@@ -13,6 +13,8 @@ import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -239,6 +241,12 @@ public class TransactionServiceImpl implements TransactionService {
         return transactions.stream()
                 .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Pageable pageable) {
+        return transactionRepository.findByIsAcceptedTrueAndIsClosedFalse(pageable)
+                .map(element -> modelMapper.map(element, TransactionDto.class));
     }
 
     /**
