@@ -4,6 +4,8 @@ import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
+import com.onspring.onspring_customer.domain.customer.entity.Party;
+import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
@@ -12,8 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -28,6 +31,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final FranchiseRepository franchiseRepository;
     private final EndUserRepository endUserRepository;
+    private final PartyRepository partyRepository;
     private final ModelMapper modelMapper;
 
     /**
@@ -36,7 +40,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @return transaction id
      */
     @Override
-    public Long saveTransaction(TransactionDto transactionDto) {
+    public Long saveTransaction(Long partyId, TransactionDto transactionDto) {
         log.info("Saving transaction: {}", transactionDto);
 
         // FranchiseId와 UserId를 통해 가맹점과 사용자 정보를 조회
@@ -48,14 +52,19 @@ public class TransactionServiceImpl implements TransactionService {
                 .orElseThrow(() -> new RuntimeException("EndUser not found"));
         log.info("endUser: " + endUser);
 
+        Party party = partyRepository.findById(partyId)
+                .orElseThrow(() -> new RuntimeException("Party not found"));
+
         // TransactionDto -> Transaction 엔티티로 변환
         Transaction transaction = new Transaction();
         transaction.setFranchise(franchise);
         transaction.setEndUser(endUser);
-        transaction.setTransactionTime(transactionDto.getTransactionTime());
+        transaction.setTransactionTime(LocalDateTime.now());
         transaction.setAmount(transactionDto.getAmount());
         transaction.setAccepted(transactionDto.isAccepted());
         transaction.setClosed(transactionDto.isClosed());
+        transaction.setAccepted(true);
+        transaction.setParty(party);
 
         log.info("Saving transaction: {}", transaction);
 

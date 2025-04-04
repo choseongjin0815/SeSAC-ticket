@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionService {
-    Long saveTransaction(TransactionDto transactionDto);
+    Long saveTransaction(Long partyId, TransactionDto transactionDto);
 
     List<TransactionDto> findAllTransaction();
 
