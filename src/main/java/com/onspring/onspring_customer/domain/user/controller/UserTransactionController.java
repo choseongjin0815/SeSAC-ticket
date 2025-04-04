@@ -5,6 +5,7 @@ import com.onspring.onspring_customer.domain.common.service.TransactionService;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.service.FranchiseService;
 import com.onspring.onspring_customer.domain.user.service.EndUserService;
+import com.onspring.onspring_customer.domain.user.service.PointService;
 import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 public class UserTransactionController {
 
     private final TransactionService transactionService;
+    private final PointService pointService;
     private final FranchiseService franchiseService;
     private final EndUserService endUserService;
 
@@ -39,10 +41,13 @@ public class UserTransactionController {
         return ResponseEntity.ok(result);
     }
     //사용자의 가맹점 결제
-    @PostMapping("/{franchiseId}")
+    @PostMapping("/{franchiseId}/point/{pointId}")
     public ResponseEntity<Long> addTransaction(@PathVariable Long franchiseId,
+                                               @PathVariable Long pointId,
+                                               @RequestParam Long partyId,
                                                @RequestBody TransactionDto transactionDto) {
-        Long userId = 2L; // 테스트용 아이디
+
+        Long userId = SecurityUtil.getCurrentUserId();
 
         log.info(transactionDto);
         log.info(franchiseId);
@@ -60,7 +65,10 @@ public class UserTransactionController {
 
 
         // 트랜잭션 저장 서비스 호출
-        Long savedTransactionId = transactionService.saveTransaction(transactionDto);
+        Long savedTransactionId = transactionService.saveTransaction(partyId, transactionDto);
+
+        //결제 후 가용 포인트 처리 로직
+        pointService.usePointOnPayment(pointId, transactionDto.getAmount());
 
         // 저장된 트랜잭션 ID 반환
         return ResponseEntity.ok(savedTransactionId);
