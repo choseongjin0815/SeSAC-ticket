@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+
 @Controller
 @RequestMapping("/view/users")
 public class UserViewController {
@@ -31,9 +33,10 @@ public class UserViewController {
         EndUserDto endUserDto = new EndUserDto();
         endUserDto.setName(name);
         endUserDto.setPhone(phone);
-        endUserDto.setPartyId(partyId);
+        endUserDto.setPartyIds(Collections.singletonList(partyId));
         endUserDto.setPassword("*");
         endUserDto.setActivated(true);
+
         endUserService.saveEndUser(endUserDto);
 
         return "redirect:list";
