@@ -103,6 +103,16 @@ public class TransactionServiceImpl implements TransactionService {
         return processedIds;
     }
 
+    @Override
+    public Long saveTransaction(TransactionDto transactionDto) {
+        return 0L;
+    }
+
+    @Override
+    public TransactionDto findTransactionById(Long id) {
+        return null;
+    }
+
     /**
      * 사용자의 결제
      * @param transactionDto    결제 정보를 담은 transactionDto
