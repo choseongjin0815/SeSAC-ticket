@@ -85,6 +85,7 @@ public class FranchiseServiceImpl implements FranchiseService {
 
     // 엔티티의 필드를 업데이트하는 메소드
     public void updateFranchiseFields(Franchise franchise, FranchiseDto franchiseDto) {
+        log.info(franchiseDto);
         if (franchiseDto.getName() != null) {
             franchise.setName(franchiseDto.getName());
         }
@@ -93,6 +94,10 @@ public class FranchiseServiceImpl implements FranchiseService {
         }
         if (franchiseDto.getPhone() != null) {
             franchise.setPhone(franchiseDto.getPhone());
+        }
+        if (franchiseDto.getDescription() != null) {
+            log.info(franchiseDto.getDescription());
+            franchise.setDescription(franchiseDto.getDescription());
         }
     }
 
