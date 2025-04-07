@@ -1,5 +1,7 @@
 package com.onspring.onspring_customer.domain.user.controller;
 
+import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
+import com.onspring.onspring_customer.domain.customer.service.PartyService;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.service.EndUserService;
 import com.onspring.onspring_customer.global.auth.dto.PasswordUpdateRequest;
@@ -16,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 public class UserController {
     private final EndUserService endUserService;
+    private final PartyService partyService;
 
+    //사용자의 정보
     @GetMapping("/info")
     public ResponseEntity<EndUserDto> getUserInfo() {
         Long userId = SecurityUtil.getCurrentUserId();
@@ -30,7 +34,17 @@ public class UserController {
         return ResponseEntity.ok(endUserDto);
     }
 
+    //해당 사용자가 속한 party 정보
+    @GetMapping("/party")
+    public ResponseEntity<PartyDto> getUserParty() {
+        Long userId = SecurityUtil.getCurrentUserId();
 
+        PartyDto partyDto = partyService.findPartyByUserId(userId);
+
+        return ResponseEntity.ok(partyDto);
+    }
+
+    //사용자의 비밀번호 업데이트
     @PutMapping("/password")
     public ResponseEntity<String> updateUserPassword(
             @RequestBody PasswordUpdateRequest request) {

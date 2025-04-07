@@ -16,7 +16,6 @@ public class EndUserDto implements Serializable {
 
     PartyDto partyDto;
 
-
     String password;
 
     @NotNull
