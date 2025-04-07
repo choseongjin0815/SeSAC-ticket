@@ -26,11 +26,11 @@ public class FranchiseViewController {
     }
 
     @PostMapping("/add")
-    String saveFranchise(@RequestParam(value = "userName", required = false) String userName, @RequestParam(value =
-            "name", required = false) String name,
-                         @RequestParam(value = "ownerName", required = false) String ownerName, @RequestParam(value =
-                    "businessNumber", required = false) String businessNumber, @RequestParam(value = "address",
-                    required = false) String address, @RequestParam(value = "phone", required = false) String phone) {
+    String saveFranchise(@RequestParam(value = "userName") String userName, @RequestParam(value = "name") String name
+            , @RequestParam(value = "ownerName") String ownerName,
+                         @RequestParam(value = "businessNumber") String businessNumber, @RequestParam(value =
+                    "address") String address, @RequestParam(value = "phone") String phone, @RequestParam(value =
+                    "password") String password) {
         FranchiseDto franchiseDto = FranchiseDto.builder()
                 .userName(userName)
                 .name(name)
@@ -38,6 +38,7 @@ public class FranchiseViewController {
                 .businessNumber(businessNumber)
                 .address(address)
                 .phone(phone)
+                .password(password)
                 .build();
         franchiseService.saveFranchise(franchiseDto);
 
