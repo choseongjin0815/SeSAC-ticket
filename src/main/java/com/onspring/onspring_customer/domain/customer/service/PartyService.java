@@ -13,6 +13,8 @@ public interface PartyService {
 
     PartyDto findPartyById(Long id);
 
+    PartyDto findPartyByUserId(Long userId);
+
     List<PartyDto> findAllParty();
 
     Page<PartyDto> findAllPartyByQuery(String name, LocalTime allowedTimeStart, LocalTime allowedTimeEnd,

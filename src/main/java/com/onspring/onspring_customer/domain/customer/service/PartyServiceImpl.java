@@ -76,6 +76,19 @@ public class PartyServiceImpl implements PartyService {
         return partyDto;
     }
 
+    /**
+     * 사용자가 속한 가장 오래된 party의 정보를 가져옴
+     * @param userId
+     * @return partyDto
+     */
+    @Override
+    public PartyDto findPartyByUserId(Long userId) {
+        Party party = partyRepository.findOldestPartyByEndUserId(userId).get(0);
+        PartyDto partyDto = modelMapper.map(party, PartyDto.class);
+
+        return partyDto;
+    }
+
     @Override
     public List<PartyDto> findAllParty() {
         return partyRepository.findAll()
