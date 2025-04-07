@@ -161,7 +161,7 @@ public class PartyServiceImpl implements PartyService {
             partyList = partyRepository.findByNameContainsAllIgnoreCase(name);
         }
 
-        partyEndUserRepository.findAllById(partyList.stream()
+        partyEndUserRepository.findByParty_IdIn(partyList.stream()
                         .map(Party::getId)
                         .toList())
                 .forEach(partyEndUser -> {
