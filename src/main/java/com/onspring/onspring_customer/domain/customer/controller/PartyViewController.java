@@ -56,26 +56,23 @@ public class PartyViewController {
     }
 
     @GetMapping("/list")
-    public String getParties(@RequestParam(value = "customerId", required = false) Long customerId,
-                             @RequestParam(value = "name", required = false) String name, @RequestParam(value =
-                    "period", required = false) LocalDateTime period, @RequestParam(value = "amount", required =
-                    false) BigDecimal amount,
-                             @RequestParam(value = "allowedTimeStart", required = false) LocalTime allowedTimeStart,
-                             @RequestParam(value = "allowedTimeEnd", required = false) LocalTime allowedTimeEnd,
-                             @RequestParam(value = "validThru", required = false) Long validThru,
-                             @RequestParam(value = "sunday", defaultValue = "false") Boolean sunday,
-                             @RequestParam(value = "monday", defaultValue = "false") Boolean monday,
-                             @RequestParam(value = "tuesday", defaultValue = "false") Boolean tuesday,
-                             @RequestParam(value = "wednesday", defaultValue = "false") Boolean wednesday,
-                             @RequestParam(value = "thursday", defaultValue = "false") Boolean thursday,
-                             @RequestParam(value = "friday", defaultValue = "false") Boolean friday,
-                             @RequestParam(value = "saturday", defaultValue = "false") Boolean saturday,
-                             @RequestParam(value = "maximumAmount", required = false) BigDecimal maximumAmount,
-                             @RequestParam(value = "maximumTransaction", required = false) Long maximumTransaction,
-                             @RequestParam(value = "showDeactivated", defaultValue = "true", required = false) Boolean showDeactivated, @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
+    public String getParties(@RequestParam(value = "searchType", required = false) String searchType,
+                             @RequestParam(value = "keyword", required = false) String keyword, @RequestParam(value =
+                    "page", defaultValue = "1") Integer page,
+                             @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<PartyDto> partyDtoPage = partyService.findAllPartyByQuery(name, allowedTimeStart, allowedTimeEnd, sunday
-                , monday, tuesday, wednesday, thursday, friday, saturday, maximumAmount, maximumTransaction, pageable);
+        Page<PartyDto> partyDtoPage;
+        if (searchType != null) {
+            partyDtoPage = switch (searchType) {
+                case "name" ->
+                        partyService.findAllPartyByQuery(keyword, null, null, false, false, false, false, false,
+                                false, false, null, null, pageable);
+                default -> throw new IllegalStateException("Unexpected value: " + searchType);
+            };
+        } else {
+            partyDtoPage = partyService.findAllPartyByQuery(null, null, null, false, false, false, false, false,
+                    false, false, null, null, pageable);
+        }
 
         model.addAttribute("parties", partyDtoPage.getContent());
         model.addAttribute("currentPage", page);
