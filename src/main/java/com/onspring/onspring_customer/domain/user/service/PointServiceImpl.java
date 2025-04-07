@@ -9,7 +9,6 @@ import com.onspring.onspring_customer.domain.user.entity.Point;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import com.onspring.onspring_customer.domain.user.repository.PointRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -65,8 +64,8 @@ public class PointServiceImpl implements PointService {
                     return new PointResponseDto(
                             point.getId(),
                             party.getId(),
-                            point.getAmount(),          // 사용 가능한 포인트
-                            party.getAmount(),            // 충전된 포인트 (추가 로직 필요)
+                            point.getCurrentAmount(),          // 사용 가능한 포인트
+                            point.getAssignedAmount(),            // 충전된 포인트 (추가 로직 필요)
                             party.getName(),            // 파티명
                             party.isSunday(),
                             party.isMonday(),
@@ -100,10 +99,20 @@ public class PointServiceImpl implements PointService {
         }
         Point point = pointRepository.findById(pointId).orElse(null);
 
-        point.setAmount(point.getAmount().subtract(amount));
+        point.setCurrentAmount(point.getCurrentAmount().subtract(amount));
 
         pointRepository.save(point);
 
         return true;
+    }
+
+    @Override
+    public boolean assignPointToEndUserById(Long endUserId, Long partyId, BigDecimal amount, LocalDateTime validThru) {
+        return false;
+    }
+
+    @Override
+    public PointDto findAvailablePointByEndUserIdAndPartyId(Long endUserId, Long partyId) {
+        return null;
     }
 }
