@@ -32,12 +32,12 @@ public class UserViewController {
 
     @PostMapping("/add")
     String saveUser(@RequestParam(value = "name") String name, @RequestParam(value = "phone") String phone,
-                    @RequestParam(value = "partyId") Long partyId) {
+                    @RequestParam(value = "password") String password, @RequestParam(value = "partyId") Long partyId) {
         EndUserDto endUserDto = new EndUserDto();
         endUserDto.setName(name);
         endUserDto.setPhone(phone);
         endUserDto.setPartyIds(Collections.singletonList(partyId));
-        endUserDto.setPassword("*");
+        endUserDto.setPassword(password);
         endUserDto.setActivated(true);
 
         endUserService.saveEndUser(endUserDto);
