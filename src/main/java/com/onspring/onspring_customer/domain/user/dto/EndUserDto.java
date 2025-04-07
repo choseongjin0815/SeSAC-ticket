@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NoArgsConstructor(force = true)
@@ -28,5 +28,7 @@ public class EndUserDto implements Serializable {
 
     boolean isActivated;
 
-    BigDecimal currentPoint;
+    private List<Long> partyIds;
+
+    private List<Long> pointIds;
 }

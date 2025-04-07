@@ -5,8 +5,6 @@ import com.onspring.onspring_customer.domain.user.dto.PointDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EndUserService {
@@ -21,8 +19,6 @@ public interface EndUserService {
 
     Page<PointDto> findPointByEndUserId(Long id, Pageable pageable);
 
-    PointDto findAvailablePointByEndUserIdAndPartyId(Long endUserId, Long partyId);
-
     boolean updateEndUserPasswordById(Long id, String password);
 
     boolean updateEndUserPasswordById(Long id, String oldPassword, String newPassword);
@@ -31,5 +27,9 @@ public interface EndUserService {
 
     boolean activateEndUserById(Long id);
 
+    List<Boolean> activateEndUserById(List<Long> ids);
+
     boolean deactivateEndUserById(Long id);
+
+    List<Boolean> deactivateEndUserById(List<Long> ids);
 }

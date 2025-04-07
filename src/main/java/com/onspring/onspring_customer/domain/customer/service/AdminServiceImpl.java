@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
@@ -78,6 +79,10 @@ public class AdminServiceImpl implements AdminService {
             query.where(admin.userName.containsIgnoreCase(userName));
         }
 
+        Long count = Objects.requireNonNull(query.clone()
+                .select(admin.count())
+                .fetchOne());
+
         query.where(admin.isActivated.eq(isActivated));
 
         query.offset(pageable.getOffset());
@@ -89,7 +94,7 @@ public class AdminServiceImpl implements AdminService {
                 .map(element -> modelMapper.map(element, AdminDto.class))
                 .toList();
 
-        return new PageImpl<>(adminDtoList, pageable, adminDtoList.size());
+        return new PageImpl<>(adminDtoList, pageable, count);
     }
 
     @Override

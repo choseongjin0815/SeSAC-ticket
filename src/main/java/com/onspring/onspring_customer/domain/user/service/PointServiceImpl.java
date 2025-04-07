@@ -1,25 +1,46 @@
 package com.onspring.onspring_customer.domain.user.service;
 
 import com.onspring.onspring_customer.domain.customer.entity.Party;
+import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
+import com.onspring.onspring_customer.domain.user.dto.PointDto;
 import com.onspring.onspring_customer.domain.user.dto.PointResponseDto;
+import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.entity.Point;
+import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import com.onspring.onspring_customer.domain.user.repository.PointRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class PointServiceImpl implements PointService {
-
+    private final PartyRepository partyRepository;
+    private final EndUserRepository endUserRepository;
     private final PointRepository pointRepository;
     private final ModelMapper modelMapper;
+
+    private EndUser getEndUser(Long id) {
+        Optional<EndUser> result = endUserRepository.findById(id);
+
+        return result.orElseThrow(() -> new EntityNotFoundException("EndUser with ID " + id + " not found"));
+    }
+
+    private Party getParty(Long id) {
+        return partyRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Party with ID " + id + " not found"));
+    }
+
     /**
      *
      * @param endUserId 포인트를 조회할 사용자의 Id

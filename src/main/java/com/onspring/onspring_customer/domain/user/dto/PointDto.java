@@ -17,7 +17,10 @@ public class PointDto implements Serializable {
     EndUserDto endUserDto;
 
     @NotNull
-    BigDecimal amount;
+    BigDecimal assignedAmount;
+
+    @NotNull
+    BigDecimal currentAmount;
 
     LocalDateTime validThru;
 

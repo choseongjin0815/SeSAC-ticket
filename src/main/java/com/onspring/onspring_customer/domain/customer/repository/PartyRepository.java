@@ -6,9 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import org.springframework.lang.Nullable;
+
+import java.util.List;
 
 public interface PartyRepository extends JpaRepository<Party, Long> {
 
     @Query("SELECT peu.party FROM PartyEndUser peu WHERE peu.endUser.id = :endUserId ORDER BY peu.createdAt ASC")
     List<Party> findOldestPartyByEndUserId(@Param("endUserId") Long endUserId);
+    List<Party> findByNameContainsAllIgnoreCase(@Nullable String name);
 }

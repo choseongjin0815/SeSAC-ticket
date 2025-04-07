@@ -6,6 +6,8 @@ import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
+import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
+import jakarta.transaction.Transactional;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
@@ -18,10 +20,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +37,71 @@ public class TransactionServiceImpl implements TransactionService {
     private final EndUserRepository endUserRepository;
     private final PartyRepository partyRepository;
     private final ModelMapper modelMapper;
+
+
+
+    // 선택된 미정산 거래 내역(단 한개)가 정산으로 저장됨 isClosed = False -> True => Figma 홈_정산관리_정산확인
+    @Override
+    public Long saveFalseTransaction(TransactionDto transactionDto) {
+        log.info("Saving transaction with ID: {}", transactionDto.getId());
+
+        Transaction existingTransaction = transactionRepository.findById(transactionDto.getId())
+                .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + transactionDto.getId()));
+
+        // 이미 정산 처리된 거래인지 확인
+        if (existingTransaction.isClosed()) {
+            throw new RuntimeException("Transaction is already closed with ID: " + transactionDto.getId());
+        }
+
+        // 정산 처리로 상태 변경 (isClosed = true)
+        existingTransaction.setClosed(true);
+
+        // 변경된 내용 저장
+        Transaction savedTransaction = transactionRepository.save(existingTransaction);
+        log.info("Transaction successfully closed: {}", savedTransaction.getId());
+
+        return savedTransaction.getId();
+
+    }
+
+    // 선택된 미정산 거래 내역(여러 개)가 정산으로 저장됨 isClosed = False -> True => Figma 홈_정산관리_정산확인
+    @Override
+    @Transactional
+    public List<Long> saveFalseTransactions(List<Long> transactionIds) {
+        log.info("Processing multiple transactions: {}", transactionIds);
+
+        List<Long> processedIds = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Long id : transactionIds) {
+            try {
+                Transaction transaction = transactionRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + id));
+
+                // 이미 정산 처리된 거래는 건너뜀
+                if (transaction.isClosed()) {
+                    log.warn("Transaction is already closed with ID: {}", id);
+                    continue;
+                }
+
+                // 정산 처리로 상태 변경 (isClosed = true)
+                transaction.setClosed(true);
+
+
+                // 변경된 내용 저장
+                Transaction savedTransaction = transactionRepository.save(transaction);
+                log.info("Transaction successfully closed: {}", savedTransaction.getId());
+
+                processedIds.add(savedTransaction.getId());
+            } catch (Exception e) {
+                log.error("Error processing transaction with ID {}: {}", id, e.getMessage());
+                // 개별 트랜잭션 처리 실패 시에도 나머지 작업은 계속 진행
+            }
+        }
+
+        log.info("Successfully closed {} transactions", processedIds.size());
+        return processedIds;
+    }
 
     /**
      * 사용자의 결제
@@ -76,9 +145,112 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
+
+
+    // 정산 처리가 완료된(isClosed=true) 내역을 가맹점 기준으로 한달 간격으로 정리해서 요약 표시 => Figma
+    @Override
+    public List<TransactionDto> findMonthlySettlementSummary() {
+        log.info("Finding monthly settlement summary by franchise");
+
+        // 정산 완료된(isClosed=true) 모든 트랜잭션 조회
+        List<Transaction> closedTransactions = transactionRepository.findByIsClosed(true);
+
+        if (closedTransactions.isEmpty()) {
+            log.info("No closed transactions found");
+            return new ArrayList<>();
+        }
+
+        // 가맹점 ID와 월별로 트랜잭션 그룹화
+        Map<String, List<Transaction>> groupedTransactions = closedTransactions.stream()
+                .collect(Collectors.groupingBy(transaction -> {
+                    // 가맹점 ID와 연월을 조합한 키 생성 (예: "franchiseId-2025-02")
+                    LocalDateTime date = transaction.getTransactionTime();
+                    String yearMonth = date.getYear() + "-" + String.format("%02d", date.getMonthValue());
+                    return transaction.getFranchise().getId() + "-" + yearMonth;
+                }));
+
+        // 그룹화된 트랜잭션으로부터 가맹점별 월간 요약 정보 생성
+        List<TransactionDto> summaries = new ArrayList<>();
+
+        groupedTransactions.forEach((key, transactions) -> {
+            // 키에서 가맹점 ID와 연월 추출
+            String[] parts = key.split("-");
+            Long franchiseId = Long.parseLong(parts[0]);
+            String yearMonth = parts[1] + "-" + parts[2];
+
+            // 가맹점 이름 가져오기
+            String franchiseName = transactions.get(0).getFranchise().getName();
+
+            // 거래 건수
+            int totalCount = transactions.size();
+
+            // 정산 총액 계산
+            BigDecimal totalAmount = transactions.stream()
+                    .map(Transaction::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            // 정산 기간 계산 (해당 월의 첫날부터 마지막 날까지)
+            LocalDate firstDay = LocalDate.of(
+                    Integer.parseInt(parts[1]),
+                    Integer.parseInt(parts[2]),
+                    1
+            );
+            LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
+            String settlementPeriod = firstDay.toString() + " ~ " + lastDay.toString();
+
+            // TransactionDto를 활용하여 요약 정보 생성
+            TransactionDto summaryDto = new TransactionDto();
+
+            // franchiseDto 객체 생성하고 설정
+            FranchiseDto franchiseDto = new FranchiseDto();
+            franchiseDto.setId(franchiseId);
+            franchiseDto.setName(franchiseName);
+
+            // 설정된 franchiseDto 객체를 summaryDto에 설정
+            summaryDto.setFranchiseDto(franchiseDto);
+
+            // 다른 필드들 설정
+            summaryDto.setAmount(totalAmount);
+            summaryDto.setClosed(true); // 정산 완료된 내역임을 표시
+
+            // 트랜잭션 시간을 해당 월의 마지막 날로 설정 (월별 요약이므로)
+            summaryDto.setTransactionTime(lastDay.atTime(23, 59, 59));
+
+            summaries.add(summaryDto);
+        });
+
+        // 정렬 - 트랜잭션 시간 (월) 기준 내림차순, 동일 월이면 가맹점 이름 기준 오름차순
+        summaries.sort((a, b) -> {
+            int timeCompare = b.getTransactionTime().compareTo(a.getTransactionTime());
+            if (timeCompare != 0) {
+                return timeCompare;
+            }
+            return a.getFranchiseDto().getName().compareTo(b.getFranchiseDto().getName());
+        });
+
+        return summaries;
+    }
+
+    // 거래내역 중 미정산된 (isClosed = False) 모든 거래 내역 띄우기 => Figma 홈_정산관리_정산
     @Override
     public List<TransactionDto> findAllTransaction() {
-        return List.of();
+        List<Transaction> transactions = transactionRepository.findByIsClosed(false);
+
+        if (transactions.isEmpty()) {
+            log.info("No open transactions found");
+            return new ArrayList<>();
+        }
+
+        // Entity를 DTO로 변환하여 반환
+        return transactions.stream()
+                .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Pageable pageable) {
+        return transactionRepository.findByIsAcceptedTrueAndIsClosedFalse(pageable)
+                .map(element -> modelMapper.map(element, TransactionDto.class));
     }
 
     /**

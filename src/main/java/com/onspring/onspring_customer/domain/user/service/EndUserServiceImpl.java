@@ -1,7 +1,6 @@
 package com.onspring.onspring_customer.domain.user.service;
 
 import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
-import com.onspring.onspring_customer.domain.common.entity.QTransaction;
 import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.entity.QParty;
@@ -11,13 +10,12 @@ import com.onspring.onspring_customer.domain.user.dto.PointDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.entity.Point;
 import com.onspring.onspring_customer.domain.user.entity.QEndUser;
-import com.onspring.onspring_customer.domain.user.entity.QPoint;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import com.onspring.onspring_customer.domain.user.repository.PointRepository;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,11 +68,13 @@ public class EndUserServiceImpl implements EndUserService {
     @Override
     public Long saveEndUser(EndUserDto endUserDto) {
         log.info("Saving end user with name {} associated with party ID {}", endUserDto.getName(),
-                endUserDto.getPartyDto());
-
-        Party party = getParty(endUserDto.getPartyDto().getId());
+                endUserDto.getPartyIds()
+                .get(0));
 
         EndUser endUser = modelMapper.map(endUserDto, EndUser.class);
+
+        Party party = getParty(endUserDto.getPartyIds()
+                .get(0));
 
         Long id = endUserRepository.save(endUser)
                 .getId();
@@ -87,24 +86,54 @@ public class EndUserServiceImpl implements EndUserService {
         partyEndUserRepository.save(partyEndUser);
 
         log.info("Successfully saved end user with name {} associated with party ID {}", endUserDto.getName(),
-                endUserDto.getPartyDto());
+                endUserDto.getPartyIds()
+                .get(0));
 
         return id;
     }
 
+    @Transactional
     @Override
     public EndUserDto findEndUserById(Long id) {
         EndUser endUser = getEndUser(id);
+
+        List<Long> partyIds = endUser.getPartyEndUsers()
+                .stream()
+                .map(PartyEndUser::getParty)
+                .map(Party::getId)
+                .toList();
+        List<Long> pointIds = endUser.getPoints()
+                .stream()
+                .map(Point::getId)
+                .toList();
+
+        EndUserDto endUserDto = modelMapper.map(endUser, EndUserDto.class);
+        endUserDto.setPartyIds(partyIds);
+        endUserDto.setPointIds(pointIds);
 
         return modelMapper.map(endUser, EndUserDto.class);
     }
 
     @Override
     public List<EndUserDto> findAllEndUser() {
-        return endUserRepository.findAll()
-                .stream()
-                .map(element -> modelMapper.map(element, EndUserDto.class))
-                .toList();
+        List<EndUser> endUserList = endUserRepository.findAll();
+        List<EndUserDto> endUserDtoList = new ArrayList<>();
+
+        for (EndUser element : endUserList) {
+            EndUserDto map = modelMapper.map(element, EndUserDto.class);
+            map.setPartyIds(element.getPartyEndUsers()
+                    .stream()
+                    .map(PartyEndUser::getParty)
+                    .map(Party::getId)
+                    .toList());
+            map.setPointIds(element.getPoints()
+                    .stream()
+                    .map(Point::getId)
+                    .toList());
+            endUserDtoList.add(map);
+        }
+
+        return endUserDtoList;
     }
 
     @Override
@@ -131,64 +160,40 @@ public class EndUserServiceImpl implements EndUserService {
 
         query.where(endUser.isActivated.eq(isActivated));
 
+        Long count = Objects.requireNonNull(query.clone()
+                .select(endUser.count())
+                .fetchOne());
+
+        query.orderBy(endUser.id.desc());
         query.offset(pageable.getOffset());
         query.limit(pageable.getPageSize());
 
         List<EndUser> endUserList = query.fetch();
 
-        List<EndUserDto> endUserDtoList = endUserList.stream()
-                .map(element -> modelMapper.map(element, EndUserDto.class))
-                .toList();
+        List<EndUserDto> endUserDtoList = new ArrayList<>();
 
-        return new PageImpl<>(endUserDtoList, pageable, endUserDtoList.size());
+        for (EndUser element : endUserList) {
+            EndUserDto map = modelMapper.map(element, EndUserDto.class);
+            map.setPartyIds(element.getPartyEndUsers()
+                    .stream()
+                    .map(PartyEndUser::getParty)
+                    .map(Party::getId)
+                    .toList());
+            map.setPointIds(element.getPoints()
+                    .stream()
+                    .map(Point::getId)
+                    .toList());
+            endUserDtoList.add(map);
+        }
+
+
+        return new PageImpl<>(endUserDtoList, pageable, count);
     }
 
     @Override
     public Page<PointDto> findPointByEndUserId(Long id, Pageable pageable) {
         return pointRepository.findByEndUser_Id(id, pageable)
                 .map(element -> modelMapper.map(element, PointDto.class));
-    }
-
-    @Override
-    public PointDto findAvailablePointByEndUserIdAndPartyId(Long endUserId, Long partyId) {
-        EndUser endUser = getEndUser(endUserId);
-        Party party = getParty(partyId);
-
-//        find points and sum up if each point is valid
-        QPoint point = QPoint.point;
-        JPAQuery<Tuple> pointQuery = queryFactory.select(point.amount.sumBigDecimal(), point.validThru.min())
-                .from(point);
-
-        pointQuery.where(point.endUser.id.eq(endUserId))
-                .where(point.party.id.eq(partyId))
-                .where(point.validThru.goe(LocalDateTime.now()));
-
-        Tuple tuple = pointQuery.fetchOne();
-        BigDecimal totalPoint = Objects.requireNonNull(tuple)
-                .get(point.amount.sumBigDecimal());
-
-//        time for finding the oldest valid transaction for calculation
-        LocalDateTime startTimeFrom = Objects.requireNonNull(tuple)
-                .get(point.validThru.min());
-
-//        find points and sum up if the transaction is closed and the transaction time is later or identical to the
-//        closest point to be expired
-        QTransaction transaction = QTransaction.transaction;
-        JPAQuery<BigDecimal> transactionQuery = queryFactory.select(point.amount.sumBigDecimal())
-                .from(transaction);
-
-        transactionQuery.where(transaction.party.id.eq(partyId))
-                .where(transaction.endUser.id.eq(endUserId))
-                .where(transaction.isClosed)
-                .where(transaction.transactionTime.goe(startTimeFrom));
-
-        BigDecimal usedPoint = transactionQuery.fetchOne();
-
-        return modelMapper.map(Point.builder()
-                .party(party)
-                .endUser(endUser)
-                .amount(Objects.requireNonNull(totalPoint)
-                        .subtract(usedPoint)), PointDto.class);
     }
 
     @Override
@@ -258,6 +263,13 @@ public class EndUserServiceImpl implements EndUserService {
     }
 
     @Override
+    public List<Boolean> activateEndUserById(List<Long> ids) {
+        return ids.stream()
+                .map(this::activateEndUserById)
+                .toList();
+    }
+
+    @Override
     public boolean deactivateEndUserById(Long id) {
         log.info("Deactivating end user with ID {}", id);
 
@@ -269,5 +281,12 @@ public class EndUserServiceImpl implements EndUserService {
         log.info("Successfully deactivated end user with ID {}", id);
 
         return true;
+    }
+
+    @Override
+    public List<Boolean> deactivateEndUserById(List<Long> ids) {
+        return ids.stream()
+                .map(this::deactivateEndUserById)
+                .toList();
     }
 }
