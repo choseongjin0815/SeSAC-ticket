@@ -1,12 +1,15 @@
 package com.onspring.onspring_customer.domain.customer.service;
 
+import com.onspring.onspring_customer.domain.common.dto.PartyEndUserDto;
 import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
+import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.entity.QParty;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
+import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -21,23 +24,23 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Log4j2
 @Service
 public class PartyServiceImpl implements PartyService {
     private final PartyRepository partyRepository;
+    private final PartyEndUserRepository partyEndUserRepository;
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
 
     @Autowired
-    public PartyServiceImpl(PartyRepository partyRepository, CustomerRepository customerRepository,
-                            ModelMapper modelMapper, JPAQueryFactory queryFactory) {
+    public PartyServiceImpl(PartyRepository partyRepository, PartyEndUserRepository partyEndUserRepository,
+                            CustomerRepository customerRepository, ModelMapper modelMapper,
+                            JPAQueryFactory queryFactory) {
         this.partyRepository = partyRepository;
+        this.partyEndUserRepository = partyEndUserRepository;
         this.customerRepository = customerRepository;
         this.modelMapper = modelMapper;
         this.queryFactory = queryFactory;
@@ -146,6 +149,38 @@ public class PartyServiceImpl implements PartyService {
         }
 
         return new PageImpl<>(partyDtoList, pageable, count);
+    }
+
+    @Override
+    public Page<PartyEndUserDto> findAllPartyEndUserByQuery(String name, Pageable pageable) {
+        Map<Long, PartyEndUserDto> partyEndUserDtoMap = new HashMap<>();
+        List<Party> partyList;
+        if (name == null) {
+            partyList = partyRepository.findAll();
+        } else {
+            partyList = partyRepository.findByNameContainsAllIgnoreCase(name);
+        }
+
+        partyEndUserRepository.findAllById(partyList.stream()
+                        .map(Party::getId)
+                        .toList())
+                .forEach(partyEndUser -> {
+                    Party party = partyEndUser.getParty();
+                    EndUserDto endUserDto = modelMapper.map(partyEndUser.getEndUser(), EndUserDto.class);
+
+                    if (!partyEndUserDtoMap.containsKey(party.getId())) {
+                        partyEndUserDtoMap.put(party.getId(), new PartyEndUserDto(party.getId(), party.getName()));
+                    }
+                    partyEndUserDtoMap.get(party.getId())
+                            .getEndUserList()
+                            .add(endUserDto);
+                });
+
+        log.info(partyEndUserDtoMap);
+
+        return new PageImpl<>(partyEndUserDtoMap.values()
+                .stream()
+                .toList(), pageable, partyEndUserDtoMap.size());
     }
 
     @Override

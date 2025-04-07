@@ -1,5 +1,6 @@
 package com.onspring.onspring_customer.domain.customer.controller;
 
+import com.onspring.onspring_customer.domain.common.dto.PartyEndUserDto;
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.service.PartyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,5 +133,29 @@ public class PartyViewController {
         partyService.deactivatePartyById(id);
 
         return "redirect:list";
+    }
+
+    @GetMapping("/users")
+    public String getPartyEndUser(@RequestParam(value = "searchType", required = false) String searchType,
+                                  @RequestParam(value = "keyword", required = false) String keyword,
+                                  @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                  @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<PartyEndUserDto> partyEndUserDtoPage;
+
+        if (searchType != null) {
+            partyEndUserDtoPage = switch (searchType) {
+                case "name" -> partyService.findAllPartyEndUserByQuery(keyword, pageable);
+                default -> throw new IllegalStateException("Unexpected value: " + searchType);
+            };
+        } else {
+            partyEndUserDtoPage = partyService.findAllPartyEndUserByQuery(null, pageable);
+        }
+
+        model.addAttribute("models", partyEndUserDtoPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", partyEndUserDtoPage.getTotalPages());
+
+        return "parties/users";
     }
 }
