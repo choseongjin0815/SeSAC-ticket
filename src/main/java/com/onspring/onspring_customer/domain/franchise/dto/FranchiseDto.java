@@ -43,9 +43,15 @@ public class FranchiseDto implements Serializable {
     @Size(min = 1)
     String address;
 
+    Double latitude;
+
+    Double longitude;
+
     @NotNull
     @Size(min = 1)
     String phone;
+
+    String description;
 
     @JsonIgnore
     @Builder.Default
@@ -60,6 +66,7 @@ public class FranchiseDto implements Serializable {
         franchise.setName(this.name);
         franchise.setAddress(this.address);
         franchise.setPhone(this.phone);
+        franchise.setDescription(this.description);
 
         // 파일 처리
         List<String> uploadFileNames = this.uploadFileNames;
