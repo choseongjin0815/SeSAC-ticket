@@ -245,7 +245,7 @@
 <div class="sidebar">
   <!-- 로고 영역 -->
   <div class="logo-container">
-    <a href="/">
+    <a href="/view/home">
       <img class="logo" src="/images/logo.png" alt="Seoul Software Academy Logo" />
     </a>
   </div>
@@ -331,14 +331,20 @@
   <div class="top-bar">
     <div class="user-info">
       <div class="info-item">
-        <span>로그인 계정 : 홍길동</span>
+        <span>로그인 계정 : <span th:text="${userName}">홍길동</span></span>
       </div>
       <div class="info-item">
         <span>지점 : 은평</span>
       </div>
     </div>
+    <!-- 로그아웃 영역 -->
     <div class="logout-container">
-      <a href="#" class="logout-btn">
+      <!-- 숨겨진 form -->
+      <form id="logoutForm" th:action="@{/view/logout}" method="post" style="display: none;">
+      </form>
+
+      <!-- a 태그처럼 보이는 버튼 (스타일 유지) -->
+      <a href="#" class="logout-btn" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">
         <svg class="logout-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M16 17L21 12L16 7" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
