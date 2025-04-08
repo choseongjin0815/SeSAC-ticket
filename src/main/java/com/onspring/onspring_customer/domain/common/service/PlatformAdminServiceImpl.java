@@ -7,9 +7,9 @@ import com.onspring.onspring_customer.domain.common.repository.PlatformAdminRepo
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,19 +20,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
+@RequiredArgsConstructor
 @Service
 public class PlatformAdminServiceImpl implements PlatformAdminService {
     private final PlatformAdminRepository platformAdminRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
 
-    @Autowired
-    public PlatformAdminServiceImpl(PlatformAdminRepository platformAdminRepository, ModelMapper modelMapper,
-                                    JPAQueryFactory queryFactory) {
-        this.platformAdminRepository = platformAdminRepository;
-        this.modelMapper = modelMapper;
-        this.queryFactory = queryFactory;
-    }
 
     private PlatformAdmin getPlatformAdmin(Long id) {
         Optional<PlatformAdmin> result = platformAdminRepository.findById(id);

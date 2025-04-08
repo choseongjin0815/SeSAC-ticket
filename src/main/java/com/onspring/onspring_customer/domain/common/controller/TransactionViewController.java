@@ -4,7 +4,7 @@ import com.onspring.onspring_customer.domain.common.dto.TransactionArchiveDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.service.TransactionArchiveService;
 import com.onspring.onspring_customer.domain.common.service.TransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,17 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/view/transactions")
 public class TransactionViewController {
     private final TransactionService transactionService;
     private final TransactionArchiveService transactionArchiveService;
 
-    @Autowired
-    public TransactionViewController(TransactionService transactionService,
-                                     TransactionArchiveService transactionArchiveService) {
-        this.transactionService = transactionService;
-        this.transactionArchiveService = transactionArchiveService;
-    }
 
     @GetMapping("/close")
     public String getNotClosedTransaction(@RequestParam(value = "page", defaultValue = "1") Integer page,

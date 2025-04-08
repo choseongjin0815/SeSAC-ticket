@@ -2,7 +2,7 @@ package com.onspring.onspring_customer.domain.franchise.controller;
 
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.service.FranchiseService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,14 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/view/franchises")
 public class FranchiseViewController {
     private final FranchiseService franchiseService;
-
-    @Autowired
-    public FranchiseViewController(FranchiseService franchiseService) {
-        this.franchiseService = franchiseService;
-    }
 
     @GetMapping("/add")
     String showSaveFranchise() {

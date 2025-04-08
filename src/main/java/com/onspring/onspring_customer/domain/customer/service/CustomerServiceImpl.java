@@ -11,9 +11,9 @@ import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepos
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
+@RequiredArgsConstructor
 @Service
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
@@ -38,16 +39,6 @@ public class CustomerServiceImpl implements CustomerService {
         return result.orElseThrow(() -> new EntityNotFoundException("Customer with ID " + id + " not found"));
     }
 
-    @Autowired
-    public CustomerServiceImpl(CustomerRepository customerRepository, FranchiseRepository franchiseRepository,
-                               CustomerFranchiseRepository customerFranchiseRepository, ModelMapper modelMapper,
-                               JPAQueryFactory queryFactory) {
-        this.customerRepository = customerRepository;
-        this.franchiseRepository = franchiseRepository;
-        this.customerFranchiseRepository = customerFranchiseRepository;
-        this.modelMapper = modelMapper;
-        this.queryFactory = queryFactory;
-    }
 
     @Override
     public Long saveCustomer(CustomerDto customerDto) {

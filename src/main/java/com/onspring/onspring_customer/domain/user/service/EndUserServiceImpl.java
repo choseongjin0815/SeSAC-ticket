@@ -16,9 +16,9 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
+@RequiredArgsConstructor
 @Service
 public class EndUserServiceImpl implements EndUserService {
     private final EndUserRepository endUserRepository;
@@ -43,18 +44,6 @@ public class EndUserServiceImpl implements EndUserService {
     private final JPAQueryFactory queryFactory;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public EndUserServiceImpl(EndUserRepository endUserRepository, PartyRepository partyRepository,
-                              PartyEndUserRepository partyEndUserRepository, PointRepository pointRepository,
-                              ModelMapper modelMapper, JPAQueryFactory queryFactory, PasswordEncoder passwordEncoder) {
-        this.endUserRepository = endUserRepository;
-        this.partyRepository = partyRepository;
-        this.partyEndUserRepository = partyEndUserRepository;
-        this.pointRepository = pointRepository;
-        this.modelMapper = modelMapper;
-        this.queryFactory = queryFactory;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     private EndUser getEndUser(Long id) {
         Optional<EndUser> result = endUserRepository.findById(id);

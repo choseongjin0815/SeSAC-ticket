@@ -2,7 +2,7 @@ package com.onspring.onspring_customer.domain.user.controller;
 
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.service.EndUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,14 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Collections;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/view/users")
 public class UserViewController {
     private final EndUserService endUserService;
-
-    @Autowired
-    public UserViewController(EndUserService endUserService) {
-        this.endUserService = endUserService;
-    }
 
     @GetMapping("/add")
     String showSaveUser() {

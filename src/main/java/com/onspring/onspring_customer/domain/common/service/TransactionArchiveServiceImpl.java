@@ -8,9 +8,9 @@ import com.onspring.onspring_customer.domain.common.repository.TransactionReposi
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.entity.QFranchise;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,22 +24,13 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Log4j2
+@RequiredArgsConstructor
 @Service
 public class TransactionArchiveServiceImpl implements TransactionArchiveService {
     private final ModelMapper modelMapper;
     private final TransactionRepository transactionRepository;
     private final TransactionArchiveRepository transactionArchiveRepository;
     private final JPAQueryFactory queryFactory;
-
-    @Autowired
-    public TransactionArchiveServiceImpl(TransactionRepository transactionRepository,
-                                         TransactionArchiveRepository transactionArchiveRepository,
-                                         JPAQueryFactory queryFactory, ModelMapper modelMapper) {
-        this.transactionRepository = transactionRepository;
-        this.transactionArchiveRepository = transactionArchiveRepository;
-        this.queryFactory = queryFactory;
-        this.modelMapper = modelMapper;
-    }
 
     @Override
     public List<Long> closeTransactionById(List<Long> ids) {

@@ -2,7 +2,7 @@ package com.onspring.onspring_customer.domain.customer.controller;
 
 import com.onspring.onspring_customer.domain.customer.dto.AdminDto;
 import com.onspring.onspring_customer.domain.customer.service.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,14 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/view/admins")
 public class AdminViewController {
     private final AdminService adminService;
-
-    @Autowired
-    public AdminViewController(AdminService adminService) {
-        this.adminService = adminService;
-    }
 
     @PostMapping("/add")
     public String saveAdmin(@RequestParam(value = "customerId") Long customerId,

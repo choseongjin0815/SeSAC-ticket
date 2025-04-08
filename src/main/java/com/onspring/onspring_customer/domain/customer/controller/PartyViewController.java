@@ -3,7 +3,7 @@ package com.onspring.onspring_customer.domain.customer.controller;
 import com.onspring.onspring_customer.domain.common.dto.PartyEndUserDto;
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.service.PartyService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,14 +16,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/view/parties")
 public class PartyViewController {
     private final PartyService partyService;
-
-    @Autowired
-    public PartyViewController(PartyService partyService) {
-        this.partyService = partyService;
-    }
 
     @GetMapping("/add")
     public String showSaveParty() {

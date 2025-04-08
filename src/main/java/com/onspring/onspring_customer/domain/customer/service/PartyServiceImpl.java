@@ -14,9 +14,9 @@ import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +27,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 @Log4j2
+@RequiredArgsConstructor
 @Service
 public class PartyServiceImpl implements PartyService {
     private final PartyRepository partyRepository;
@@ -34,17 +35,6 @@ public class PartyServiceImpl implements PartyService {
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
-
-    @Autowired
-    public PartyServiceImpl(PartyRepository partyRepository, PartyEndUserRepository partyEndUserRepository,
-                            CustomerRepository customerRepository, ModelMapper modelMapper,
-                            JPAQueryFactory queryFactory) {
-        this.partyRepository = partyRepository;
-        this.partyEndUserRepository = partyEndUserRepository;
-        this.customerRepository = customerRepository;
-        this.modelMapper = modelMapper;
-        this.queryFactory = queryFactory;
-    }
 
     private Party getParty(Long id) {
         Optional<Party> result = partyRepository.findById(id);
@@ -174,10 +164,12 @@ public class PartyServiceImpl implements PartyService {
             partyList = partyRepository.findByNameContainsAllIgnoreCase(name);
         }
 
-        partyEndUserRepository.findAllById(partyList.stream()
+       List<PartyEndUser> list =  partyEndUserRepository.findAllById(partyList.stream()
                         .map(Party::getId)
-                        .toList())
-                .forEach(partyEndUser -> {
+                        .toList());
+
+
+                list.forEach(partyEndUser -> {
                     Party party = partyEndUser.getParty();
                     EndUserDto endUserDto = modelMapper.map(partyEndUser.getEndUser(), EndUserDto.class);
 
