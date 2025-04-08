@@ -1,11 +1,11 @@
-package com.onspring.onspring_customer.global.auth.service;
+package com.onspring.onspring_customer.domain.auth.service;
 
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
-import com.onspring.onspring_customer.global.auth.dto.LoginResponseDto;
+import com.onspring.onspring_customer.domain.auth.dto.LoginResponseDto;
 import com.onspring.onspring_customer.global.util.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

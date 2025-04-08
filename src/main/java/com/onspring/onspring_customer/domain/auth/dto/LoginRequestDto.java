@@ -1,4 +1,4 @@
-package com.onspring.onspring_customer.global.auth.dto;
+package com.onspring.onspring_customer.domain.auth.dto;
 
 import lombok.ToString;
 
