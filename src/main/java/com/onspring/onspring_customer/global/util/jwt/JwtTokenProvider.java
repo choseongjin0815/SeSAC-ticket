@@ -65,33 +65,6 @@ public class JwtTokenProvider {
     }
 
 
-//    public String createToken(String username, String role) {
-//        Date now = new Date();
-//        Date validity = new Date(now.getTime() + tokenValidityInMilliseconds);
-//
-//        return Jwts.builder()
-//                .setSubject(username)
-//                .claim("role", role)
-//                .setIssuedAt(now)
-//                .setExpiration(validity)
-//                .signWith(secretKey, SignatureAlgorithm.HS256)
-//                .compact();
-//    }
-//
-//
-//    public String createRefreshToken(String username, String role) {
-//        Date now = new Date();
-//
-//        Date validity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
-//
-//        return Jwts.builder()
-//                .setSubject(username)
-//                .claim("role", role)
-//                .setIssuedAt(now)
-//                .setExpiration(validity)
-//                .signWith(secretKey, SignatureAlgorithm.HS256)
-//                .compact();
-//    }
 
     public String reissueAccessToken(String refreshToken) {
         if (validateToken(refreshToken)) {
@@ -111,25 +84,6 @@ public class JwtTokenProvider {
     }
 
 
-//    public String reissueAccessToken(String refreshToken) {
-//        if (validateToken(refreshToken)) {
-//            log.info("Refresh token received: {}", refreshToken);
-//            Claims claims = Jwts.parserBuilder()
-//                    .setSigningKey(secretKey)
-//                    .build()
-//                    .parseClaimsJws(refreshToken)
-//                    .getBody();
-//
-//            String username = claims.getSubject();
-//            String role = claims.get("role", String.class);
-//
-//            log.info("userName: {}", username);
-//            log.info("role: {}", role);
-//            return createToken(username, role);
-//        }
-//        throw new RuntimeException("Invalid Refresh Token");
-//    }
-
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -145,7 +99,7 @@ public class JwtTokenProvider {
                 Arrays.asList(new SimpleGrantedAuthority(role));
 
         // CustomUserDetails 객체 생성
-        CustomUserDetails customUserDetails = new CustomUserDetails(id, username, role, authorities);
+        CustomUserDetails customUserDetails = new CustomUserDetails(id, username, "", role, authorities);
         log.info(customUserDetails);
         return new UsernamePasswordAuthenticationToken(
                 customUserDetails, // principal에 CustomUserDetails 설정
@@ -154,23 +108,6 @@ public class JwtTokenProvider {
         );
     }
 
-
-//    public Authentication getAuthentication(String token) {
-//        Claims claims = Jwts.parserBuilder()
-//                .setSigningKey(secretKey)
-//                .build()
-//                .parseClaimsJws(token)
-//                .getBody();
-//
-//        Collection<? extends GrantedAuthority> authorities =
-//                Arrays.asList(new SimpleGrantedAuthority(claims.get("role", String.class)));
-//
-//        return new UsernamePasswordAuthenticationToken(
-//                claims.getSubject(),
-//                "",
-//                authorities
-//        );
-//    }
 
     public boolean validateToken(String token) {
         try {
