@@ -4,7 +4,7 @@ import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.service.PartyService;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.service.EndUserService;
-import com.onspring.onspring_customer.global.auth.dto.PasswordUpdateRequest;
+import com.onspring.onspring_customer.domain.auth.dto.PasswordUpdateRequest;
 import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

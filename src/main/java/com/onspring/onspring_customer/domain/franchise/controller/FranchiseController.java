@@ -5,7 +5,7 @@ import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.service.TransactionService;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.service.FranchiseService;
-import com.onspring.onspring_customer.global.auth.dto.PasswordUpdateRequest;
+import com.onspring.onspring_customer.domain.auth.dto.PasswordUpdateRequest;
 import com.onspring.onspring_customer.global.util.file.CustomFileUtil;
 import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
