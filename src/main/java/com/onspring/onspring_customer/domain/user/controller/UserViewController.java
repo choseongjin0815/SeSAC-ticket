@@ -1,5 +1,7 @@
 package com.onspring.onspring_customer.domain.user.controller;
 
+import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
+import com.onspring.onspring_customer.domain.customer.service.PartyService;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.service.EndUserService;
 import lombok.RequiredArgsConstructor;
@@ -14,15 +16,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collections;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/view/users")
 public class UserViewController {
     private final EndUserService endUserService;
+    private final PartyService partyService;
+
 
     @GetMapping("/add")
-    String showSaveUser() {
+    String showSaveUser(Model model) {
+        List<PartyDto> partyList = partyService.findAllParty();
+
+        model.addAttribute("parties", partyList);
+
         return "users/add";
     }
 

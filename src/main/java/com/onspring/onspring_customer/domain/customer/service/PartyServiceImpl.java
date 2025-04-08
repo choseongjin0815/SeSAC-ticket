@@ -164,12 +164,10 @@ public class PartyServiceImpl implements PartyService {
             partyList = partyRepository.findByNameContainsAllIgnoreCase(name);
         }
 
-       List<PartyEndUser> list =  partyEndUserRepository.findAllById(partyList.stream()
+        partyEndUserRepository.findByParty_IdIn(partyList.stream()
                         .map(Party::getId)
-                        .toList());
-
-
-                list.forEach(partyEndUser -> {
+                        .toList())
+                .forEach(partyEndUser -> {
                     Party party = partyEndUser.getParty();
                     EndUserDto endUserDto = modelMapper.map(partyEndUser.getEndUser(), EndUserDto.class);
 
