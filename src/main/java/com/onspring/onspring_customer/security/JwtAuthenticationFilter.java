@@ -17,6 +17,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    //JWT 제외할 경로
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        //해당 경로들이 아닌 경우에는 필터 통과
+        return  !(path.startsWith("/api/user/") || path.startsWith("/api/franchise/"));
+    }
+
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
