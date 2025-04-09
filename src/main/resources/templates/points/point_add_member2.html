@@ -16,29 +16,24 @@
         <span class="path-item current">포인트 충전</span>
     </div>
 
-    <form action="add" method="post">
+    <form action="point" method="post">
         <!-- 회원 추가 폼 -->
         <div class="form-container">
             <table class="form-table">
                 <tr>
-                    <th>선택한 과정</th>
-                    <td>
-                        신입 개발자를 위한 자바 백엔드 심화 과정
-
-                    </td>
+                    <th>선택한 그룹</th>
+                    <td th:text="${party.name}"></td>
                 </tr>
                 <tr>
                     <th>선택된 회원</th>
-                    <td>
-                        김자바, 이분석
-
-                    </td>
+                    <td th:text="${#strings.listJoin(endUsers.![name], ', ')}" th:value="${endUsers.![id]}"></td>
+                    <input type="hidden" name="userIds" th:value="${endUsers.![id]}">
                 </tr>
                 <tr>
                     <th>충전 포인트</th>
                     <td>
-                        <input type="text" id="phone" class="form-input" name="phone"
-                               placeholder="20,000" required/>
+                        <input type="number" id="amount" class="form-input" name="amount"
+                               placeholder="20000" required/>
                     </td>
                 </tr>
 
@@ -51,10 +46,6 @@
             <button type="button" class="cancel-btn">취소</button>
         </div>
     </form>
-
-
-
-
 
 
 </div>
