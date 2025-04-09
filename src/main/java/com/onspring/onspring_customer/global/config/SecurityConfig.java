@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/franchise/login", "/api/user/login", "/api/token/refresh", "/api/franchise/menu/**").permitAll()
+                        .requestMatchers("/api/franchise/login", "/api/user/login", "/api/token/refresh", "/api/franchise/menu/**", "/api/user/menu/**").permitAll()
                         .requestMatchers("/view/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/franchise/**").hasRole("FRANCHISE")
