@@ -157,11 +157,79 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
+    public boolean assignPointToEndUserById(List<Long> endUserIds, Long partyId, BigDecimal amount,
+                                            LocalDateTime validThru) {
+        log.info("Assigning point to end users with ID {} associated with party ID {}", endUserIds, partyId);
+
+        List<Point> pointList = pointRepository.findByParty_IdAndEndUser_IdIn(partyId, endUserIds);
+
+        pointList.forEach(point -> {
+            point.setAssignedAmount(point.getCurrentAmount()
+                    .add(amount));
+            point.setCurrentAmount(point.getCurrentAmount()
+                    .add(amount));
+            point.setValidThru(validThru);
+        });
+
+        pointRepository.saveAll(pointList);
+
+        log.info("Successfully assigned point to end users with ID {} associated with party ID {}", endUserIds,
+                partyId);
+
+        return true;
+    }
+
+    @Override
+    public boolean updatePointOfEndUserById(Long endUserId, Long partyId, BigDecimal amount, LocalDateTime validThru) {
+        log.info("Updating point to end user with ID {} associated with party ID {}", endUserId, partyId);
+
+        Point point = pointRepository.findByParty_IdAndEndUser_Id(partyId, endUserId).orElseThrow();
+
+        point.setAssignedAmount(amount);
+        point.setCurrentAmount(amount);
+        point.setValidThru(validThru);
+
+        pointRepository.save(point);
+
+        log.info("Successfully updated point to end user with ID {} associated with party ID {}", endUserId, partyId);
+
+        return true;
+    }
+
+    @Override
+    public boolean updatePointOfEndUserById(List<Long> endUserIds, Long partyId, BigDecimal amount,
+                                            LocalDateTime validThru) {
+        log.info("Updating point to end users with ID {} associated with party ID {}", endUserIds, partyId);
+
+        List<Point> pointList = pointRepository.findByParty_IdAndEndUser_IdIn(partyId, endUserIds);
+
+        pointList.forEach(point -> {
+            point.setAssignedAmount(amount);
+            point.setCurrentAmount(amount);
+            point.setValidThru(validThru);
+        });
+
+        pointRepository.saveAll(pointList);
+
+        log.info("Successfully updated point to end users with ID {} associated with party ID {}", endUserIds, partyId);
+
+        return true;
+    }
+
+    @Override
     public PointDto findAvailablePointByEndUserIdAndPartyId(Long endUserId, Long partyId) {
         Point point = pointRepository.findByParty_IdAndEndUser_Id(partyId, endUserId)
                 .orElseThrow(() -> new EntityNotFoundException("Point with Party ID " + partyId + " and EndUser ID " + endUserId + " not found"));
 
         return modelMapper.map(point, PointDto.class);
+    }
+
+    @Override
+    public EndUserPointDto findEndUserAndPointByPartyIdAndEndUserId(Long partyId, Long endUserId) {
+        Point point = pointRepository.findByParty_IdAndEndUser_Id(partyId, endUserId)
+                .orElseThrow();
+        return new EndUserPointDto(modelMapper.map(point.getEndUser(), EndUserDto.class), modelMapper.map(point,
+                PointDto.class));
     }
 
     @Override
