@@ -26,11 +26,11 @@ public class FranchiseViewController {
     }
 
     @PostMapping("/add")
-    String saveFranchise(@RequestParam(value = "userName") String userName, @RequestParam(value = "name") String name
-            , @RequestParam(value = "ownerName") String ownerName,
-                         @RequestParam(value = "businessNumber") String businessNumber, @RequestParam(value =
-                    "address") String address, @RequestParam(value = "phone") String phone, @RequestParam(value =
-                    "password") String password) {
+    String saveFranchise(@RequestParam(value = "userName", required = false) String userName, @RequestParam(value =
+            "name", required = false) String name,
+                         @RequestParam(value = "ownerName", required = false) String ownerName, @RequestParam(value =
+                    "businessNumber", required = false) String businessNumber, @RequestParam(value = "address",
+                    required = false) String address, @RequestParam(value = "phone", required = false) String phone) {
         FranchiseDto franchiseDto = FranchiseDto.builder()
                 .userName(userName)
                 .name(name)
@@ -38,7 +38,6 @@ public class FranchiseViewController {
                 .businessNumber(businessNumber)
                 .address(address)
                 .phone(phone)
-                .password(password)
                 .build();
         franchiseService.saveFranchise(franchiseDto);
 
@@ -46,32 +45,17 @@ public class FranchiseViewController {
     }
 
     @GetMapping("/list")
-    String getFranchises(@RequestParam(value = "searchType", required = false) String searchType,
-                         @RequestParam(value = "keyword", required = false) String keyword, @RequestParam(value =
-                    "page", defaultValue = "1") Integer page,
-                         @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
+    String getFranchises(@RequestParam(value = "userName", required = false) String userName, @RequestParam(value =
+            "name", required = false) String name,
+                         @RequestParam(value = "ownerName", required = false) String ownerName, @RequestParam(value =
+                    "businessNumber", required = false) String businessNumber, @RequestParam(value = "address",
+                    required = false) String address, @RequestParam(value = "phone", required = false) String phone,
+                         @RequestParam(value = "customerName", required = false) String customerName,
+                         @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size"
+                    , defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<FranchiseDto> franchiseDtoPage;
-        if (searchType == null) {
-            franchiseDtoPage = franchiseService.findAllFranchiseByQuery(null, null, null, null, null, null, null,
-                    true, pageable);
-        } else {
-            franchiseDtoPage = switch (searchType) {
-                case "name" ->
-                        franchiseService.findAllFranchiseByQuery(null, keyword, null, null, null, null, null, true,
-                                pageable);
-                case "businessNumber" ->
-                        franchiseService.findAllFranchiseByQuery(null, null, null, keyword, null, null, null, true,
-                                pageable);
-                case "ownerName" ->
-                        franchiseService.findAllFranchiseByQuery(null, null, keyword, null, null, null, null, true,
-                                pageable);
-                case "phone" ->
-                        franchiseService.findAllFranchiseByQuery(null, null, null, null, null, keyword, null, true,
-                                pageable);
-                default -> throw new IllegalStateException("Unexpected value: " + searchType);
-            };
-        }
+        Page<FranchiseDto> franchiseDtoPage = franchiseService.findAllFranchiseByQuery(userName, name, ownerName,
+                businessNumber, address, phone, customerName, true, pageable);
 
         model.addAttribute("franchises", franchiseDtoPage.getContent());
         model.addAttribute("currentPage", page);

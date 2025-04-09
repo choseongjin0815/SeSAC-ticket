@@ -1,6 +1,5 @@
 package com.onspring.onspring_customer.domain.customer.service;
 
-import com.onspring.onspring_customer.domain.common.dto.PartyEndUserDto;
 import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
 import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
@@ -9,7 +8,6 @@ import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.entity.QParty;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
-import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -21,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
@@ -59,7 +58,7 @@ public class PartyServiceImpl implements PartyService {
 
         Customer customer = customerRepository.findById(partyDto.getCustomerId())
                 .orElseThrow(() -> new EntityNotFoundException("Customer with ID " + partyDto.getCustomerId() + " not"
-                                                               + " found"));
+                        + " found"));
 
         Party party = modelMapper.map(partyDto, Party.class);
         party.setCustomer(customer);
@@ -152,44 +151,35 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public Page<PartyEndUserDto> findAllPartyEndUserByQuery(String name, Pageable pageable) {
-        Map<Long, PartyEndUserDto> partyEndUserDtoMap = new HashMap<>();
-        List<Party> partyList;
-        if (name == null) {
-            partyList = partyRepository.findAll();
-        } else {
-            partyList = partyRepository.findByNameContainsAllIgnoreCase(name);
-        }
-
-        partyEndUserRepository.findByParty_IdIn(partyList.stream()
-                        .map(Party::getId)
-                        .toList())
-                .forEach(partyEndUser -> {
-                    Party party = partyEndUser.getParty();
-                    EndUserDto endUserDto = modelMapper.map(partyEndUser.getEndUser(), EndUserDto.class);
-
-                    if (!partyEndUserDtoMap.containsKey(party.getId())) {
-                        partyEndUserDtoMap.put(party.getId(), new PartyEndUserDto(party.getId(), party.getName()));
-                    }
-                    partyEndUserDtoMap.get(party.getId())
-                            .getEndUserList()
-                            .add(endUserDto);
-                });
-
-        log.info(partyEndUserDtoMap);
-
-        return new PageImpl<>(partyEndUserDtoMap.values()
-                .stream()
-                .toList(), pageable, partyEndUserDtoMap.size());
-    }
-
-    @Override
+    @Transactional
     public boolean updateParty(PartyDto partyDto) {
         log.info("Updating party with ID {}", partyDto.getId());
 
         Party party = getParty(partyDto.getId());
 
-        modelMapper.map(partyDto, party);
+        // Customer 관계 유지
+        Customer customer = party.getCustomer();
+
+        // 기본 필드 업데이트
+        party.setName(partyDto.getName());
+        party.setPeriod(partyDto.getPeriod());
+        party.setAmount(partyDto.getAmount());
+        party.setAllowedTimeStart(partyDto.getAllowedTimeStart());
+        party.setAllowedTimeEnd(partyDto.getAllowedTimeEnd());
+        party.setValidThru(partyDto.getValidThru());
+        party.setSunday(partyDto.isSunday());
+        party.setMonday(partyDto.isMonday());
+        party.setTuesday(partyDto.isTuesday());
+        party.setWednesday(partyDto.isWednesday());
+        party.setThursday(partyDto.isThursday());
+        party.setFriday(partyDto.isFriday());
+        party.setSaturday(partyDto.isSaturday());
+        party.setMaximumAmount(partyDto.getMaximumAmount());
+        party.setMaximumTransaction(partyDto.getMaximumTransaction());
+
+        // customer 관계 유지
+        party.setCustomer(customer);
+
         partyRepository.save(party);
 
         log.info("Successfully updated party with ID {}", partyDto.getId());

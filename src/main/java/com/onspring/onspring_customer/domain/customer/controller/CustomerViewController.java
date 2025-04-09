@@ -45,11 +45,12 @@ public class CustomerViewController {
     @GetMapping("/list")
     String getCustomers(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "address",
             required = false) String address, @RequestParam(value = "phone", required = false) String phone,
+                        @RequestParam(value = "showDeactivated", defaultValue = "false") Boolean showDeactivated,
                         @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size",
                     defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<CustomerDto> customerDtoPage = customerService.findAllCustomerByQuery(name, address, phone, true,
-                pageable);
+        Page<CustomerDto> customerDtoPage = customerService.findAllCustomerByQuery(name, address, phone,
+                showDeactivated, pageable);
 
         model.addAttribute("customers", customerDtoPage.getContent());
         model.addAttribute("currentPage", page);

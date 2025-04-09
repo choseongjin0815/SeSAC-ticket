@@ -15,7 +15,6 @@ public class HomeController {
 
     @GetMapping("/members/add")
     public String addMember(Model model) {
-
         return "members/add";
     }
 

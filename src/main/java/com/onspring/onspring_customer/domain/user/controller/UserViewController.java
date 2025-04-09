@@ -10,11 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,7 +54,7 @@ public class UserViewController {
 
     @GetMapping("/list")
     String getUsers(@RequestParam(value = "searchType", required = false) String searchType, @RequestParam(value =
-            "keyword", required = false) String keyword,
+                            "keyword", required = false) String keyword,
                     @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size",
                     defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -103,4 +101,53 @@ public class UserViewController {
 
         return "users/activate";
     }
+    @GetMapping("/edit/{id}")
+    String showEditForm(@PathVariable Long id, Model model) {
+        // 회원 정보 가져오기
+        EndUserDto user = endUserService.findEndUserById(id);
+
+        // 그룹 목록 가져오기
+        List<PartyDto> parties = partyService.findAllParty();
+
+
+        // 디버깅 로그 추가
+        System.out.println("User: " + user);
+        System.out.println("Parties size: " + (parties != null ? parties.size() : "null"));
+        if(parties != null && !parties.isEmpty()) {
+            System.out.println("First party: " + parties.get(0).getName());
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("parties", parties);
+
+        return "users/edit";
+    }
+
+    @PostMapping("/edit/{id}")
+    String updateUser(@PathVariable Long id,
+                      @RequestParam(value = "name") String name,
+                      @RequestParam(value = "phone") String phone,
+                      @RequestParam(value = "partyIds", required = false) List<Long> partyIds) {
+
+        // 기존 회원 정보 가져오기
+        EndUserDto userDto = endUserService.findEndUserById(id);
+
+        // 정보 업데이트
+        userDto.setName(name);
+        userDto.setPhone(phone);
+
+        // partyIds가 null인 경우 빈 리스트로 설정
+        if (partyIds == null) {
+            partyIds = new ArrayList<>();
+        }
+
+        userDto.setPartyIds(partyIds);
+
+
+        // 업데이트 처리
+        endUserService.saveEndUser(userDto);
+
+        return "redirect:/view/users/list";
+    }
+
 }

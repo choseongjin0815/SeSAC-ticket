@@ -63,30 +63,55 @@ public class EndUserServiceImpl implements EndUserService {
     }
 
     @Override
+    @Transactional
     public Long saveEndUser(EndUserDto endUserDto) {
-        log.info("Saving end user with name {} associated with party ID {}", endUserDto.getName(),
-                endUserDto.getPartyIds()
-                .get(0));
+        log.info("Saving end user with name {} associated with party IDs {}", endUserDto.getName(),
+                endUserDto.getPartyIds());
 
-        EndUser endUser = modelMapper.map(endUserDto, EndUser.class);
+        // 엔티티가 이미 존재하는지 확인 (업데이트 케이스)
+        EndUser endUser;
+        boolean isUpdate = endUserDto.getId() != null;
 
-        Party party = getParty(endUserDto.getPartyIds()
-                .get(0));
+        if (isUpdate) {
+            // 기존 사용자 조회
+            endUser = getEndUser(endUserDto.getId());
+            // 기본 정보 업데이트
+            endUser.setName(endUserDto.getName());
+            endUser.setPhone(endUserDto.getPhone());
+            endUser.setActivated(endUserDto.isActivated());
 
-        Long id = endUserRepository.save(endUser)
-                .getId();
+            // 비밀번호가 제공된 경우에만 업데이트
+            if (endUserDto.getPassword() != null && !endUserDto.getPassword().isEmpty()) {
+                endUser.setPassword(endUserDto.getPassword());
+            }
 
-        PartyEndUser partyEndUser = new PartyEndUser();
-        partyEndUser.setParty(party);
-        partyEndUser.setEndUser(endUser);
+            // 기존 파티 연결 관계 모두 삭제
+            partyEndUserRepository.deleteAll(endUser.getPartyEndUsers());
+            endUser.getPartyEndUsers().clear();
+        } else {
+            // 새 사용자 생성
+            endUser = modelMapper.map(endUserDto, EndUser.class);
+        }
 
-        partyEndUserRepository.save(partyEndUser);
+        // 사용자 저장 또는 업데이트
+        endUser = endUserRepository.save(endUser);
 
-        log.info("Successfully saved end user with name {} associated with party ID {}", endUserDto.getName(),
-                endUserDto.getPartyIds()
-                .get(0));
+        // 모든 파티와의 연결 관계 생성
+        if (endUserDto.getPartyIds() != null && !endUserDto.getPartyIds().isEmpty()) {
+            for (Long partyId : endUserDto.getPartyIds()) {
+                Party party = getParty(partyId);
 
-        return id;
+                PartyEndUser partyEndUser = new PartyEndUser();
+                partyEndUser.setParty(party);
+                partyEndUser.setEndUser(endUser);
+
+                partyEndUserRepository.save(partyEndUser);
+            }
+        }
+
+        log.info("Successfully saved/updated end user with ID {}", endUser.getId());
+
+        return endUser.getId();
     }
 
     @Transactional
@@ -108,7 +133,7 @@ public class EndUserServiceImpl implements EndUserService {
         endUserDto.setPartyIds(partyIds);
         endUserDto.setPointIds(pointIds);
 
-        return modelMapper.map(endUser, EndUserDto.class);
+        return endUserDto;
     }
 
     @Override

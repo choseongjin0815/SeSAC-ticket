@@ -67,7 +67,7 @@
                 <td th:text="*{validThru}"></td>
                 <td th:text="*{formattedDays}"></td>
                 <td>
-                    <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">
+                    <button th:onclick="'location.href=\'/view/parties/edit/' + *{id} + '\''" style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">
                         수정
                     </button>
                 </td>
@@ -89,7 +89,7 @@
     </div>
 
     <!-- 페이지네이션 -->
-    <div style="margin-top: 30px; text-align: center;" th:if="${totalPages > 1}">
+    <div style="margin-top: 30px; text-align: center;">
         <div style="display: inline-block;">
             <a style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;"
                th:if="${currentPage > 1}" th:href="@{list(page=${currentPage - 1}, size=${size})}">&lt;</a>
