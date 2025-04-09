@@ -69,7 +69,20 @@
             allCheckBtn.textContent = allChecked ? '전체 해제' : '전체 선택';
         }
 
+        function addPointToUsers() {
+            const userIds = [
+                ...document.querySelectorAll("tr[id]:has(input:checked)"),
+            ].map((x) => x.id);
 
+            if (userIds.length === 0) {
+                alert("포인트를 추가할 사용자를 선택해 주세요.");
+                return;
+            }
+
+            let searchParams = new URLSearchParams();
+            searchParams.append("userIds", userIds);
+            window.location.href = window.location.href + "/point?" + searchParams.toString();
+        }
     </script>
 </div>
 
