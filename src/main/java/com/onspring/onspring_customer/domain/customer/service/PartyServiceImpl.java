@@ -27,7 +27,6 @@ import java.util.*;
 @Service
 public class PartyServiceImpl implements PartyService {
     private final PartyRepository partyRepository;
-    private final PartyEndUserRepository partyEndUserRepository;
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
@@ -37,7 +36,6 @@ public class PartyServiceImpl implements PartyService {
                             JPAQueryFactory queryFactory) {
     public PartyServiceImpl(PartyRepository partyRepository, CustomerRepository customerRepository,
         this.partyRepository = partyRepository;
-        this.partyEndUserRepository = partyEndUserRepository;
         this.customerRepository = customerRepository;
         this.modelMapper = modelMapper;
         this.queryFactory = queryFactory;
