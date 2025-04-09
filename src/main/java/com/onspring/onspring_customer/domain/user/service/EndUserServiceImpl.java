@@ -112,6 +112,14 @@ public class EndUserServiceImpl implements EndUserService {
     }
 
     @Override
+    public List<EndUserDto> findEndUserById(List<Long> ids) {
+        return endUserRepository.findAllById(ids)
+                .stream()
+                .map(element -> modelMapper.map(element, EndUserDto.class))
+                .toList();
+    }
+
+    @Override
     public List<EndUserDto> findAllEndUser() {
         List<EndUser> endUserList = endUserRepository.findAll();
         List<EndUserDto> endUserDtoList = new ArrayList<>();
