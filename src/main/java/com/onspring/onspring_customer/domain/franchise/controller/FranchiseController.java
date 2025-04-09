@@ -79,9 +79,9 @@ public class FranchiseController {
     //메뉴 사진 업로드
     @PutMapping(value = "/menu", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadMenu(@ModelAttribute FranchiseDto franchiseDto) {
-        Long id = 2L; // 테스트용 ID
+        Long franchiseId = SecurityUtil.getCurrentUserId();
 
-        FranchiseDto oldFranchiseDto = franchiseService.findFranchiseById(id);
+        FranchiseDto oldFranchiseDto = franchiseService.findFranchiseById(franchiseId);
         log.info(oldFranchiseDto);
 
         //기존 데이터베이스에 존재하는 파일들
