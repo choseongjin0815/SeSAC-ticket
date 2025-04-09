@@ -15,7 +15,6 @@
     </div>
 
 
-
     <!-- 전체 선택 버튼-->
     <div style="margin-top: 20px; margin-bottom: 10px; text-align: right;">
         <button id="allCheck" onclick="toggleAllCheckboxes()"
@@ -31,21 +30,18 @@
             <tr style="background-color: #f2f2f2; height: 40px;">
                 <th style="width: 5%;">이름</th>
                 <th style="width: 10%;">아이디</th>
-                <th style="width: 10%;">생년월일</th>
-                <th style="width: 35%;">과정</th>
                 <th style="width: 8%;">현재 포인트</th>
                 <th style="width: 5%;">선택</th>
             </tr>
             </thead>
 
             <tbody>
-            <tr style="border-bottom: 1px solid #e0e0e0; height: 50px;">
-                <td>김자바</td>
-                <td>01045644565</td>
-                <td>1998.08.18</td>
-                <td>신입 개발자를 위한 자바 백엔드 심화 과정</td>
-                <td>0</td>
-                <td><input type="checkbox" class="member-checkbox" value="1" /></td>
+            <tr style="border-bottom: 1px solid #e0e0e0; height: 50px;" th:each="model : ${models}"
+                th:id="${model.endUserDto.id}" th:object="${model}">
+                <td th:text="*{endUserDto.name}"></td>
+                <td th:text="*{endUserDto.phone}"></td>
+                <td th:text="*{pointDto.currentAmount}"></td>
+                <td><input type="checkbox" class="member-checkbox" value="1"/></td>
             </tr>
 
             </tbody>
@@ -53,7 +49,7 @@
     </div>
 
     <div class="btn-container">
-        <button type="submit" class="submit-btn">추가하기</button>
+        <button type="submit" class="submit-btn" onclick="addPointToUsers()">추가하기</button>
     </div>
 
     <script>
