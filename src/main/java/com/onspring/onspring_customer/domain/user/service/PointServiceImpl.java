@@ -2,6 +2,8 @@ package com.onspring.onspring_customer.domain.user.service;
 
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
+import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
+import com.onspring.onspring_customer.domain.user.dto.EndUserPointDto;
 import com.onspring.onspring_customer.domain.user.dto.PointDto;
 import com.onspring.onspring_customer.domain.user.dto.PointResponseDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
@@ -13,11 +15,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,6 +45,27 @@ public class PointServiceImpl implements PointService {
     private Party getParty(Long id) {
         return partyRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Party with ID " + id + " not found"));
+    }
+
+    private EndUserPointDto createEndUserPointDto(EndUser endUser, Party party, Long partyId) {
+        PointDto pointDto = endUser.getPoints()
+                .stream()
+                .filter(point -> Objects.equals(point.getParty()
+                        .getId(), partyId))
+                .findFirst()
+                .map(point -> modelMapper.map(point, PointDto.class))
+                .orElseGet(() -> createDefaultPointDto(party, endUser));
+
+        return new EndUserPointDto(modelMapper.map(endUser, EndUserDto.class), pointDto);
+    }
+
+    private PointDto createDefaultPointDto(Party party, EndUser endUser) {
+        return modelMapper.map(Point.builder()
+                .party(party)
+                .endUser(endUser)
+                .assignedAmount(BigDecimal.ZERO)
+                .currentAmount(BigDecimal.ZERO)
+                .build(), PointDto.class);
     }
 
     /**
@@ -135,5 +162,18 @@ public class PointServiceImpl implements PointService {
                 .orElseThrow(() -> new EntityNotFoundException("Point with Party ID " + partyId + " and EndUser ID " + endUserId + " not found"));
 
         return modelMapper.map(point, PointDto.class);
+    }
+
+    @Override
+    public Page<EndUserPointDto> findAllEndUserAndPointByPartyId(Long id, Pageable pageable) {
+        Party party = getParty(id);
+
+        List<EndUserPointDto> endUserPointDtoList = party.getPoints()
+                .stream()
+                .map(Point::getEndUser)
+                .map(endUser -> createEndUserPointDto(endUser, party, id))
+                .toList();
+
+        return new PageImpl<>(endUserPointDtoList, pageable, endUserPointDtoList.size());
     }
 }
