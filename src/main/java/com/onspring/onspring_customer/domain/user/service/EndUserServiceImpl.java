@@ -1,7 +1,5 @@
 package com.onspring.onspring_customer.domain.user.service;
 
-import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
-import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.entity.QParty;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
@@ -37,7 +35,6 @@ import java.util.Optional;
 public class EndUserServiceImpl implements EndUserService {
     private final EndUserRepository endUserRepository;
     private final PartyRepository partyRepository;
-    private final PartyEndUserRepository partyEndUserRepository;
     private final PointRepository pointRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
