@@ -7,11 +7,13 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class PointDto implements Serializable {
     Long id;
 
+    @NotNull
     PartyDto partyDto;
 
     EndUserDto endUserDto;
@@ -23,5 +25,7 @@ public class PointDto implements Serializable {
     BigDecimal currentAmount;
 
     LocalDateTime validThru;
+
+    List<EndUserDto> endUserDtoList;
 
 }

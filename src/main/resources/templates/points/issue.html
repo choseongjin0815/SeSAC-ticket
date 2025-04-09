@@ -16,14 +16,19 @@
     <!-- 검색 폼 -->
     <div class="search-form" style="margin-bottom: 20px;">
         <form action="#" method="get" style="display: flex;">
-            <select name="searchType" style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; border-right: none;">
+            <select name="searchType"
+                    style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; border-right: none;">
                 <option value="name">이름</option>
                 <option value="id">아이디</option>
                 <option value="party">그룹</option>
 
             </select>
-            <input type="text" name="keyword" placeholder="검색어를 입력하세요" style="flex-grow: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 0;">
-            <button type="submit" style="width: 80px; background-color: #4CAF50; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer;">검색</button>
+            <input type="text" name="keyword" placeholder="검색어를 입력하세요"
+                   style="flex-grow: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 0;">
+            <button type="submit"
+                    style="width: 80px; background-color: #4CAF50; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer;">
+                검색
+            </button>
         </form>
     </div>
 
@@ -44,43 +49,20 @@
             </tr>
             </thead>
             <tbody>
-            <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
-                <td>1</td>
-                <td>신입 개발자를 위한 자바 백엔드 심화 과정</td>
-                <td>10,000</td>
-                <td>1</td>
-                <td>11:30 ~ 13:00</td>
-                <td>2025.01.01</td>
-                <td>2025.04.18</td>
-                <td>월, 수, 금</td>
+            <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;" th:each="party : ${parties}" th:id="${party.id}"
+                th:object="${party}">
+                <td th:text="*{id}"></td>
+                <td th:text="*{name}"></td>
+                <td th:text="*{maximumAmount}"></td>
+                <td th:text="*{maximumTransaction}"></td>
+                <td th:text="*{allowedTimeStart} + ' ~ ' + *{allowedTimeEnd}"></td>
+                <td>?</td>
+                <td>?</td>
+                <td th:text="*{getFormattedDays}"></td>
                 <td>
-                    <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">충전</button>
-                </td>
-            </tr>
-            <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
-                <td>2</td>
-                <td>러닝메이트-온봄</td>
-                <td>15,000</td>
-                <td>1</td>
-                <td>14:00 ~ 20:00</td>
-                <td>2025.01.01</td>
-                <td>2025.04.16</td>
-                <td>월,화,수,목,금</td>
-                <td>
-                    <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">충전</button>
-                </td>
-            </tr>
-            <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
-                <td>3</td>
-                <td>러닝메이트-러닝</td>
-                <td>15,000</td>
-                <td>1</td>
-                <td>14:00 ~ 20:00</td>
-                <td>2025.01.01</td>
-                <td>2025.04.16</td>
-                <td>토,일</td>
-                <td>
-                    <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">충전</button>
+                    <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;" th:onclick="|location.href='add/*{id}'|">
+                        충전
+                    </button>
                 </td>
             </tr>
             </tbody>

@@ -11,9 +11,9 @@ public interface FranchiseRepository extends JpaRepository<Franchise, Long> {
 
     @Query("SELECT DISTINCT f FROM Franchise f " +
             "JOIN CustomerFranchise cf ON cf.franchise = f " +
-            "JOIN Party p ON p.customer = cf.customer " +
-            "JOIN PartyEndUser peu ON peu.party = p " +
-            "WHERE peu.endUser.id = :endUserId")
+            "JOIN Party p ON p.customer.id = cf.customer.id " +
+            "JOIN Point p1 ON p1.party.customer.id = p.customer.id " +
+            "WHERE p1.endUser.id = :endUserId")
     Page<Franchise> findAllFranchiseByEndUserId(@Param("endUserId") Long endUserId, Pageable pageable);
 
     Franchise findByUserName(String userName);

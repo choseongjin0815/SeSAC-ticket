@@ -24,7 +24,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,6 +42,7 @@ public class EndUserServiceImpl implements EndUserService {
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
     private final PasswordEncoder passwordEncoder;
+
 
 
     private EndUser getEndUser(Long id) {
@@ -70,11 +70,14 @@ public class EndUserServiceImpl implements EndUserService {
         Long id = endUserRepository.save(endUser)
                 .getId();
 
-        PartyEndUser partyEndUser = new PartyEndUser();
-        partyEndUser.setParty(party);
-        partyEndUser.setEndUser(endUser);
+        Point point = Point.builder()
+                .party(party)
+                .endUser(endUser)
+                .assignedAmount(BigDecimal.ZERO)
+                .currentAmount(BigDecimal.ZERO)
+                .build();
 
-        partyEndUserRepository.save(partyEndUser);
+        pointRepository.save(point);
 
         log.info("Successfully saved end user with name {} associated with party ID {}", endUserDto.getName(),
                 endUserDto.getPartyIds()
@@ -88,9 +91,9 @@ public class EndUserServiceImpl implements EndUserService {
     public EndUserDto findEndUserById(Long id) {
         EndUser endUser = getEndUser(id);
 
-        List<Long> partyIds = endUser.getPartyEndUsers()
+        List<Long> partyIds = endUser.getPoints()
                 .stream()
-                .map(PartyEndUser::getParty)
+                .map(Point::getParty)
                 .map(Party::getId)
                 .toList();
         List<Long> pointIds = endUser.getPoints()
@@ -106,15 +109,23 @@ public class EndUserServiceImpl implements EndUserService {
     }
 
     @Override
+    public List<EndUserDto> findEndUserById(List<Long> ids) {
+        return endUserRepository.findAllById(ids)
+                .stream()
+                .map(element -> modelMapper.map(element, EndUserDto.class))
+                .toList();
+    }
+
+    @Override
     public List<EndUserDto> findAllEndUser() {
         List<EndUser> endUserList = endUserRepository.findAll();
         List<EndUserDto> endUserDtoList = new ArrayList<>();
 
         for (EndUser element : endUserList) {
             EndUserDto map = modelMapper.map(element, EndUserDto.class);
-            map.setPartyIds(element.getPartyEndUsers()
+            map.setPartyIds(element.getPoints()
                     .stream()
-                    .map(PartyEndUser::getParty)
+                    .map(Point::getParty)
                     .map(Party::getId)
                     .toList());
             map.setPointIds(element.getPoints()
@@ -143,7 +154,7 @@ public class EndUserServiceImpl implements EndUserService {
                     .where(party.name.containsIgnoreCase(partyName))
                     .fetch();
 
-            query.where(endUser.partyEndUsers.any().party.id.in(partyIds));
+            query.where(endUser.points.any().party.id.in(partyIds));
         }
         if (phone != null) {
             query.where(endUser.phone.contains(phone));
@@ -165,9 +176,9 @@ public class EndUserServiceImpl implements EndUserService {
 
         for (EndUser element : endUserList) {
             EndUserDto map = modelMapper.map(element, EndUserDto.class);
-            map.setPartyIds(element.getPartyEndUsers()
+            map.setPartyIds(element.getPoints()
                     .stream()
-                    .map(PartyEndUser::getParty)
+                    .map(Point::getParty)
                     .map(Party::getId)
                     .toList());
             map.setPointIds(element.getPoints()

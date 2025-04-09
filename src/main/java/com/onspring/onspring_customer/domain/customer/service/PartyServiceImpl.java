@@ -1,9 +1,7 @@
 package com.onspring.onspring_customer.domain.customer.service;
 
-import com.onspring.onspring_customer.domain.common.dto.PartyEndUserDto;
-import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
-import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
+import com.onspring.onspring_customer.domain.customer.dto.PartyEndUserRelationDto;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.entity.QParty;
@@ -11,6 +9,9 @@ import com.onspring.onspring_customer.domain.customer.repository.CustomerReposit
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
+import com.onspring.onspring_customer.domain.user.entity.Point;
+import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
+import com.onspring.onspring_customer.domain.user.repository.PointRepository;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,13 +26,16 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
 @Service
 public class PartyServiceImpl implements PartyService {
+    private final PointRepository pointRepository;
+    private final EndUserRepository endUserRepository;
     private final PartyRepository partyRepository;
-    private final PartyEndUserRepository partyEndUserRepository;
+
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
@@ -40,6 +44,10 @@ public class PartyServiceImpl implements PartyService {
         Optional<Party> result = partyRepository.findById(id);
 
         return result.orElseThrow(() -> new EntityNotFoundException("Party with ID " + id + " not found"));
+    }
+
+    private List<EndUser> getEndUser(List<Long> ids) {
+        return endUserRepository.findAllById(ids);
     }
 
     @Override
@@ -69,9 +77,9 @@ public class PartyServiceImpl implements PartyService {
         PartyDto partyDto = modelMapper.map(party, PartyDto.class);
         partyDto.setCustomerId(party.getCustomer()
                 .getId());
-        partyDto.setEndUserIds(party.getPartyEndUsers()
+        partyDto.setEndUserIds(party.getPoints()
                 .stream()
-                .map(PartyEndUser::getEndUser)
+                .map(Point::getEndUser)
                 .map(EndUser::getId)
                 .toList());
 
@@ -143,9 +151,9 @@ public class PartyServiceImpl implements PartyService {
 
         for (Party element : partyList) {
             PartyDto map = modelMapper.map(element, PartyDto.class);
-            map.setEndUserIds(element.getPartyEndUsers()
+            map.setEndUserIds(element.getPoints()
                     .stream()
-                    .map(PartyEndUser::getEndUser)
+                    .map(Point::getEndUser)
                     .map(EndUser::getId)
                     .toList());
             partyDtoList.add(map);
@@ -155,35 +163,54 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public Page<PartyEndUserDto> findAllPartyEndUserByQuery(String name, Pageable pageable) {
-        Map<Long, PartyEndUserDto> partyEndUserDtoMap = new HashMap<>();
-        List<Party> partyList;
-        if (name == null) {
-            partyList = partyRepository.findAll();
-        } else {
-            partyList = partyRepository.findByNameContainsAllIgnoreCase(name);
-        }
-
-        partyEndUserRepository.findByParty_IdIn(partyList.stream()
-                        .map(Party::getId)
-                        .toList())
-                .forEach(partyEndUser -> {
-                    Party party = partyEndUser.getParty();
-                    EndUserDto endUserDto = modelMapper.map(partyEndUser.getEndUser(), EndUserDto.class);
-
-                    if (!partyEndUserDtoMap.containsKey(party.getId())) {
-                        partyEndUserDtoMap.put(party.getId(), new PartyEndUserDto(party.getId(), party.getName()));
-                    }
-                    partyEndUserDtoMap.get(party.getId())
-                            .getEndUserList()
-                            .add(endUserDto);
-                });
-
-        log.info(partyEndUserDtoMap);
-
-        return new PageImpl<>(partyEndUserDtoMap.values()
+    public Page<PartyEndUserRelationDto> findAllPartyEndUserRelationByQuery(String name, Pageable pageable) {
+        Map<Long, List<Point>> pointMap = pointRepository.findAll()
                 .stream()
-                .toList(), pageable, partyEndUserDtoMap.size());
+                .collect(Collectors.groupingBy(point -> point.getParty()
+                        .getId()));
+
+        List<PartyEndUserRelationDto> partyEndUserRelationDtoList = pointMap.values()
+                .stream()
+                .map(points -> {
+
+                    PartyDto partyDto = modelMapper.map(points.stream()
+                            .findFirst()
+                            .orElseThrow()
+                            .getParty(), PartyDto.class);
+                    List<EndUserDto> endUserDtoList = points.stream()
+                            .map(Point::getEndUser)
+                            .map(element -> modelMapper.map(element, EndUserDto.class))
+                            .toList();
+
+                    return new PartyEndUserRelationDto(partyDto, endUserDtoList);
+                })
+                .toList();
+
+        return new PageImpl<>(partyEndUserRelationDtoList, pageable, partyEndUserRelationDtoList.size());
+    }
+
+    @Override
+    public List<Long> addEndUserToParty(Long partyId, List<Long> endUserIds) {
+        log.info("Adding points with end users ID {} to party ID {}", endUserIds, partyId);
+
+        Party party = getParty(partyId);
+        List<EndUser> endUserList = getEndUser(endUserIds);
+
+        List<Point> points = endUserList.stream()
+                .map(endUser -> Point.builder()
+                        .party(party)
+                        .endUser(endUser)
+                        .assignedAmount(BigDecimal.ZERO)
+                        .currentAmount(BigDecimal.ZERO)
+                        .build())
+                .toList();
+        pointRepository.saveAll(points);
+
+        log.info("Successfully added points with end users ID {} to party id {}", endUserIds, partyId);
+
+        return points.stream()
+                .map(Point::getId)
+                .toList();
     }
 
     @Override

@@ -14,6 +14,8 @@ public interface EndUserService {
 
     EndUserDto findEndUserById(Long id);
 
+    List<EndUserDto> findEndUserById(List<Long> ids);
+
     List<EndUserDto> findAllEndUser();
 
     Page<EndUserDto> findAllEndUserByQuery(String name, String partyName, String phone, boolean isActivated,
