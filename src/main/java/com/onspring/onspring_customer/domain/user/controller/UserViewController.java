@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import java.util.List;
 public class UserViewController {
     private final EndUserService endUserService;
     private final PartyService partyService;
+    private final PasswordEncoder passwordEncoder;
 
 
     @GetMapping("/add")
@@ -42,7 +44,7 @@ public class UserViewController {
         endUserDto.setName(name);
         endUserDto.setPhone(phone);
         endUserDto.setPartyIds(Collections.singletonList(partyId));
-        endUserDto.setPassword(password);
+        endUserDto.setPassword(passwordEncoder.encode(password));
         endUserDto.setActivated(true);
 
         endUserService.saveEndUser(endUserDto);

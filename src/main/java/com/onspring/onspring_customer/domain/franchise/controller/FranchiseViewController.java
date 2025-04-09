@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/view/franchises")
 public class FranchiseViewController {
     private final FranchiseService franchiseService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/add")
     String showSaveFranchise() {
@@ -34,7 +36,7 @@ public class FranchiseViewController {
                 .businessNumber(businessNumber)
                 .address(address)
                 .phone(phone)
-                .password(password)
+                .password(passwordEncoder.encode(password))
                 .build();
         franchiseService.saveFranchise(franchiseDto);
 
