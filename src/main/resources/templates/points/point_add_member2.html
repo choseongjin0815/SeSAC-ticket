@@ -26,8 +26,8 @@
                 </tr>
                 <tr>
                     <th>선택된 회원</th>
-                    <td th:text="${#strings.listJoin(endUsers.![name], ', ')}" th:value="${endUsers.![id]}"></td>
-                    <input type="hidden" name="userIds" th:value="${endUsers.![id]}">
+                    <td th:text="${#strings.listJoin(endUsers.![name], ', ')}"></td>
+                    <input type="hidden" name="userIds" th:each="endUser : ${endUsers}" th:value="${endUser.id}">
                 </tr>
                 <tr>
                     <th>충전 포인트</th>
