@@ -1,7 +1,6 @@
 package com.onspring.onspring_customer.domain.customer.entity;
 
 import com.onspring.onspring_customer.domain.common.entity.BaseEntity;
-import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.user.entity.Point;
 import jakarta.persistence.*;
@@ -78,8 +77,5 @@ public class Party extends BaseEntity {
 
     @OneToMany(mappedBy = "party")
     private Set<Transaction> transactions = new HashSet<>();
-
-    @OneToMany(mappedBy = "party")
-    private Set<Point> points = new HashSet<>();
 
 }

@@ -1,8 +1,5 @@
 package com.onspring.onspring_customer.domain.customer.service;
 
-import com.onspring.onspring_customer.domain.common.dto.PartyEndUserDto;
-import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
-import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
@@ -36,9 +33,9 @@ public class PartyServiceImpl implements PartyService {
     private final JPAQueryFactory queryFactory;
 
     @Autowired
-    public PartyServiceImpl(PartyRepository partyRepository, PartyEndUserRepository partyEndUserRepository,
                             CustomerRepository customerRepository, ModelMapper modelMapper,
                             JPAQueryFactory queryFactory) {
+    public PartyServiceImpl(PartyRepository partyRepository, CustomerRepository customerRepository,
         this.partyRepository = partyRepository;
         this.partyEndUserRepository = partyEndUserRepository;
         this.customerRepository = customerRepository;
@@ -79,9 +76,9 @@ public class PartyServiceImpl implements PartyService {
         PartyDto partyDto = modelMapper.map(party, PartyDto.class);
         partyDto.setCustomerId(party.getCustomer()
                 .getId());
-        partyDto.setEndUserIds(party.getPartyEndUsers()
+        partyDto.setEndUserIds(party.getPoints()
                 .stream()
-                .map(PartyEndUser::getEndUser)
+                .map(Point::getEndUser)
                 .map(EndUser::getId)
                 .toList());
 
@@ -140,9 +137,9 @@ public class PartyServiceImpl implements PartyService {
 
         for (Party element : partyList) {
             PartyDto map = modelMapper.map(element, PartyDto.class);
-            map.setEndUserIds(element.getPartyEndUsers()
+            map.setEndUserIds(element.getPoints()
                     .stream()
-                    .map(PartyEndUser::getEndUser)
+                    .map(Point::getEndUser)
                     .map(EndUser::getId)
                     .toList());
             partyDtoList.add(map);

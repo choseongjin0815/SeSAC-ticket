@@ -1,7 +1,5 @@
 package com.onspring.onspring_customer.domain.user.service;
 
-import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
-import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.entity.QParty;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
@@ -24,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,18 +33,16 @@ import java.util.Optional;
 public class EndUserServiceImpl implements EndUserService {
     private final EndUserRepository endUserRepository;
     private final PartyRepository partyRepository;
-    private final PartyEndUserRepository partyEndUserRepository;
     private final PointRepository pointRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
 
     @Autowired
     public EndUserServiceImpl(EndUserRepository endUserRepository, PartyRepository partyRepository,
-                              PartyEndUserRepository partyEndUserRepository, PointRepository pointRepository,
+                              PointRepository pointRepository,
                               ModelMapper modelMapper, JPAQueryFactory queryFactory) {
         this.endUserRepository = endUserRepository;
         this.partyRepository = partyRepository;
-        this.partyEndUserRepository = partyEndUserRepository;
         this.pointRepository = pointRepository;
         this.modelMapper = modelMapper;
         this.queryFactory = queryFactory;
@@ -76,11 +73,14 @@ public class EndUserServiceImpl implements EndUserService {
         Long id = endUserRepository.save(endUser)
                 .getId();
 
-        PartyEndUser partyEndUser = new PartyEndUser();
-        partyEndUser.setParty(party);
-        partyEndUser.setEndUser(endUser);
+        Point point = Point.builder()
+                .party(party)
+                .endUser(endUser)
+                .assignedAmount(BigDecimal.ZERO)
+                .currentAmount(BigDecimal.ZERO)
+                .build();
 
-        partyEndUserRepository.save(partyEndUser);
+        pointRepository.save(point);
 
         log.info("Successfully saved end user with name {} associated with party ID {}", endUserDto.getName(),
                 endUserDto.getPartyIds()
@@ -94,9 +94,9 @@ public class EndUserServiceImpl implements EndUserService {
     public EndUserDto findEndUserById(Long id) {
         EndUser endUser = getEndUser(id);
 
-        List<Long> partyIds = endUser.getPartyEndUsers()
+        List<Long> partyIds = endUser.getPoints()
                 .stream()
-                .map(PartyEndUser::getParty)
+                .map(Point::getParty)
                 .map(Party::getId)
                 .toList();
         List<Long> pointIds = endUser.getPoints()
@@ -118,9 +118,9 @@ public class EndUserServiceImpl implements EndUserService {
 
         for (EndUser element : endUserList) {
             EndUserDto map = modelMapper.map(element, EndUserDto.class);
-            map.setPartyIds(element.getPartyEndUsers()
+            map.setPartyIds(element.getPoints()
                     .stream()
-                    .map(PartyEndUser::getParty)
+                    .map(Point::getParty)
                     .map(Party::getId)
                     .toList());
             map.setPointIds(element.getPoints()
@@ -149,7 +149,7 @@ public class EndUserServiceImpl implements EndUserService {
                     .where(party.name.containsIgnoreCase(partyName))
                     .fetch();
 
-            query.where(endUser.partyEndUsers.any().party.id.in(partyIds));
+            query.where(endUser.points.any().party.id.in(partyIds));
         }
         if (phone != null) {
             query.where(endUser.phone.contains(phone));
@@ -171,9 +171,9 @@ public class EndUserServiceImpl implements EndUserService {
 
         for (EndUser element : endUserList) {
             EndUserDto map = modelMapper.map(element, EndUserDto.class);
-            map.setPartyIds(element.getPartyEndUsers()
+            map.setPartyIds(element.getPoints()
                     .stream()
-                    .map(PartyEndUser::getParty)
+                    .map(Point::getParty)
                     .map(Party::getId)
                     .toList());
             map.setPointIds(element.getPoints()

@@ -11,8 +11,8 @@ public interface FranchiseRepository extends JpaRepository<Franchise, Long> {
     @Query("SELECT f FROM Franchise f " +
             "JOIN CustomerFranchise cf ON cf.franchise.id = f.id " +
             "JOIN Party p ON p.customer.id = cf.customer.id " +
-            "JOIN PartyEndUser peu ON peu.party.customer.id = p.customer.id " +
-            "WHERE peu.endUser.id = :endUserId")
+            "JOIN Point p1 ON p1.party.customer.id = p.customer.id " +
+            "WHERE p1.endUser.id = :endUserId")
     List<Franchise> findAllFranchiseByEndUserId(Long endUserId);
 
     Franchise findByUserName(String userName);

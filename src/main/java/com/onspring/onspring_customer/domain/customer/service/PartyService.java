@@ -1,6 +1,5 @@
 package com.onspring.onspring_customer.domain.customer.service;
 
-import com.onspring.onspring_customer.domain.common.dto.PartyEndUserDto;
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +20,6 @@ public interface PartyService {
                                        boolean thursday, boolean friday, boolean saturday,
                                        BigDecimal maximumAmount, Long maximumTransaction, Pageable pageable);
 
-    Page<PartyEndUserDto> findAllPartyEndUserByQuery(String name, Pageable pageable);
 
     boolean updateParty(PartyDto partyDto);
 
