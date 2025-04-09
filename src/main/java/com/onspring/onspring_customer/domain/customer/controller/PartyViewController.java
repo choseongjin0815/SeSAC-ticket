@@ -1,6 +1,7 @@
 package com.onspring.onspring_customer.domain.customer.controller;
 
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
+import com.onspring.onspring_customer.domain.customer.dto.PartyEndUserRelationDto;
 import com.onspring.onspring_customer.domain.customer.service.PartyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -132,25 +133,25 @@ public class PartyViewController {
     }
 
     @GetMapping("/users")
-    public String getPartyEndUser(@RequestParam(value = "searchType", required = false) String searchType,
-                                  @RequestParam(value = "keyword", required = false) String keyword,
-                                  @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                  @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
+    public String getPoints(@RequestParam(value = "searchType", required = false) String searchType,
+                            @RequestParam(value = "keyword", required = false) String keyword,
+                            @RequestParam(value = "page", defaultValue = "1") Integer page,
+                            @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<PartyEndUserDto> partyEndUserDtoPage;
+        Page<PartyEndUserRelationDto> partyEndUserRelationDtoPage;
 
         if (searchType != null) {
-            partyEndUserDtoPage = switch (searchType) {
-                case "name" -> partyService.findAllPartyEndUserByQuery(keyword, pageable);
+            partyEndUserRelationDtoPage = switch (searchType) {
+                case "name" -> partyService.findAllPartyEndUserRelationByQuery(keyword, pageable);
                 default -> throw new IllegalStateException("Unexpected value: " + searchType);
             };
         } else {
-            partyEndUserDtoPage = partyService.findAllPartyEndUserByQuery(null, pageable);
+            partyEndUserRelationDtoPage = partyService.findAllPartyEndUserRelationByQuery(null, pageable);
         }
 
-        model.addAttribute("models", partyEndUserDtoPage.getContent());
+        model.addAttribute("models", partyEndUserRelationDtoPage.getContent());
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", partyEndUserDtoPage.getTotalPages());
+        model.addAttribute("totalPages", partyEndUserRelationDtoPage.getTotalPages());
 
         return "parties/users";
     }
