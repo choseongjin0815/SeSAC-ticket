@@ -1,6 +1,5 @@
 package com.onspring.onspring_customer.domain.customer.controller;
 
-import com.onspring.onspring_customer.domain.common.dto.PartyEndUserDto;
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.service.PartyService;
 import org.springframework.beans.factory.annotation.Autowired;
