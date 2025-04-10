@@ -7,11 +7,11 @@ import com.onspring.onspring_customer.domain.common.repository.TransactionReposi
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
-import jakarta.transaction.Transactional;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -344,6 +343,7 @@ public class TransactionServiceImpl implements TransactionService {
                 case "오늘":
                     startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);  // 오늘의 시작 시점
                     endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999);  // 오늘의 끝 시점
+                    log.info(startDate + " - " + endDate);
                     break;
                 case "최근1주":
                     startDate = LocalDateTime.now().minusWeeks(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -359,21 +359,6 @@ public class TransactionServiceImpl implements TransactionService {
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid period value: " + period);
-            }
-        } else if (month != null) {
-            // 월이 주어졌을 경우 해당 월의 startDate와 endDate 계산
-            if (!month.matches("\\d{4}.\\d{2}")) {
-                throw new IllegalArgumentException("Invalid month format. Use 'YYYY-MM' format.");
-            }
-            startDate = LocalDateTime.parse(month + "-01T00:00:00");  // 해당 월의 첫 번째 날짜 (00:00:00)
-            endDate = startDate.plusMonths(1).minusNanos(1);  // 해당 월의 마지막 날짜 (23:59:59.999999999)
-        } else if (startDate != null && endDate != null) {
-            // startDate와 endDate가 주어졌을 경우
-            try {
-                startDate = LocalDateTime.parse(startDate + "T00:00:00");
-                endDate = LocalDateTime.parse(endDate + "T23:59:59.999999999");
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("Invalid date format. Use 'YYYY-MM-DD' format for start and end date.");
             }
         }
 
