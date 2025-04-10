@@ -77,22 +77,35 @@ public class PartyViewController {
         return "parties/list";
     }
 
-    @PutMapping("/update")
-    public String updateParty(@RequestParam(value = "id") Long id, @RequestParam(value = "name") String name,
-                              @RequestParam(value = "period") LocalDateTime period,
-                              @RequestParam(value = "amount") BigDecimal amount, @RequestParam(value =
-                    "allowedTimeStart") LocalTime allowedTimeStart,
-                              @RequestParam(value = "allowedTimeEnd") LocalTime allowedTimeEnd, @RequestParam(value =
-                    "validThru") Long validThru, @RequestParam(value = "sunday") Boolean sunday, @RequestParam(value
-                    = "monday") Boolean monday, @RequestParam(value = "tuesday") Boolean tuesday,
-                              @RequestParam(value = "wednesday") Boolean wednesday,
-                              @RequestParam(value = "thursday") Boolean thursday,
-                              @RequestParam(value = "friday") Boolean friday,
-                              @RequestParam(value = "saturday") Boolean saturday, @RequestParam(value =
-                    "maximumAmount") BigDecimal maximumAmount,
+
+    @RequestMapping(value = "/update", method = {RequestMethod.PUT, RequestMethod.POST})
+    public String updateParty(@RequestParam(value = "id") Long id,
+                              @RequestParam(value = "customerId") Long customerId,
+                              @RequestParam(value = "name") String name,
+                              @RequestParam(value = "period") String periodStr,
+                              @RequestParam(value = "amount") BigDecimal amount,
+                              @RequestParam(value = "allowedTimeStart") LocalTime allowedTimeStart,
+                              @RequestParam(value = "allowedTimeEnd") LocalTime allowedTimeEnd,
+                              @RequestParam(value = "validThru") Long validThru,
+                              @RequestParam(value = "sunday", defaultValue = "false") Boolean sunday,
+                              @RequestParam(value = "monday", defaultValue = "false") Boolean monday,
+                              @RequestParam(value = "tuesday", defaultValue = "false") Boolean tuesday,
+                              @RequestParam(value = "wednesday", defaultValue = "false") Boolean wednesday,
+                              @RequestParam(value = "thursday", defaultValue = "false") Boolean thursday,
+                              @RequestParam(value = "friday", defaultValue = "false") Boolean friday,
+                              @RequestParam(value = "saturday", defaultValue = "false") Boolean saturday,
+                              @RequestParam(value = "maximumAmount") BigDecimal maximumAmount,
                               @RequestParam(value = "maximumTransaction") Long maximumTransaction) {
+
+        // 기존 Party 객체를 가져와서 업데이트
+        PartyDto existingParty = partyService.findPartyById(id);
+
+        // 문자열을 LocalDateTime으로 변환
+        LocalDateTime period = LocalDate.parse(periodStr).atStartOfDay();
+
         PartyDto partyDto = PartyDto.builder()
                 .id(id)
+                .customerId(customerId) // customerId 유지
                 .name(name)
                 .period(period)
                 .amount(amount)
@@ -108,6 +121,7 @@ public class PartyViewController {
                 .saturday(saturday)
                 .maximumAmount(maximumAmount)
                 .maximumTransaction(maximumTransaction)
+                .isActivated(existingParty.isActivated()) // 활성화 상태 유지
                 .build();
         partyService.updateParty(partyDto);
 
@@ -119,6 +133,14 @@ public class PartyViewController {
         partyService.activatePartyById(id);
 
         return "redirect:list";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String showEditParty(@PathVariable("id") Long id, Model model) {
+        PartyDto partyDto = partyService.findPartyById(id);
+        model.addAttribute("party", partyDto);
+
+        return "parties/edit";
     }
 
     @PatchMapping("/deactivate")

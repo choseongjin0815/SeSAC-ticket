@@ -18,9 +18,9 @@
             <select name="searchType"
                     style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; border-right: none;">
                 <option value="name">가맹점명</option>
-                <option value="businessNumber">사업자번호</option>
-                <option value="ownerName">대표자</option>
-                <option value="phone">연락처</option>
+                <option value="salesnumber">사업자번호</option>
+                <option value="ownername">대표자</option>
+                <option value="id">연락처</option>
             </select>
             <input type="text" name="keyword" placeholder="검색어를 입력하세요"
                    style="flex-grow: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 0;">
@@ -81,7 +81,7 @@
     </div>
 
     <!-- 페이지네이션 -->
-    <div style="margin-top: 30px; text-align: center;" th:if="${totalPages > 1}">
+    <div style="margin-top: 30px; text-align: center;">
         <div style="display: inline-block;">
             <a style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;"
                th:if="${currentPage > 1}" th:href="@{list(page=${currentPage - 1}, size=${size})}">&lt;</a>

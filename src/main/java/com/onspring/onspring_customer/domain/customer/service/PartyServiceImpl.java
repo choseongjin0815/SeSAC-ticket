@@ -214,12 +214,35 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
+    @Transactional
     public boolean updateParty(PartyDto partyDto) {
         log.info("Updating party with ID {}", partyDto.getId());
 
         Party party = getParty(partyDto.getId());
 
-        modelMapper.map(partyDto, party);
+        // Customer 관계 유지
+        Customer customer = party.getCustomer();
+
+        // 기본 필드 업데이트
+        party.setName(partyDto.getName());
+        party.setPeriod(partyDto.getPeriod());
+        party.setAmount(partyDto.getAmount());
+        party.setAllowedTimeStart(partyDto.getAllowedTimeStart());
+        party.setAllowedTimeEnd(partyDto.getAllowedTimeEnd());
+        party.setValidThru(partyDto.getValidThru());
+        party.setSunday(partyDto.isSunday());
+        party.setMonday(partyDto.isMonday());
+        party.setTuesday(partyDto.isTuesday());
+        party.setWednesday(partyDto.isWednesday());
+        party.setThursday(partyDto.isThursday());
+        party.setFriday(partyDto.isFriday());
+        party.setSaturday(partyDto.isSaturday());
+        party.setMaximumAmount(partyDto.getMaximumAmount());
+        party.setMaximumTransaction(partyDto.getMaximumTransaction());
+
+        // customer 관계 유지
+        party.setCustomer(customer);
+
         partyRepository.save(party);
 
         log.info("Successfully updated party with ID {}", partyDto.getId());
