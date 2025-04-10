@@ -59,7 +59,13 @@
                 <td th:text="*{id}"></td>
                 <td th:text="*{name}"></td>
                 <td th:text="*{phone}"></td>
-                <td th:text="*{partyIds}"></td>
+                <td>
+                    <th:block th:each="party, partyStat : *{parties}">
+                        <span th:text="${party.name}"></span>
+                        <span th:if="${!partyStat.last}">, </span>
+                    </th:block>
+                    <span th:if="*{parties == null || parties.isEmpty()}">-</span>
+                </td>
                 <td>
                     <button th:onclick="'location.href=\'/view/users/edit/' + *{id} + '\''"
                             style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">
