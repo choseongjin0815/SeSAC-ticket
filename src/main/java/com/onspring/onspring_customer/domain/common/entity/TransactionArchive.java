@@ -3,12 +3,14 @@ package com.onspring.onspring_customer.domain.common.entity;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Builder
 @Getter
 @Setter
 @Entity

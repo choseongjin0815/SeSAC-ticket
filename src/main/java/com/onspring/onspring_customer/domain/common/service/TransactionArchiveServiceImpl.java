@@ -7,6 +7,7 @@ import com.onspring.onspring_customer.domain.common.repository.TransactionArchiv
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.entity.QFranchise;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -17,11 +18,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Log4j2
 @Service
@@ -42,66 +42,75 @@ public class TransactionArchiveServiceImpl implements TransactionArchiveService 
     }
 
     @Override
-    public List<Long> closeTransactionById(List<Long> ids) {
+    public List<Integer> closeTransactionById(List<Long> ids) {
         log.info("Closing transaction with ID {}", ids.toString());
 
-        List<Long> changedTransactionIds = ids.stream()
-                .filter(id -> transactionRepository.updateIsClosedByIdAndIsAcceptedTrueAndIsClosedFalse(id) == 1)
-                .toList();
+        int updatedTransactionsCount = transactionRepository.updateIsClosedByIdInAndIsAcceptedTrueAndIsClosedFalse(ids);
 
-        log.info("{} records changed, {} records remain unchanged", changedTransactionIds.size(),
-                ids.size() - changedTransactionIds.size());
+
+        log.info("{} records changed, {} records remain unchanged", updatedTransactionsCount,
+                ids.size() - updatedTransactionsCount);
 
         QTransaction transaction = QTransaction.transaction;
         QFranchise franchise = QFranchise.franchise;
 
-        AtomicLong updateCount = new AtomicLong();
-        AtomicLong saveCount = new AtomicLong();
-
-        queryFactory.select(franchise, transaction.count(), transaction.amount.sumAggregate(),
-                        transaction.transactionTime.year(), transaction.transactionTime.month())
+        List<Tuple> aggregatedData = queryFactory.select(franchise, transaction.count(),
+                        transaction.amount.sumAggregate(), transaction.transactionTime.year(),
+                        transaction.transactionTime.month())
                 .from(transaction)
                 .join(franchise)
                 .on(transaction.franchise.id.eq(franchise.id))
+                .where(transaction.id.in(ids))
                 .groupBy(franchise.name, transaction.transactionTime.year(), transaction.transactionTime.month())
-                .fetch()
-                .forEach(fetchedRecord -> {
-                    Franchise archiveFranchise = Objects.requireNonNull(fetchedRecord.get(franchise));
-                    Long transactionCount = Objects.requireNonNull(fetchedRecord.get(transaction.count()));
-                    BigDecimal amountSum = Objects.requireNonNull(fetchedRecord.get(transaction.amount.sumAggregate()));
-                    int year = Objects.requireNonNull(fetchedRecord.get(transaction.transactionTime.year()));
-                    int month = Objects.requireNonNull(fetchedRecord.get(transaction.transactionTime.month()));
-                    LocalDate duration = LocalDate.of(year, month, 1);
+                .fetch();
 
-                    Optional<TransactionArchive> existingTransactionArchive =
-                            transactionArchiveRepository.findByFranchiseAndDuration(archiveFranchise, duration);
-                    if (existingTransactionArchive.isPresent()) {
-                        existingTransactionArchive.get()
-                                .setTransactionCount(existingTransactionArchive.get()
-                                                             .getTransactionCount() + transactionCount);
-                        existingTransactionArchive.get()
-                                .setAmountSum(existingTransactionArchive.get()
-                                        .getAmountSum()
-                                        .add(amountSum));
-                        transactionArchiveRepository.save(existingTransactionArchive.get());
+        Set<LocalDate> durations = aggregatedData.stream()
+                .map(tuple -> LocalDate.of(tuple.get(transaction.transactionTime.year()),
+                        tuple.get(transaction.transactionTime.month()), 1))
+                .collect(Collectors.toSet());
 
-                        updateCount.getAndIncrement();
-                    } else {
-                        TransactionArchive archive = new TransactionArchive();
-                        archive.setFranchise(archiveFranchise);
-                        archive.setTransactionCount(transactionCount);
-                        archive.setAmountSum(amountSum);
-                        archive.setDuration(duration);
+        Map<String, TransactionArchive> existingArchives = transactionArchiveRepository.findByDurationIn(durations)
+                .stream()
+                .collect(Collectors.toMap(transactionArchive -> transactionArchive.getFranchise()
+                                                                        .getName() + "_" + transactionArchive.getDuration(), Function.identity()));
 
-                        transactionArchiveRepository.save(archive);
+        List<TransactionArchive> archivesToUpdate = new ArrayList<>();
+        List<TransactionArchive> archivesToSave = new ArrayList<>();
 
-                        saveCount.getAndIncrement();
-                    }
-                });
+        aggregatedData.forEach(tuple -> {
+            Franchise franchise1 = tuple.get(franchise);
+            Long count = tuple.get(transaction.count());
+            BigDecimal amountSum = tuple.get(transaction.amount.sumAggregate());
+            LocalDate duration = LocalDate.of(tuple.get(transaction.transactionTime.year()),
+                    tuple.get(transaction.transactionTime.month()), 1);
 
-        log.info("{} archived data updated, {} new archive data saved", updateCount.get(), saveCount.get());
+            String key = Objects.requireNonNull(franchise1)
+                                 .getName() + "_" + duration;
+            TransactionArchive transactionArchive = existingArchives.get(key);
 
-        return Arrays.asList(updateCount.get(), saveCount.get());
+            if (transactionArchive != null) {
+                transactionArchive.setTransactionCount(transactionArchive.getTransactionCount() + count);
+                transactionArchive.setAmountSum(transactionArchive.getAmountSum()
+                        .add(amountSum));
+                archivesToUpdate.add(transactionArchive);
+            } else {
+                TransactionArchive archiveToSave = TransactionArchive.builder()
+                        .franchise(franchise1)
+                        .transactionCount(count)
+                        .amountSum(amountSum)
+                        .duration(duration)
+                        .build();
+
+                archivesToSave.add(archiveToSave);
+            }
+        });
+
+        transactionArchiveRepository.saveAll(Stream.concat(archivesToUpdate.stream(), archivesToSave.stream())
+                .toList());
+
+        log.info("{} archived data updated, {} new archive data saved", archivesToUpdate.size(), archivesToSave.size());
+
+        return Arrays.asList(archivesToUpdate.size(), archivesToSave.size());
     }
 
     @Override
