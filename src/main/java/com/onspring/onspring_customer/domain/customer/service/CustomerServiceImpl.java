@@ -83,9 +83,8 @@ public class CustomerServiceImpl implements CustomerService {
         if (phone != null) {
             query.where(customer.phone.contains(phone));
         }
-        if (isActivated) {
-            query.where(customer.isActivated);
-        }
+
+        query.where(customer.isActivated);
 
         Long count = Objects.requireNonNull(query.clone()
                 .select(customer.count())
