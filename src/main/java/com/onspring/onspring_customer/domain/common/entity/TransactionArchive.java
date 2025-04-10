@@ -3,9 +3,7 @@ package com.onspring.onspring_customer.domain.common.entity;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,6 +13,8 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "transaction_archive")
+@NoArgsConstructor
+@AllArgsConstructor
 public class TransactionArchive {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
