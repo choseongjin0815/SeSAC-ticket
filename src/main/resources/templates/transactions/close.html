@@ -134,7 +134,7 @@
                 const formData = new FormData();
                 formData.append("ids", selectedMembers);
 
-                fetch("activate", {
+                fetch("close", {
                     method: "PATCH",
                     body: formData,
                 })
