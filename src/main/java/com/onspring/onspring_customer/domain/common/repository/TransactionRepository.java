@@ -4,8 +4,11 @@ import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,4 +62,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query("select t from Transaction t where t.isAccepted = true and t.isClosed = false")
     Page<Transaction> findByIsAcceptedTrueAndIsClosedFalse(Pageable pageable);
+
+    @Transactional
+    @Modifying
+    @Query("update Transaction t set t.isClosed = true where t.id = ?1 and t.isAccepted = true and t.isClosed = false")
+    int updateIsClosedByIdAndIsAcceptedTrueAndIsClosedFalse(@NonNull Long id);
 }
