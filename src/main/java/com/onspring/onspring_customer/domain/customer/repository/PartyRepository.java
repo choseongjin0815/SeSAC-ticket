@@ -8,6 +8,7 @@ import org.springframework.lang.Nullable;
 
 import java.util.List;
 
+
 public interface PartyRepository extends JpaRepository<Party, Long> {
 
     @Query("SELECT p.party FROM Point p WHERE p.endUser.id = :endUserId ORDER BY p.createdAt ASC")
