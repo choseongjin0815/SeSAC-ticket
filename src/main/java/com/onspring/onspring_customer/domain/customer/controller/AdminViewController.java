@@ -28,10 +28,9 @@ public class AdminViewController {
 
     @GetMapping("/list")
     public String findAdmins(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "userName",
-            required = false) String userName,
-                             @RequestParam(value = "showDeactivated", defaultValue = "false") Boolean showDeactivated
-            , @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size",
-                    defaultValue = "10") Integer size, Model model) {
+            required = false) String userName, @RequestParam(value = "showDeactivated", defaultValue = "true",
+            required = false) Boolean showDeactivated, @RequestParam(value = "page", defaultValue = "1") Integer page
+            , @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<AdminDto> adminDtoPage = adminService.findAllAdminByQuery(customerId, userName, showDeactivated, pageable);
 
