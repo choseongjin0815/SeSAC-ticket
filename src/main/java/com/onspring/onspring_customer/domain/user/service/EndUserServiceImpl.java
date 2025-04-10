@@ -1,5 +1,6 @@
 package com.onspring.onspring_customer.domain.user.service;
 
+import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.entity.QParty;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
@@ -22,12 +23,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -60,6 +59,8 @@ public class EndUserServiceImpl implements EndUserService {
                 .get(0));
 
         EndUser endUser = modelMapper.map(endUserDto, EndUser.class);
+
+        log.info(endUserDto.toString());
 
         Party party = getParty(endUserDto.getPartyIds()
                 .get(0));
@@ -134,7 +135,6 @@ public class EndUserServiceImpl implements EndUserService {
 
         return endUserDtoList;
     }
-
     @Override
     public Page<EndUserDto> findAllEndUserByQuery(String name, String partyName, String phone, boolean isActivated,
                                                   Pageable pageable) {
@@ -173,26 +173,173 @@ public class EndUserServiceImpl implements EndUserService {
 
         for (EndUser element : endUserList) {
             EndUserDto map = modelMapper.map(element, EndUserDto.class);
-            map.setPartyIds(element.getPoints()
+
+            // Party ID 리스트 설정
+            List<Party> parties = element.getPoints()
                     .stream()
                     .map(Point::getParty)
+                    .distinct()
+                    .toList();
+
+            map.setPartyIds(parties.stream()
                     .map(Party::getId)
                     .toList());
+
+            // Party 정보 설정 (새로 추가)
+            List<PartyDto> partyDtos = parties.stream()
+                    .map(party -> modelMapper.map(party, PartyDto.class))
+                    .toList();
+            map.setParties(partyDtos);
+
             map.setPointIds(element.getPoints()
                     .stream()
                     .map(Point::getId)
                     .toList());
+
             endUserDtoList.add(map);
         }
 
+        log.info(endUserDtoList.toString());
 
         return new PageImpl<>(endUserDtoList, pageable, count);
     }
+
+
+//    @Override
+//    public Page<EndUserDto> findAllEndUserByQuery(String name, String partyName, String phone, boolean isActivated,
+//                                                  Pageable pageable) {
+//        QEndUser endUser = QEndUser.endUser;
+//        JPAQuery<EndUser> query = queryFactory.selectFrom(endUser);
+//
+//        if (name != null) {
+//            query.where(endUser.name.containsIgnoreCase(name));
+//        }
+//        if (partyName != null) {
+//            QParty party = QParty.party;
+//            List<Long> partyIds = queryFactory.select(party.id)
+//                    .from(party)
+//                    .where(party.name.containsIgnoreCase(partyName))
+//                    .fetch();
+//
+//            query.where(endUser.points.any().party.id.in(partyIds));
+//        }
+//        if (phone != null) {
+//            query.where(endUser.phone.contains(phone));
+//        }
+//
+//        query.where(endUser.isActivated.eq(isActivated));
+//
+//        Long count = Objects.requireNonNull(query.clone()
+//                .select(endUser.count())
+//                .fetchOne());
+//
+//        query.orderBy(endUser.id.desc());
+//        query.offset(pageable.getOffset());
+//        query.limit(pageable.getPageSize());
+//
+//        List<EndUser> endUserList = query.fetch();
+//
+//        List<EndUserDto> endUserDtoList = new ArrayList<>();
+//
+//        for (EndUser element : endUserList) {
+//            EndUserDto map = modelMapper.map(element, EndUserDto.class);
+//            map.setPartyIds(element.getPoints()
+//                    .stream()
+//                    .map(Point::getParty)
+//                    .map(Party::getId)
+//                    .toList());
+//            map.setPointIds(element.getPoints()
+//                    .stream()
+//                    .map(Point::getId)
+//                    .toList());
+//            endUserDtoList.add(map);
+//        }
+//
+//        log.info(endUserDtoList.toString());
+//
+//        return new PageImpl<>(endUserDtoList, pageable, count);
+//    }
 
     @Override
     public Page<PointDto> findPointByEndUserId(Long id, Pageable pageable) {
         return pointRepository.findByEndUser_Id(id, pageable)
                 .map(element -> modelMapper.map(element, PointDto.class));
+    }
+
+    @Transactional
+    @Override
+    public boolean updateEndUser(EndUserDto endUserDto) {
+
+        EndUser endUser = getEndUser(endUserDto.getId());
+        endUser.setPhone(endUserDto.getPhone());
+        endUser.setName(endUserDto.getName());
+
+        log.info("partyIds:{}", endUserDto.getPartyIds());
+        Set<Party> newParties = new HashSet<>();
+        for (Long partyId : endUserDto.getPartyIds()) {
+            Party party = partyRepository.findById(partyId)
+                    .orElseThrow(() -> new IllegalArgumentException("Party not found"));
+            newParties.add(party);
+        }
+
+        // 유지할 points와 삭제할 points 식별
+        Set<Point> pointsToKeep = new HashSet<>();
+        Set<Point> pointsToDelete = new HashSet<>();
+
+        for (Point existingPoint : endUser.getPoints()) {
+            if (newParties.contains(existingPoint.getParty())) {
+                // 파티가 아직 할당되어 있으므로 이 point 유지
+                pointsToKeep.add(existingPoint);
+            } else {
+                // 더 이상 필요 없는 point는 삭제 대상으로 표시
+                pointsToDelete.add(existingPoint);
+            }
+        }
+
+        // 삭제할 points를 먼저 처리
+        for (Point point : pointsToDelete) {
+
+            pointRepository.delete(point);
+        }
+
+        // pointRepository.delete 후에 flush를 강제로 수행하여 변경사항을 데이터베이스에 즉시 반영
+        pointRepository.flush();
+
+        // 새 파티에 대한 새 points 추가
+        for (Party newParty : newParties) {
+            // 이 파티에 이미 point가 있는지 확인
+            boolean exists = false;
+            for (Point point : pointsToKeep) {
+                if (point.getParty().equals(newParty)) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            // 이 파티에 대한 point가 없으면 새로 생성
+            if (!exists) {
+                Point newPoint = Point.builder()
+                        .endUser(endUser)
+                        .party(newParty)
+                        .assignedAmount(BigDecimal.ZERO)
+                        .currentAmount(BigDecimal.ZERO)
+                        .validThru(LocalDateTime.now())
+                        .build();
+                // 저장하고 유지할 집합에 추가
+                Point savedPoint = pointRepository.save(newPoint);
+                log.info("save point:{}", savedPoint);
+                pointsToKeep.add(savedPoint);
+            }
+        }
+
+        // 엔드유저의 points 집합을 명시적으로 업데이트
+        endUser.getPoints().clear();
+        endUser.getPoints().addAll(pointsToKeep);
+
+        // 업데이트된 EndUser 저장
+        EndUser savedUser = endUserRepository.save(endUser);
+
+        return savedUser != null;
     }
 
     @Override

@@ -23,6 +23,8 @@ public interface EndUserService {
 
     Page<PointDto> findPointByEndUserId(Long id, Pageable pageable);
 
+    boolean updateEndUser(EndUserDto endUserDto);
+
     boolean updateEndUserPasswordById(Long id, String password);
 
     boolean updateEndUserPasswordById(Long id, String oldPassword, String newPassword);
