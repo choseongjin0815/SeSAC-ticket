@@ -5,6 +5,7 @@ import com.onspring.onspring_customer.domain.common.entity.QTransaction;
 import com.onspring.onspring_customer.domain.common.entity.TransactionArchive;
 import com.onspring.onspring_customer.domain.common.repository.TransactionArchiveRepository;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
+import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.entity.QFranchise;
 import com.querydsl.core.Tuple;
@@ -61,7 +62,7 @@ public class TransactionArchiveServiceImpl implements TransactionArchiveService 
                 .join(franchise)
                 .on(transaction.franchise.id.eq(franchise.id))
                 .where(transaction.id.in(ids))
-                .groupBy(franchise.name, transaction.transactionTime.year(), transaction.transactionTime.month())
+                .groupBy(franchise, transaction.transactionTime.year(), transaction.transactionTime.month())
                 .fetch();
 
         Set<LocalDate> durations = aggregatedData.stream()
@@ -116,6 +117,9 @@ public class TransactionArchiveServiceImpl implements TransactionArchiveService 
     @Override
     public Page<TransactionArchiveDto> findAllTransactionArchive(Pageable pageable) {
         return transactionArchiveRepository.findAll(pageable)
-                .map(element -> modelMapper.map(element, TransactionArchiveDto.class));
+                .map(transactionArchive -> new TransactionArchiveDto(transactionArchive.getId(),
+                        modelMapper.map(transactionArchive.getFranchise(), FranchiseDto.class),
+                        transactionArchive.getTransactionCount(), transactionArchive.getAmountSum(),
+                        transactionArchive.getDuration()));
     }
 }
