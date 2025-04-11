@@ -58,7 +58,13 @@
                 <td th:text="*{id}"></td>
                 <td th:text="*{name}"></td>
                 <td th:text="*{phone}"></td>
-                <td th:text="*{partyIds}"></td>
+                <td>
+                    <th:block th:each="party, partyStat : *{parties}">
+                        <span th:text="${party.name}"></span>
+                        <span th:if="${!partyStat.last}">, </span>
+                    </th:block>
+                    <span th:if="*{parties == null || parties.isEmpty()}">-</span>
+                </td>
                 <td>
                     <input type="checkbox" name="selectedMember" value="3" class="member-checkbox"
                            style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
