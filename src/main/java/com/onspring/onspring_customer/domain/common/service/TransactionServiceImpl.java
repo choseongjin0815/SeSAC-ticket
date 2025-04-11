@@ -2,28 +2,36 @@ package com.onspring.onspring_customer.domain.common.service;
 
 import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
+import com.onspring.onspring_customer.domain.common.entity.QTransaction;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
+import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
-import jakarta.transaction.Transactional;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
+import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +42,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final FranchiseRepository franchiseRepository;
     private final EndUserRepository endUserRepository;
     private final ModelMapper modelMapper;
-
+    private final JPAQueryFactory queryFactory;
 
 
     // 선택된 미정산 거래 내역(단 한개)가 정산으로 저장됨 isClosed = False -> True => Figma 홈_정산관리_정산확인
@@ -247,6 +255,52 @@ public class TransactionServiceImpl implements TransactionService {
     public Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Pageable pageable) {
         return transactionRepository.findByIsAcceptedTrueAndIsClosedFalse(pageable)
                 .map(element -> modelMapper.map(element, TransactionDto.class));
+    }
+
+    @Override
+    public Page<TransactionDto> findAllTransactionByQuery(String by, String name, LocalDate after, LocalDate before,
+                                                          Pageable pageable) {
+        QTransaction transaction = QTransaction.transaction;
+        JPAQuery<Transaction> query = queryFactory.selectFrom(transaction);
+
+        if (name != null) {
+            query.where(switch (by) {
+                case "franchise" -> transaction.franchise.name.containsIgnoreCase(name);
+                case "party" -> transaction.party.name.containsIgnoreCase(name);
+                case "user" -> transaction.endUser.name.containsIgnoreCase(name);
+                default -> throw new IllegalStateException("Unexpected value: " + by);
+            });
+        }
+        if (after != null) {
+            query.where(transaction.transactionTime.goe(after.atStartOfDay()));
+        }
+        if (before != null) {
+            query.where(transaction.transactionTime.loe(before.atTime(LocalTime.MAX)));
+        }
+
+        Long count = Objects.requireNonNull(query.clone()
+                .select(transaction.count())
+                .fetchOne());
+
+        query.orderBy(transaction.id.desc());
+
+        query.offset(pageable.getOffset());
+        query.limit(pageable.getPageSize());
+
+        List<Transaction> transactions = query.fetch();
+
+        List<TransactionDto> transactionDtoList = transactions.stream()
+                .map(element -> {
+                    TransactionDto transactionDto = modelMapper.map(element, TransactionDto.class);
+                    transactionDto.setFranchiseDto(modelMapper.map(element.getFranchise(), FranchiseDto.class));
+                    transactionDto.setPartyDto(modelMapper.map(element.getParty(), PartyDto.class));
+                    transactionDto.setEndUserDto(modelMapper.map(element.getEndUser(), EndUserDto.class));
+
+                    return transactionDto;
+                })
+                .toList();
+
+        return new PageImpl<>(transactionDtoList, pageable, count);
     }
 
     /**

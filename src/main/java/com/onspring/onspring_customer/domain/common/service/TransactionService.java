@@ -25,6 +25,9 @@ public interface TransactionService {
 
     Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Pageable pageable);
 
+    Page<TransactionDto> findAllTransactionByQuery(String by, String name, LocalDate after,
+                                                   LocalDate before, Pageable pageable);
+
     List<TransactionDto> findTransactionByFranchiseId(Long franchiseId,
                                                 LocalDateTime startDate,
                                                 LocalDateTime endDate,
