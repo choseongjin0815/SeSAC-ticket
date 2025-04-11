@@ -29,7 +29,7 @@ public class TransactionViewController {
                                             @RequestParam(value = "after", required = false) LocalDate after,
                                             @RequestParam(value = "before", required = false) LocalDate before,
                                             @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                            @RequestParam(value = "size", defaultValue = "1") Integer size,
+                                            @RequestParam(value = "size", defaultValue = "10") Integer size,
                                             Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<TransactionDto> transactionDtoPage = transactionService.findAllTransactionByQuery("franchise", keyword,
@@ -47,10 +47,12 @@ public class TransactionViewController {
                                         @RequestParam(value = "after", required = false) LocalDate after,
                                         @RequestParam(value = "before", required = false) LocalDate before,
                                         @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                        @RequestParam(value = "size", defaultValue = "1") Integer size, Model model) {
+                                        @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<TransactionDto> transactionDtoPage = transactionService.findAllTransactionByQuery("party", keyword,
                 after, before, pageable);
+
+        log.info(transactionDtoPage);
 
         model.addAttribute("transactions", transactionDtoPage.getContent());
         model.addAttribute("currentPage", page);
@@ -64,10 +66,11 @@ public class TransactionViewController {
                                        @RequestParam(value = "after", required = false) LocalDate after,
                                        @RequestParam(value = "before", required = false) LocalDate before,
                                        @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                       @RequestParam(value = "size", defaultValue = "1") Integer size, Model model) {
+                                       @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<TransactionDto> transactionDtoPage = transactionService.findAllTransactionByQuery("user", keyword, after
                 , before, pageable);
+
 
         model.addAttribute("transactions", transactionDtoPage.getContent());
         model.addAttribute("currentPage", page);
