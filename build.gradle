@@ -82,6 +82,17 @@ dependencies {
 
 }
 
+
+task copyEnvFile(type: Copy) {
+	from '.env'  // 루트 디렉토리에서 .env 파일을 찾습니다.
+	into "$buildDir/resources/main"  // 빌드 리소스 디렉토리로 복사 (deprecated된 'buildDir'을 'project.buildDir'로 대체)
+}
+
+processResources.dependsOn(copyEnvFile)
+
+processResources.dependsOn(copyEnvFile)
+processResources.dependsOn(copyEnvFile)
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
