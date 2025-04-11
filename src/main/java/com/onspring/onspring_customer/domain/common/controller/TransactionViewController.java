@@ -52,8 +52,6 @@ public class TransactionViewController {
         Page<TransactionDto> transactionDtoPage = transactionService.findAllTransactionByQuery("party", keyword,
                 after, before, pageable);
 
-        log.info(transactionDtoPage);
-
         model.addAttribute("transactions", transactionDtoPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", transactionDtoPage.getTotalPages());
