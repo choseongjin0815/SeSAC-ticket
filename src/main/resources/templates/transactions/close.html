@@ -134,7 +134,7 @@
                 const formData = new FormData();
                 formData.append("ids", selectedMembers);
 
-                fetch("activate", {
+                fetch("close", {
                     method: "PATCH",
                     body: formData,
                 })
@@ -142,7 +142,7 @@
                     if (response.ok) {
                         alert('선택한 내역이 정산되었습니다.');
 
-                        location.reload();
+                        window.location.href = "list";
                     }
                 });
             }

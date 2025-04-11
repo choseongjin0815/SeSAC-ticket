@@ -11,6 +11,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
@@ -65,6 +66,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Transactional
     @Modifying
-    @Query("update Transaction t set t.isClosed = true where t.id = ?1 and t.isAccepted = true and t.isClosed = false")
-    int updateIsClosedByIdAndIsAcceptedTrueAndIsClosedFalse(@NonNull Long id);
+    @Query("update Transaction t set t.isClosed = false where t.id in ?1 and t.isAccepted = true and t.isClosed = " +
+           "false")
+    int updateIsClosedByIdInAndIsAcceptedTrueAndIsClosedFalse(@NonNull Collection<Long> ids);
 }
