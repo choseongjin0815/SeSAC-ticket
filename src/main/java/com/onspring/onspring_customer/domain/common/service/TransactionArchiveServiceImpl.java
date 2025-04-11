@@ -108,9 +108,11 @@ public class TransactionArchiveServiceImpl implements TransactionArchiveService 
     @Override
     public Page<TransactionArchiveDto> findAllTransactionArchive(Pageable pageable) {
         return transactionArchiveRepository.findAll(pageable)
-                .map(transactionArchive -> new TransactionArchiveDto(transactionArchive.getId(),
-                        modelMapper.map(transactionArchive.getFranchise(), FranchiseDto.class),
-                        transactionArchive.getTransactionCount(), transactionArchive.getAmountSum(),
-                        transactionArchive.getDuration()));
+                .map(element -> {
+                    TransactionArchiveDto transactionArchiveDto = modelMapper.map(element, TransactionArchiveDto.class);
+                    transactionArchiveDto.setFranchiseDto(modelMapper.map(element.getFranchise(), FranchiseDto.class));
+
+                    return transactionArchiveDto;
+                });
     }
 }

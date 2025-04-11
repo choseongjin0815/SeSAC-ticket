@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.data.domain.Pageable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,6 +28,9 @@ public interface TransactionService {
     List<TransactionDto> findAllTransaction();
 
     Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Pageable pageable);
+
+    Page<TransactionDto> findAllTransactionByQuery(String by, String name, LocalDate after,
+                                                   LocalDate before, Pageable pageable);
 
     List<TransactionDto> findTransactionByFranchiseId(Long franchiseId,
                                                 LocalDateTime startDate,

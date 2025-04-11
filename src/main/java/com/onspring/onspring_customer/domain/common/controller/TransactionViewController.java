@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/view/transactions")
@@ -21,6 +23,58 @@ public class TransactionViewController {
     private final TransactionService transactionService;
     private final TransactionArchiveService transactionArchiveService;
 
+
+    @GetMapping("/by-franchise")
+    public String getTransactionByFranchise(@RequestParam(value = "keyword", required = false) String keyword,
+                                            @RequestParam(value = "after", required = false) LocalDate after,
+                                            @RequestParam(value = "before", required = false) LocalDate before,
+                                            @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                            @RequestParam(value = "size", defaultValue = "1") Integer size,
+                                            Model model) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<TransactionDto> transactionDtoPage = transactionService.findAllTransactionByQuery("franchise", keyword,
+                after, before, pageable);
+
+        model.addAttribute("transactions", transactionDtoPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", transactionDtoPage.getTotalPages());
+
+        return "transactions/by-franchise";
+    }
+
+    @GetMapping("/by-group")
+    public String getTransactionByGroup(@RequestParam(value = "keyword", required = false) String keyword,
+                                        @RequestParam(value = "after", required = false) LocalDate after,
+                                        @RequestParam(value = "before", required = false) LocalDate before,
+                                        @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                        @RequestParam(value = "size", defaultValue = "1") Integer size, Model model) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<TransactionDto> transactionDtoPage = transactionService.findAllTransactionByQuery("party", keyword,
+                after, before, pageable);
+
+        model.addAttribute("transactions", transactionDtoPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", transactionDtoPage.getTotalPages());
+
+        return "transactions/by-group";
+    }
+
+    @GetMapping("/by-user")
+    public String getTransactionByUser(@RequestParam(value = "keyword", required = false) String keyword,
+                                       @RequestParam(value = "after", required = false) LocalDate after,
+                                       @RequestParam(value = "before", required = false) LocalDate before,
+                                       @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                       @RequestParam(value = "size", defaultValue = "1") Integer size, Model model) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<TransactionDto> transactionDtoPage = transactionService.findAllTransactionByQuery("user", keyword, after
+                , before, pageable);
+
+        model.addAttribute("transactions", transactionDtoPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", transactionDtoPage.getTotalPages());
+
+        return "transactions/by-user";
+    }
 
     @GetMapping("/close")
     public String getNotClosedTransaction(@RequestParam(value = "page", defaultValue = "1") Integer page,
