@@ -59,9 +59,6 @@ dependencies {
 	//file thumbnail
 	implementation 'net.coobird:thumbnailator:0.4.19'
 
-	//Faker Library
-	implementation 'net.datafaker:datafaker:2.0.2'
-
 	testImplementation "org.mockito:mockito-core:5.+"
 
 	//ThymeleafLayoutDialect 의존성 추가
@@ -84,8 +81,8 @@ dependencies {
 
 
 task copyEnvFile(type: Copy) {
-	from '.env'  // 루트 디렉토리에서 .env 파일을 찾습니다.
-	into "$buildDir/resources/main"  // 빌드 리소스 디렉토리로 복사 (deprecated된 'buildDir'을 'project.buildDir'로 대체)
+	from '.env'
+	into "$buildDir/resources/main"
 }
 
 processResources.dependsOn(copyEnvFile)
