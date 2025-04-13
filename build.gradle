@@ -59,11 +59,36 @@ dependencies {
 	//file thumbnail
 	implementation 'net.coobird:thumbnailator:0.4.19'
 
-	//Faker Library
-	implementation 'net.datafaker:datafaker:2.0.2'
-
 	testImplementation "org.mockito:mockito-core:5.+"
+
+	//ThymeleafLayoutDialect 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	implementation 'com.google.code.gson:gson:2.10.1'
+
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+
+
 }
+
+
+task copyEnvFile(type: Copy) {
+	from '.env'
+	into "$buildDir/resources/main"
+}
+
+processResources.dependsOn(copyEnvFile)
+
+processResources.dependsOn(copyEnvFile)
+processResources.dependsOn(copyEnvFile)
 
 tasks.named('test') {
 	useJUnitPlatform()
