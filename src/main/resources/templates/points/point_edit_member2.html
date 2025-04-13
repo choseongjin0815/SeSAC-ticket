@@ -32,7 +32,7 @@
                 </tr>
                 <tr>
                     <th>현재 포인트</th>
-                    <td th:text="*{pointDto.currentAmount}"></td>
+                    <td th:text="*{#numbers.formatInteger(pointDto.currentAmount, 0, 'WHITESPACE')}"></td>
                 </tr>
                 <tr>
                     <th>변경 포인트</th>
