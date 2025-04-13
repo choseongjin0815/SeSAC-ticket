@@ -212,11 +212,17 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public Page<EndUserPointDto> findAllEndUserAndPointByPartyId(Long id, Pageable pageable) {
+    public Page<EndUserPointDto> findAllEndUserAndPointByPartyId(Long adminId, Long id, Pageable pageable) {
         Party party = getParty(id);
 
         List<EndUserPointDto> endUserPointDtoList = party.getPoints()
                 .stream()
+                .filter(point -> point.getParty()
+                        .getCustomer()
+                        .getAdmins()
+                        .stream()
+                        .anyMatch(admin -> admin.getId()
+                                .equals(adminId)))
                 .map(Point::getEndUser)
                 .map(endUser -> createEndUserPointDto(endUser, party, id))
                 .toList();

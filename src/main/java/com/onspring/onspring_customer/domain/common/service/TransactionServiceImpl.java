@@ -7,6 +7,9 @@ import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
+import com.onspring.onspring_customer.domain.customer.entity.QAdmin;
+import com.onspring.onspring_customer.domain.customer.entity.QCustomer;
+import com.onspring.onspring_customer.domain.customer.entity.QParty;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
@@ -16,7 +19,6 @@ import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.transaction.Transactional;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -30,7 +32,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -267,16 +268,24 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Pageable pageable) {
-        return transactionRepository.findByIsAcceptedTrueAndIsClosedFalse(pageable)
+    public Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Long adminId, Pageable pageable) {
+        return transactionRepository.findByParty_Customer_Admins_IdAndIsAcceptedTrueAndIsClosedFalse(adminId, pageable)
                 .map(element -> modelMapper.map(element, TransactionDto.class));
     }
 
     @Override
-    public Page<TransactionDto> findAllTransactionByQuery(String by, String name, LocalDate after, LocalDate before,
+    public Page<TransactionDto> findAllTransactionByQuery(Long adminId, String by, String name, LocalDate after,
+                                                          LocalDate before,
                                                           Pageable pageable) {
+        QAdmin admin = QAdmin.admin;
+        QCustomer customer = QCustomer.customer;
+        QParty party = QParty.party;
         QTransaction transaction = QTransaction.transaction;
-        JPAQuery<Transaction> query = queryFactory.selectFrom(transaction);
+        JPAQuery<Transaction> query = queryFactory.selectFrom(transaction)
+                .join(transaction.party, party)
+                .join(party.customer, customer)
+                .join(customer.admins, admin)
+                .where(admin.id.eq(adminId));
 
         if (name != null) {
             query.where(switch (by) {
