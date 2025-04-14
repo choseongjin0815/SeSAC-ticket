@@ -52,7 +52,7 @@ const BillingPage = () => {
                             <Text style={styles.cellText}>{item.totalTransactions}</Text>
                             <Text style={styles.cellText}>{item.totalAmount.toLocaleString()}</Text>
                             <View style={styles.buttonCell}>
-                                <TouchableOpacity style={styles.detailButton} onPress={() => handleDetail(`${item.year}.${item.month}`)}>
+                                <TouchableOpacity style={styles.detailButton} onPress={() => handleDetail(`${item.year}.${item.month < 10 ? `0${item.month}` : item.month}`)}>
                                     <Text style={styles.detailButtonText}>상세확인</Text>
                                 </TouchableOpacity>
                             </View>      
