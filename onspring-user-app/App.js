@@ -43,13 +43,20 @@ const TabContainer = () => (
         headerShown: false,
         tabBarShowLabel: false,
       }}
+      listeners={({ navigation }) => ({
+        tabPress: (e) => {
+          navigation.navigate('FranchiseTab', {
+            screen: 'HomePage',
+          });
+        },
+      })}
     />
     <Tab.Screen
       name="TransactionTab"
       component={TransactionStackNavigator}
       options={{
         tabBarIcon: ({ color, size }) => (
-          <Image source={require('./images/Transaction.png')} style={{ width: size * 1.3, height: size * 1.3, tintColor: color, resizeMode: 'contain' }} />
+          <Image source={require('./images/transaction.png')} style={{ width: size * 1.3, height: size * 1.3, tintColor: color, resizeMode: 'contain' }} />
         ),
         headerShown: false,
         tabBarShowLabel: false,
@@ -65,6 +72,13 @@ const TabContainer = () => (
         headerShown: false,
         tabBarShowLabel: false,
       }}
+      listeners={({ navigation }) => ({
+        tabPress: (e) => {
+          navigation.navigate('MyInfoTab', {
+            screen: 'myPage',
+          });
+        },
+      })}
     />
   </Tab.Navigator>
 );

@@ -59,7 +59,8 @@ const LoginPage = () => {
             placeholder="핸드폰 번호를 입력해주세요"
             value={phone}
             onChangeText={setPhone}
-            keyboardType="phone-pad"
+            keyboardType="default"
+            // keyboardType="phone-pad"
           />
           
           <TextInput

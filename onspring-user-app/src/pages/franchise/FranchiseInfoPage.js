@@ -1,15 +1,18 @@
 import FranchiseInfoComponent from "../../component/franchise/FranchiseInfoComponent";
 import FranchiseMenuComponent from "../../component/franchise/FranchiseMenuComponent";
 import { View, StyleSheet } from "react-native";
-const FranchiseInfoPage = () => {
+import { useRoute } from "@react-navigation/native";
 
+const FranchiseInfoPage = () => {
+    const route = useRoute();
+    const {franchiseId} = route.params || {};
     return (
         <View style={styles.container}>
             <View style={styles.menuContainer}>
-                <FranchiseMenuComponent/>
+                <FranchiseMenuComponent frachiseId={franchiseId}/>
             </View>
             <View style={styles.infoContainer}>
-                <FranchiseInfoComponent/>
+                <FranchiseInfoComponent franchiseId={franchiseId}/>
             </View>
         </View>
     );    

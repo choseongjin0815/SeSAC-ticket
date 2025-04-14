@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
+import { getMyPoints } from '../../api/myInfoApi'; // 실제 경로에 맞게 조정
 
 const PointDetailComponent = ({ card }) => (
   <View style={styles.cardContainer}>
@@ -7,11 +8,11 @@ const PointDetailComponent = ({ card }) => (
     <View style={styles.divider} />
     <View style={styles.detailRow}>
       <Text style={styles.labelText}>가용포인트</Text>
-      <Text style={styles.valueText}>{card.availablePoints.toLocaleString()}</Text>
+      <Text style={styles.valueText}>{card.availablePoints}</Text>
     </View>
     <View style={styles.detailRow}>
       <Text style={styles.labelText}>충전포인트</Text>
-      <Text style={styles.valueText}>{card.chargedPoints.toLocaleString()}</Text>
+      <Text style={styles.valueText}>{card.chargedPoints}</Text>
     </View>
     <View style={styles.detailRow}>
       <Text style={styles.labelText}>사용기한</Text>
@@ -37,28 +38,70 @@ const PointDetailComponent = ({ card }) => (
 );
 
 const PointCardScreen = () => {
-  const cardData = [
-    {
-      name: '종식',
-      availablePoints: 144300,
-      chargedPoints: 200000,
-      expirationDate: '2025.02.28',
-      limitPerUse: 10000,
-      availableDays: '월, 수, 금',
-      availableTime: '11:00 - 14:00',
-      issueDate: '2025.02.01 00:41'
-    },
-    {
-      name: '러닝메이트',
-      availablePoints: 300000,
-      chargedPoints: 600000,
-      expirationDate: '2025.02.28',
-      limitPerUse: 15000,
-      availableDays: '월, 화, 수, 목, 금',
-      availableTime: '13:00 - 21:00',
-      issueDate: '2025.02.01 00:41'
-    }
-  ];
+  const [cardData, setCardData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 요일 문자열 변환
+  const convertDays = (dto) => {
+    const days = [
+      dto.monday && '월',
+      dto.tuesday && '화',
+      dto.wednesday && '수',
+      dto.thursday && '목',
+      dto.friday && '금',
+      dto.saturday && '토',
+      dto.sunday && '일',
+    ].filter(Boolean);
+    return days.join(', ');
+  };
+
+  // 날짜 포맷
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return `${date.getFullYear()}.${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}`;
+  };
+
+  // 시간 포맷 (HH:mm 형식 그대로 사용)
+  const formatTimeRange = (start, end) => {
+    return `${start} - ${end}`;
+  };
+
+  useEffect(() => {
+    const fetchPoints = async () => {
+      const result = await getMyPoints();
+      if (result) {
+        const filtered = result.filter((item) => item.activated); 
+  
+        const mapped = filtered.map((item) => ({
+          name: item.partyName,
+          availablePoints: item.availableAmount,
+          chargedPoints: item.chargedAmount,
+          expirationDate: formatDate(item.validThru),
+          limitPerUse: Number(item.maximumAmount),
+          availableDays: convertDays(item),
+          availableTime: formatTimeRange(item.allowedTimeStart, item.allowedTimeEnd),
+          issueDate: formatDate(item.createdTime),
+          activated: item.activated
+        }));
+  
+        setCardData(mapped);
+      }
+      setLoading(false);
+    };
+  
+    fetchPoints();
+  }, []);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#000" style={{ marginTop: 30 }} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>

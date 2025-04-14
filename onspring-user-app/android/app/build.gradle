@@ -88,7 +88,7 @@ android {
 
     namespace 'com.anonymous.franchiseapp'
     defaultConfig {
-        applicationId 'com.anonymous.franchiseapp'
+        applicationId 'com.anonymous.userapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

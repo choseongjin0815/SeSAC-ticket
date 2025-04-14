@@ -1,17 +1,38 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { logoutUser } from '../../auth/loginSlice';
+import { useDispatch } from 'react-redux';
+import { getMyInfo } from '../../api/myInfoApi';
 
 const SettingComponent = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const [userInfo, setUserInfo] = useState('');
+
   const handlePassword = () => {
     navigation.navigate('PasswordChangePage');
   }
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser()).unwrap();
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const info = await getMyInfo();
+      setUserInfo(info);
+    }
+
+    fetchData();
+  },[]);
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.phoneNumber}>01012341234</Text>
-        <TouchableOpacity>
+        <Text style={styles.phoneNumber}>{userInfo.phone}</Text>
+        <TouchableOpacity onPress={handleLogout}>
           <Text style={styles.loginText}>로그아웃</Text>
         </TouchableOpacity>
       </View>
