@@ -86,7 +86,7 @@ const MainStackNavigator = ({ isReady }) => {
       {(accessToken || refreshToken) ? (
         <Stack.Screen name="MainTab" component={TabContainer} options={{ headerShown: false }} />
       ) : (
-        <Stack.Screen name="Login" component={Login} options={{ title: "로그인", headerLeft: () => null }} />
+        <Stack.Screen name="Login" component={Login} options={{ title: "로그인", headerShown: false}} />
       )}
     </Stack.Navigator>
   );
@@ -98,14 +98,14 @@ const App = () => {
 
   useEffect(() => {
     setupInterceptors(); // axios 인터셉터 연결
-
+    // AsyncStorage.clear();
     const initApp = async () => {
       try {
         const [[, accessToken], [, refreshTokenValue], [, id], [, tokenExp]] = await AsyncStorage.multiGet([
-          'accessToken',
-          'refreshToken',
-          'id',
-          'tokenExp',
+          'FranchiseAccessToken',
+          'FranchiseRefreshToken',
+          'FranchiseId',
+          'FranchiseTokenExp',
         ]);
 
         const now = Date.now();
@@ -128,19 +128,19 @@ const App = () => {
             } catch (refreshError) {
               console.log('토큰 갱신 실패:', refreshError);
               // 갱신 실패시 저장된 토큰 모두 제거
-              await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'tokenExp', 'id']);
+              await AsyncStorage.multiRemove(['FranchiseAccessToken', 'FranchiseRefreshToken', 'FranchiseTokenExp', 'FranchiseId']);
               // 상태 초기화 (로그인 화면으로 이동하게 됨)
               store.dispatch(restoreToken({ accessToken: null, refreshToken: null, id: null }));
             }
           }
         } else {
           // refreshToken이 없으면 저장된 토큰 모두 제거
-          await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'tokenExp', 'id']);
+          await AsyncStorage.multiRemove(['FranchiseAccessToken', 'FranchiseRefreshToken', 'FranchiseTokenExp', 'FranchiseId']);
         }
       } catch (e) {
         console.log('토큰 복원 실패:', e);
         // 오류 발생 시 저장된 토큰 모두 제거
-        await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'tokenExp', 'id']);
+        await AsyncStorage.multiRemove(['FranchiseAccessToken', 'FranchiseRefreshToken', 'FranchiseTokenExp', 'FranchiseId']);
       } finally {
         setIsAppReady(true);
       }
