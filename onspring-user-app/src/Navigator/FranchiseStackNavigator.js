@@ -17,6 +17,7 @@ const TopTabNavigator = () => {
         <TopTab.Navigator  
             initialRouteName="HomePage"
             screenOptions={{
+                swipeEnabled: false,
                 tabBarStyle: {
                     flexDirection: 'row',
                 },
