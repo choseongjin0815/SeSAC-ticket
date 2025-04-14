@@ -14,11 +14,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class FranchiseServiceImpl implements FranchiseService {
     private final FranchiseRepository franchiseRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
     private final JPAQueryFactory queryFactory;
 
     private Franchise getFranchise(Long id) {
@@ -56,7 +57,7 @@ public class FranchiseServiceImpl implements FranchiseService {
     @Override
     public FranchiseDto findFranchiseById(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException("프랜차이즈 ID는 null일 수 없습니다.");
+            throw new IllegalArgumentException("franchise id cannot be null");
         }
 
         Franchise franchise = getFranchise(id);
@@ -75,18 +76,13 @@ public class FranchiseServiceImpl implements FranchiseService {
      * @return 해당 ID의 프랜차이즈 정보를 담은 FranchiseDto List 객체 반환
      */
     @Override
-    public List<FranchiseDto> findFranchiseListByUserId(Long userId) {
-        if (userId == null) {
-            throw new IllegalArgumentException("사용자의 ID는 null일 수 없습니다.");
+    public Page<FranchiseDto> findFranchiseListByUserId(Long userId, Pageable pageable) {
+        if(userId == null) {
+            throw new IllegalArgumentException("userId cannot be null");
         }
 
-        List<Franchise> franchiseList = franchiseRepository.findAllFranchiseByEndUserId(userId);
-
-        List<FranchiseDto> franchiseDtoList = franchiseList.stream()
-                .map(franchise -> franchise.entityToDto())
-                .collect(Collectors.toList());
-
-        return franchiseDtoList;
+        return franchiseRepository.findAllFranchiseByEndUserId(userId, pageable)
+                .map(franchise -> modelMapper.map(franchise, FranchiseDto.class));
     }
 
     @Override
@@ -150,6 +146,7 @@ public class FranchiseServiceImpl implements FranchiseService {
 
     // 엔티티의 필드를 업데이트하는 메소드
     public void updateFranchiseFields(Franchise franchise, FranchiseDto franchiseDto) {
+        log.info(franchiseDto);
         if (franchiseDto.getName() != null) {
             franchise.setName(franchiseDto.getName());
         }
@@ -158,6 +155,10 @@ public class FranchiseServiceImpl implements FranchiseService {
         }
         if (franchiseDto.getPhone() != null) {
             franchise.setPhone(franchiseDto.getPhone());
+        }
+        if (franchiseDto.getDescription() != null) {
+            log.info(franchiseDto.getDescription());
+            franchise.setDescription(franchiseDto.getDescription());
         }
     }
 
@@ -176,6 +177,25 @@ public class FranchiseServiceImpl implements FranchiseService {
         franchiseRepository.save(franchise);
 
         return true;
+    }
+
+    /**
+     * 가맹점의 새 비밀번호 업데이트
+     *
+     * @param id            가맹점 id
+     * @param oldPassword   기존 password
+     * @param newPassword   새 password
+     * @return 성공여부
+     */
+    @Override
+    public boolean updateFranchisePassword(Long id, String oldPassword, String newPassword) {
+        Franchise franchise = getFranchise(id);
+        if (passwordEncoder.matches(oldPassword, franchise.getPassword())) {
+            franchise.setPassword(passwordEncoder.encode(newPassword));
+            franchiseRepository.save(franchise);
+            return true;
+        }
+        return false;
     }
 
     /**

@@ -2,7 +2,7 @@ package com.onspring.onspring_customer.domain.customer.controller;
 
 import com.onspring.onspring_customer.domain.customer.dto.AdminDto;
 import com.onspring.onspring_customer.domain.customer.service.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,14 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/view/admins")
 public class AdminViewController {
     private final AdminService adminService;
-
-    @Autowired
-    public AdminViewController(AdminService adminService) {
-        this.adminService = adminService;
-    }
 
     @PostMapping("/add")
     public String saveAdmin(@RequestParam(value = "customerId") Long customerId,
@@ -32,10 +28,9 @@ public class AdminViewController {
 
     @GetMapping("/list")
     public String findAdmins(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "userName",
-            required = false) String userName,
-                             @RequestParam(value = "showDeactivated", defaultValue = "false") Boolean showDeactivated
-            , @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size",
-                    defaultValue = "10") Integer size, Model model) {
+            required = false) String userName, @RequestParam(value = "showDeactivated", defaultValue = "true",
+            required = false) Boolean showDeactivated, @RequestParam(value = "page", defaultValue = "1") Integer page
+            , @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<AdminDto> adminDtoPage = adminService.findAllAdminByQuery(customerId, userName, showDeactivated, pageable);
 

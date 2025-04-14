@@ -11,7 +11,7 @@ public interface FranchiseService {
 
     FranchiseDto findFranchiseById(Long id);
 
-    List<FranchiseDto> findFranchiseListByUserId(Long userId);
+    Page<FranchiseDto> findFranchiseListByUserId(Long userId, Pageable pageable);
 
     List<FranchiseDto> findAllFranchise();
 
@@ -20,6 +20,8 @@ public interface FranchiseService {
             , Pageable pageable);
 
     boolean updateFranchise(Long id, FranchiseDto franchiseDto);
+
+    boolean updateFranchisePassword(Long id, String oldPassword, String newPassword);
 
     boolean activateFranchiseById(Long id);
 

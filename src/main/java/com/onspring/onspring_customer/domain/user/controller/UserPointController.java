@@ -2,6 +2,7 @@ package com.onspring.onspring_customer.domain.user.controller;
 
 import com.onspring.onspring_customer.domain.user.dto.PointResponseDto;
 import com.onspring.onspring_customer.domain.user.service.PointService;
+import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class UserPointController {
 
     @GetMapping("/points")
     public ResponseEntity<List<PointResponseDto>> getPointsByUserId() {
-        Long userId = 2L; //테스트용 userId
+        Long userId = SecurityUtil.getCurrentUserId();
 
         List<PointResponseDto> PointDetailList = pointService.getPointsByEndUserId(userId);
 

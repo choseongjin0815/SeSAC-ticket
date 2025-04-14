@@ -7,9 +7,9 @@ import com.onspring.onspring_customer.domain.customer.repository.AdminRepository
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,18 +20,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
+@RequiredArgsConstructor
 @Service
 public class AdminServiceImpl implements AdminService {
     private final AdminRepository adminRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
 
-    @Autowired
-    public AdminServiceImpl(AdminRepository adminRepository, ModelMapper modelMapper, JPAQueryFactory queryFactory) {
-        this.adminRepository = adminRepository;
-        this.modelMapper = modelMapper;
-        this.queryFactory = queryFactory;
-    }
 
     private Admin getAdmin(Long id) {
         Optional<Admin> result = adminRepository.findById(id);

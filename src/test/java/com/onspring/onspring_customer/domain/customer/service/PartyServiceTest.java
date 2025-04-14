@@ -131,7 +131,8 @@ class PartyServiceTest {
 
         when(modelMapper.map(party, PartyDto.class)).thenReturn(partyDto);
 
-        Page<PartyDto> result = partyService.findAllPartyByQuery(name, allowedTimeStart, allowedTimeEnd, sunday,
+        Long adminId = 1L;
+        Page<PartyDto> result = partyService.findAllPartyByQuery(adminId, name, allowedTimeStart, allowedTimeEnd, sunday,
                 monday, tuesday, wednesday, thursday, friday, saturday, maximumAmount, maximumTransaction, pageable);
 
         assertEquals(1, result.getTotalElements());

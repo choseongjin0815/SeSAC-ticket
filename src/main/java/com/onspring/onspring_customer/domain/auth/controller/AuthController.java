@@ -1,10 +1,10 @@
-package com.onspring.onspring_customer.global.auth.controller;
+package com.onspring.onspring_customer.domain.auth.controller;
 
-import com.onspring.onspring_customer.global.auth.dto.LoginRequestDto;
-import com.onspring.onspring_customer.global.auth.dto.LoginResponseDto;
-import com.onspring.onspring_customer.global.auth.dto.RefreshTokenRequestDto;
-import com.onspring.onspring_customer.global.auth.dto.TokenResponseDto;
-import com.onspring.onspring_customer.global.auth.service.AuthenticationService;
+import com.onspring.onspring_customer.domain.auth.dto.LoginRequestDto;
+import com.onspring.onspring_customer.domain.auth.dto.LoginResponseDto;
+import com.onspring.onspring_customer.domain.auth.dto.RefreshTokenRequestDto;
+import com.onspring.onspring_customer.domain.auth.dto.TokenResponseDto;
+import com.onspring.onspring_customer.domain.auth.service.AuthenticationService;
 import com.onspring.onspring_customer.global.util.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -29,15 +29,18 @@ public class AuthController {
                 request.getUserName(),
                 request.getPassword()
         );
+        log.info("Franchise login response: {}", token);
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/api/user/login")
     public ResponseEntity<LoginResponseDto> userLogin(@RequestBody LoginRequestDto request) {
+        log.info("User login request: {}", request);
         LoginResponseDto token = authenticationService.userLogin(
                 request.getPhone(),
                 request.getPassword()
         );
+        log.info("User login response: {}", token);
         return ResponseEntity.ok(token);
     }
 

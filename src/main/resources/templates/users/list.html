@@ -18,8 +18,8 @@
             <select name="searchType"
                     style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; border-right: none;">
                 <option value="name">이름</option>
-                <option value="id">아이디</option>
-                <option value="party">그룹</option>
+                <option value="phone">아이디</option>
+                <option value="partyName">그룹</option>
 
             </select>
             <input type="text" name="keyword" placeholder="검색어를 입력하세요"
@@ -59,7 +59,13 @@
                 <td th:text="*{id}"></td>
                 <td th:text="*{name}"></td>
                 <td th:text="*{phone}"></td>
-                <td th:text="*{partyIds}"></td>
+                <td>
+                    <th:block th:each="party, partyStat : *{parties}">
+                        <span th:text="${party.name}"></span>
+                        <span th:if="${!partyStat.last}">, </span>
+                    </th:block>
+                    <span th:if="*{parties == null || parties.isEmpty()}">-</span>
+                </td>
                 <td>
                     <button th:onclick="'location.href=\'/view/users/edit/' + *{id} + '\''"
                             style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">
@@ -85,7 +91,7 @@
 
 
     <!-- 페이지네이션 -->
-    <div style="margin-top: 30px; text-align: center;">
+    <div style="margin-top: 30px; text-align: center;" th:if="${totalPages > 1}">
         <div style="display: inline-block;">
             <a style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;"
                th:if="${currentPage > 1}" th:href="@{list(page=${currentPage - 1}, size=${size})}">&lt;</a>

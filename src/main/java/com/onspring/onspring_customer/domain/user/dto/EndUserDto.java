@@ -1,5 +1,6 @@
 package com.onspring.onspring_customer.domain.user.dto;
 
+import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -12,6 +13,10 @@ import java.util.List;
 @NoArgsConstructor(force = true)
 public class EndUserDto implements Serializable {
     Long id;
+
+    PartyDto partyDto;
+
+    private List<PartyDto> parties;
 
     String password;
 

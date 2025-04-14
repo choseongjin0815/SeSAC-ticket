@@ -58,7 +58,13 @@
                 <td th:text="*{id}"></td>
                 <td th:text="*{name}"></td>
                 <td th:text="*{phone}"></td>
-                <td th:text="*{partyIds}"></td>
+                <td>
+                    <th:block th:each="party, partyStat : *{parties}">
+                        <span th:text="${party.name}"></span>
+                        <span th:if="${!partyStat.last}">, </span>
+                    </th:block>
+                    <span th:if="*{parties == null || parties.isEmpty()}">-</span>
+                </td>
                 <td>
                     <input type="checkbox" name="selectedMember" value="3" class="member-checkbox"
                            style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
@@ -77,7 +83,7 @@
     </div>
 
     <!-- 페이지네이션 -->
-    <div style="margin-top: 30px; text-align: center;">
+    <div style="margin-top: 30px; text-align: center;" th:if="${totalPages > 1}">
         <div style="display: inline-block;">
             <a style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;"
                th:if="${currentPage > 1}" th:href="@{activate(page=${currentPage - 1}, size=${size})}">&lt;</a>

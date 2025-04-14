@@ -17,51 +17,34 @@
         <span class="path-item current">포인트 입력</span>
     </div>
 
-    <form action="add" method="post">
+    <form action="point" method="post">
         <!-- 회원 추가 폼 -->
         <div class="form-container">
-            <table class="form-table">
+            <table class="form-table" th:object="${point}">
+                <input type="hidden" name="userId" th:value="*{endUserDto.id}"/>
                 <tr>
                     <th>이름</th>
-                    <td>
-                        김자바
-                    </td>
+                    <td th:text="*{endUserDto.name}"></td>
                 </tr>
                 <tr>
                     <th>아이디</th>
-                    <td>
-                        01045644564
-                    </td>
-                </tr>
-                <tr>
-                    <th>생년월일</th>
-                    <td>
-                        1998.08.18
-                    </td>
-                </tr>
-                <tr>
-                    <th>과정</th>
-                    <td>
-                        신입 개발자를 위한 자바 백엔드 심화 과정
-                    </td>
+                    <td th:text="*{endUserDto.phone}"></td>
                 </tr>
                 <tr>
                     <th>현재 포인트</th>
-                    <td>
-                        65,000
-                    </td>
-                </tr>
-                <tr>
-                    <th>선택 정책</th>
-                    <td>
-                        러닝메이트 - 러닝
-                    </td>
+                    <td th:text="*{#numbers.formatInteger(pointDto.currentAmount, 0, 'WHITESPACE')}"></td>
                 </tr>
                 <tr>
                     <th>변경 포인트</th>
                     <td>
-                        <input type="text" id="phone" class="form-input" name="phone"
-                               placeholder="30,000" required/>
+                        <input type="text" id="amount" class="form-input" name="amount"
+                               placeholder="30000" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>유효 기간</th>
+                    <td>
+                        <input type="datetime-local" name="validThru" id="validThru" required/>
                     </td>
                 </tr>
 
@@ -74,10 +57,6 @@
             <button type="button" class="cancel-btn">취소</button>
         </div>
     </form>
-
-
-
-
 
 
 </div>

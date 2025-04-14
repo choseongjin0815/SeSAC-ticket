@@ -4,10 +4,12 @@ import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.service.PartyService;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.service.EndUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,16 +19,14 @@ import java.util.Collections;
 import java.util.List;
 
 @Controller
+@Log4j2
+@RequiredArgsConstructor
 @RequestMapping("/view/users")
 public class UserViewController {
     private final EndUserService endUserService;
     private final PartyService partyService;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserViewController(EndUserService endUserService, PartyService partyService) {
-        this.endUserService = endUserService;
-        this.partyService = partyService;
-    }
 
     @GetMapping("/add")
     String showSaveUser(Model model) {
@@ -44,7 +44,7 @@ public class UserViewController {
         endUserDto.setName(name);
         endUserDto.setPhone(phone);
         endUserDto.setPartyIds(Collections.singletonList(partyId));
-        endUserDto.setPassword(password);
+        endUserDto.setPassword(passwordEncoder.encode(password));
         endUserDto.setActivated(true);
 
         endUserService.saveEndUser(endUserDto);
@@ -54,7 +54,7 @@ public class UserViewController {
 
     @GetMapping("/list")
     String getUsers(@RequestParam(value = "searchType", required = false) String searchType, @RequestParam(value =
-                            "keyword", required = false) String keyword,
+            "keyword", required = false) String keyword,
                     @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size",
                     defaultValue = "10") Integer size, Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -131,10 +131,11 @@ public class UserViewController {
 
         // 기존 회원 정보 가져오기
         EndUserDto userDto = endUserService.findEndUserById(id);
-
         // 정보 업데이트
         userDto.setName(name);
         userDto.setPhone(phone);
+
+        log.info("partyIds:" + partyIds);
 
         // partyIds가 null인 경우 빈 리스트로 설정
         if (partyIds == null) {
@@ -145,7 +146,7 @@ public class UserViewController {
 
 
         // 업데이트 처리
-        endUserService.saveEndUser(userDto);
+        endUserService.updateEndUser(userDto);
 
         return "redirect:/view/users/list";
     }

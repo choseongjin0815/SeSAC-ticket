@@ -5,11 +5,13 @@ import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.service.TransactionService;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.service.FranchiseService;
+import com.onspring.onspring_customer.domain.auth.dto.PasswordUpdateRequest;
 import com.onspring.onspring_customer.global.util.file.CustomFileUtil;
 import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,13 +58,30 @@ public class FranchiseController {
         }
     }
 
+    @PutMapping("/password")
+    public ResponseEntity<String> updateFranchisePassword(
+            @RequestBody PasswordUpdateRequest request) {
+
+        log.info("Franchise password update request: {}", request);
+        Long franchiseId = SecurityUtil.getCurrentUserId();
+
+        boolean success = franchiseService.updateFranchisePassword(franchiseId, request.getOldPassword(), request.getNewPassword());
+
+        if (success) {
+            log.info("Franchise password updated successfully");
+            return ResponseEntity.ok("password updated successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("password update failed");
+        }
+    }
+
 
     //메뉴 사진 업로드
     @PutMapping(value = "/menu", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadMenu(@ModelAttribute FranchiseDto franchiseDto) {
-        Long id = 2L; // 테스트용 ID
+        Long franchiseId = SecurityUtil.getCurrentUserId();
 
-        FranchiseDto oldFranchiseDto = franchiseService.findFranchiseById(id);
+        FranchiseDto oldFranchiseDto = franchiseService.findFranchiseById(franchiseId);
         log.info(oldFranchiseDto);
 
         //기존 데이터베이스에 존재하는 파일들
@@ -185,7 +204,7 @@ public class FranchiseController {
 
         // period가 제공된 경우, 이를 사용(날짜 매개변수 무시)
         if (period != null && !period.isEmpty()) {
-            List<TransactionDto> settlementDtoList = transactionService.findSettlementByFranchiseId(franchiseId, month,period, null, null);
+            List<TransactionDto> settlementDtoList = transactionService.findSettlementByFranchiseId(franchiseId, month, period, null, null);
             return ResponseEntity.ok(settlementDtoList);
         }
 
