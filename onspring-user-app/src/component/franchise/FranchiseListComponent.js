@@ -27,7 +27,7 @@ const FranchiseListComponent = () => {
       const mapped = filtered.map((item) => ({
         id: item.id.toString(),
         name: item.name,
-        category: item.ownerName || '설명 없음',
+        category: item.description || '설명 없음',
         location: item.address,
       }));
 
@@ -59,6 +59,7 @@ const FranchiseListComponent = () => {
   return (
     <View style={styles.container}>
       <FlatList
+        style={{ flex: 1 }}
         data={data}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
