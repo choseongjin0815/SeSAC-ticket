@@ -1,6 +1,12 @@
 import axios from 'axios';
+import { Platform } from 'react-native';
 
-export const API_SERVER_HOST = 'http://localhost:8080';
+export const API_SERVER_HOST =
+  Platform.select({
+    ios: 'http://43.200.223.231:8080', // iOS 시뮬레이터
+    android: 'http://43.200.223.231:8080', // 안드로이드 에뮬레이터
+    web: 'http://43.200.223.231:8080', // 웹 브라우저
+  }) 
 
 const prefix = `${API_SERVER_HOST}/api/user`;
 
@@ -14,6 +20,16 @@ export const getMyInfo = async () => {
   }
 };
 
+export const getMyPartyInfo = async () => {
+  try {
+    const res = await axios.get(`${prefix}/party`);
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    console.error("그룹 정보 조회 실패", error);
+  }
+}
+
 export const getMyPoints = async () => {
     try {
       const res = await axios.get(`${prefix}/points`);
@@ -26,13 +42,13 @@ export const getMyPoints = async () => {
   };
 
   export const updatePassword = async ({ oldPassword, newPassword }) => {
-    try {
-      const res = await axios.put(`${prefix}/password`, {
-        oldPassword,
-        newPassword,
-      });
-      return res.data; 
-    } catch (error) {
-      throw error.response?.data || '비밀번호 변경 중 오류 발생';
-    }
-  };
+  try {
+    const res = await axios.put(`${prefix}/password`, {
+      oldPassword,
+      newPassword,
+    });
+    return res.data; 
+  } catch (error) {
+    throw error.response?.data || '비밀번호 변경 중 오류 발생';
+  }
+};
