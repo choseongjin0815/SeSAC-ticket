@@ -35,7 +35,7 @@ const FranchiseInfoComponent = () => {
     <View style={styles.container}>
       <Text style={styles.title}>{franchiseInfo.name || '이름 없음'}</Text>
       <View style={styles.infoRow}>
-        <Image source={require('../../../images/map-pin.png')} style={styles.icon} />
+        <Image source={require('../../../images/map_pin.png')} style={styles.icon} />
         <Text style={styles.infoText}>{franchiseInfo.address || '주소 없음'}</Text>
       </View>
       <View style={styles.infoRow}>
