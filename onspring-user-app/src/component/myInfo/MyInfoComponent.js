@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { getMyInfo, getMyPoints } from '../../api/myInfoApi';
+import { getMyInfo, getMyPartyInfo, getMyPoints } from '../../api/myInfoApi';
 import { 
   View, 
   Text, 
@@ -24,6 +24,7 @@ const MyInfoComponent = () => {
   const navigation = useNavigation();
   const [user, setUser] = useState({...initState});
   const [points, setPoints] = useState([]);
+  const [party, setParty] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   const handlePointDetail = () => {
@@ -34,6 +35,7 @@ const MyInfoComponent = () => {
     const fetchData = async () => {
       try {
         const info = await getMyInfo();
+        const partyInfo = await getMyPartyInfo();
         const pointsData = await getMyPoints();
         
         setUser(info);
@@ -42,6 +44,7 @@ const MyInfoComponent = () => {
           availableAmount: Number(item.availableAmount),
           chargedAmount: Number(item.chargedAmount)
         })));
+        setParty(partyInfo);
       } catch (error) {
         console.error("데이터 불러오기 실패:", error);
       } finally {
@@ -64,9 +67,9 @@ const MyInfoComponent = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerTitle}>{user.name}</Text>
-        <Text style={styles.subTitle}>은명</Text>
-        <Text style={styles.description}>학생</Text>
-        <Text style={styles.description}>신입 개발자를 위한 자바 백엔드 심화 과정</Text>
+        {/* <Text style={styles.subTitle}>은명</Text>
+        <Text style={styles.description}>학생</Text> */}
+        <Text style={styles.description}>{party.name}</Text>
       </View>
 
       <View style={styles.productContainer}>
@@ -80,7 +83,7 @@ const MyInfoComponent = () => {
               {index === 0 && (
                 <TouchableOpacity onPress={handlePointDetail}>
                   <Image 
-                    source={require('../../../images/Vector.png')} 
+                    source={require('../../../images/vector.png')} 
                     style={styles.chevronIcon} 
                   />
                 </TouchableOpacity>
