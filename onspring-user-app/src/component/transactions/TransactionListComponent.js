@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { getTransactionList } from '../../api/transactionApi';
+import { useFocusEffect } from '@react-navigation/native';
 
-const TransactionListComponent = () => {
+const TransactionListComponent = ({route}) => {
+
   const [data, setData] = useState([]);
   const [page, setPage] = useState(0);
   const [isLast, setIsLast] = useState(false);
@@ -44,9 +46,13 @@ const TransactionListComponent = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    loadMore(); // 컴포넌트 마운트 시 첫 페이지 로딩
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      setData([]); // 데이터를 초기화하고
+      setPage(0);  // 페이지 초기화
+      loadMore(); // 데이터 새로 고침
+    }, []) // 빈 배열을 넣어서 화면이 포커스될 때마다 호출되도록 설정
+  );
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
