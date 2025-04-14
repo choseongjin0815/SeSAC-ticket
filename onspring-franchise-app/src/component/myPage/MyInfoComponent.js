@@ -12,7 +12,8 @@ const initState = {
     address : '',
     phone : '',
     ownerName: '',
-    businessNumber: ''
+    businessNumber: '',
+    description: ''
 }
 
 const MyInfoComponent = () => {
@@ -29,7 +30,7 @@ const MyInfoComponent = () => {
     useEffect(() => {
         const fetchData = async () => {
           const info = await getMyInfo();
-          setFranchise(info); // 가져온 데이터를 state에 설정
+          setFranchise(info); 
         };
     
         fetchData();
@@ -60,6 +61,12 @@ const MyInfoComponent = () => {
           </View>
 
           <View style={styles.infoRow}>
+              <Text style={styles.labelText}>가게 설명</Text>
+              <Text style={styles.valueText}>{franchise.description}</Text>
+          </View>
+
+
+          <View style={styles.infoRow}>
               <Text style={styles.labelText}>연락처</Text>
               <Text style={styles.valueText}>{franchise.phone}</Text>
           </View>
@@ -72,8 +79,7 @@ const MyInfoComponent = () => {
 
               <TouchableOpacity style={styles.button} onPress={handleLogout}>
               <Text style={styles.buttonText}>로그아웃</Text>
-              </TouchableOpacity>
-              
+              </TouchableOpacity>    
           </View>
         
     </View>
