@@ -1,22 +1,22 @@
 package com.onspring.onspring_customer.domain.franchise.controller;
 
+import com.onspring.onspring_customer.domain.auth.dto.PasswordUpdateRequest;
 import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.service.TransactionService;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.service.FranchiseService;
-import com.onspring.onspring_customer.domain.auth.dto.PasswordUpdateRequest;
 import com.onspring.onspring_customer.global.util.file.CustomFileUtil;
 import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -77,8 +77,8 @@ public class FranchiseController {
 
 
     //메뉴 사진 업로드
-    @PutMapping(value = "/menu", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadMenu(@ModelAttribute FranchiseDto franchiseDto) {
+    @PutMapping(value = "/menu")
+    public ResponseEntity<String> uploadMenu(@RequestParam(value = "files", required = false) List<MultipartFile> files, @ModelAttribute FranchiseDto franchiseDto) throws IOException {
         Long franchiseId = SecurityUtil.getCurrentUserId();
 
         FranchiseDto oldFranchiseDto = franchiseService.findFranchiseById(franchiseId);
@@ -87,46 +87,43 @@ public class FranchiseController {
         //기존 데이터베이스에 존재하는 파일들
         List<String> oldFileNames = oldFranchiseDto.getUploadFileNames();
 
-        //새로 업로드 해야하는 파일
-        List<MultipartFile> files = franchiseDto.getFiles();
-
         log.info("files : " + files);
 
+        if(files != null && files.size() > 0) {
+            //새로 업로드 될 파일 이름들
+            List<String> currentFileNames = customFileUtil.saveFiles(files);
 
+            //화면에서 유지할 파일들
+            List<String> uploadFileNames = franchiseDto.getUploadFileNames();
 
-        //새로 업로드 될 파일 이름들
-        List<String> currentFileNames = customFileUtil.saveFiles(files);
+            //유지될 파일들 + 새로만든 파일 이름들
+            if (currentFileNames != null && currentFileNames.size() > 0) {
+                uploadFileNames.addAll(currentFileNames);
+            }
 
-        //화면에서 유지할 파일들
-        List<String> uploadFileNames = franchiseDto.getUploadFileNames();
+            franchiseService.updateMenuImage(franchiseDto);
 
-        //유지될 파일들 + 새로만든 파일 이름들
-        if(currentFileNames != null && currentFileNames.size() > 0) {
-            uploadFileNames.addAll(currentFileNames);
+            log.info(oldFileNames);
+
+            if (oldFileNames != null && !oldFileNames.isEmpty()) {
+                //지울 파일 목록 찾기
+                //예전 파일 이름 중에서 지워져야 할 파일 이름들
+                //기존에 있던 파일 이름들 중에 새로 업로드될 파일 이름에 없는 파일들 remove
+                List<String> removeFiles = oldFileNames
+                        .stream()
+                        .filter(fileName -> !uploadFileNames.contains(fileName)).collect(Collectors.toList());
+
+                customFileUtil.deleteFiles(removeFiles);
+                log.info("files : " + removeFiles);
+            }
         }
-
-        franchiseService.updateMenuImage(franchiseDto);
-
-        log.info(oldFileNames);
-
-        if(oldFileNames != null && !oldFileNames.isEmpty()){
-            //지울 파일 목록 찾기
-            //예전 파일 이름 중에서 지워져야 할 파일 이름들
-            //기존에 있던 파일 이름들 중에 새로 업로드될 파일 이름에 없는 파일들 remove
-            List<String> removeFiles = oldFileNames
-                    .stream()
-                    .filter(fileName -> !uploadFileNames.contains(fileName)).collect(Collectors.toList());
-
-            customFileUtil.deleteFiles(removeFiles);
-            log.info("files : " + removeFiles);
-        }
-
         return ResponseEntity.ok("메뉴 이미지 업데이트가 완료되었습니다.");
     }
 
     //메뉴 사진 조회
     @GetMapping("/menu/{fileName}")
     public ResponseEntity<Resource> getMenu(@PathVariable String fileName) {
+        log.info("getMenu: " + fileName);
         return customFileUtil.getFile(fileName);
     }
 
