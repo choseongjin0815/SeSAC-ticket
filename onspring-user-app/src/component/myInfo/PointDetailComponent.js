@@ -8,11 +8,11 @@ const PointDetailComponent = ({ card }) => (
     <View style={styles.divider} />
     <View style={styles.detailRow}>
       <Text style={styles.labelText}>가용포인트</Text>
-      <Text style={styles.valueText}>{card.availablePoints.toLocaleString()}</Text>
+      <Text style={styles.valueText}>{card.availablePoints}</Text>
     </View>
     <View style={styles.detailRow}>
       <Text style={styles.labelText}>충전포인트</Text>
-      <Text style={styles.valueText}>{card.chargedPoints.toLocaleString()}</Text>
+      <Text style={styles.valueText}>{card.chargedPoints}</Text>
     </View>
     <View style={styles.detailRow}>
       <Text style={styles.labelText}>사용기한</Text>
