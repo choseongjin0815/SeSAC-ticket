@@ -14,7 +14,8 @@ const MyInfoEditComponent = () => {
         phone: '',
         address: '',
         ownerName: '',
-        businessNumber: ''
+        businessNumber: '',
+        description: ''
     });
 
     // 데이터 가져오기
@@ -28,10 +29,11 @@ const MyInfoEditComponent = () => {
         fetchData();
     }, []);
 
-    // 연락처 변경 핸들러
-    const handleSave = (info) => {
+
+    const handleSave = (phoneInfo, descriptionInfo) => {
         const franchiseObj = {
-            phone : info
+            phone : phoneInfo,
+            description: descriptionInfo
         }
         updateInfo(franchiseObj).then(() => {
             navigation.navigate('MyPage',{refresh: true});
@@ -50,6 +52,16 @@ const MyInfoEditComponent = () => {
             phone: text, // 연락처 변경 시 업데이트
         }));
     };
+
+    // 설명 수정 핸들러
+    const handleDescriptionChange = (text) => {
+        console.log(text);
+        setFranchise((prevState) => ({
+            ...prevState,
+            description: text, // 연락처 변경 시 업데이트
+        }));
+    };
+
 
     return (
         <View style={styles.container}>
@@ -76,6 +88,17 @@ const MyInfoEditComponent = () => {
             </View>
 
             <View style={styles.infoRow}>
+                <Text style={styles.labelText}>가게 설명</Text>
+                <TextInput
+                    style={styles.input}
+                    value={franchise.description || ''} // 초기값 franchise.description
+                    onChangeText={handleDescriptionChange} // 값 변경 시 업데이트
+                    keyboardType="phone-pad"
+                    placeholder="가게 설명 입력"
+                />
+            </View>
+
+            <View style={styles.infoRow}>
                 <Text style={styles.labelText}>연락처</Text>
                 <TextInput
                     style={styles.input}
@@ -92,7 +115,7 @@ const MyInfoEditComponent = () => {
                     <Text style={styles.buttonText}>취소</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={() => handleSave(franchise.phone)}>
+                <TouchableOpacity style={styles.button} onPress={() => handleSave(franchise.phone, franchise.description)}>
                     <Text style={styles.buttonText}>확인</Text>
                 </TouchableOpacity>
             </View>
