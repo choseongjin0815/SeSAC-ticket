@@ -1,6 +1,13 @@
 import axios from 'axios';
+import { Platform } from 'react-native';
 
-export const API_SERVER_HOST = 'http://localhost:8080';
+export const API_SERVER_HOST =
+  Platform.select({
+    ios: 'http://43.200.223.231:8080', // iOS 시뮬레이터
+    android: 'http://43.200.223.231:8080', // 안드로이드 에뮬레이터
+    web: 'http://43.200.223.231:8080', // 웹 브라우저
+  }); 
+
 
 const prefix = `${API_SERVER_HOST}/api/franchise`;
 
@@ -18,7 +25,7 @@ export const getSettlementList = async (filterParam) => {
     const {period, startDate, endDate} = filterParam;
       try {
           const res = await axios.get(
-              `${prefix}/transactions`, 
+              `${prefix}/settlments`, 
               {params : {
                   period:period,
                   startDate:startDate,
