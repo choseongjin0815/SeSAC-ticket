@@ -4,6 +4,8 @@ import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.dto.PartyEndUserRelationDto;
 import com.onspring.onspring_customer.domain.customer.service.AdminService;
 import com.onspring.onspring_customer.domain.customer.service.PartyService;
+import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
+import com.onspring.onspring_customer.domain.user.service.EndUserService;
 import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ import java.time.LocalTime;
 public class PartyViewController {
     private final PartyService partyService;
     private final AdminService adminService;
+    private final EndUserService endUserService;
 
     private static Long getAdminId() {
         return SecurityUtil.getCurrentUserId();
@@ -181,5 +185,22 @@ public class PartyViewController {
         model.addAttribute("totalPages", partyEndUserRelationDtoPage.getTotalPages());
 
         return "parties/users";
+    }
+
+    @GetMapping("users/edit/{partyId}")
+    public String getAddOrRemovePartyEndUserRelation(@PathVariable Long partyId,
+                                                  @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                  @RequestParam(value = "size", defaultValue = "10") Integer size,
+                                                  Model model) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        List<EndUserDto> associatedEndUserDto = endUserService.findEndUserByPartyId(partyId);
+        Page<EndUserDto> unassociatedEndUserDto = endUserService.findEndUserByPartyId_Not(partyId, pageable);
+
+        model.addAttribute("associatedUsers", associatedEndUserDto);
+        model.addAttribute("unassociatedUsers", unassociatedEndUserDto);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", unassociatedEndUserDto.getTotalPages());
+
+        return "parties/users_edit";
     }
 }

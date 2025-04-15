@@ -115,6 +115,24 @@ public class EndUserServiceImpl implements EndUserService {
     }
 
     @Override
+    public List<EndUserDto> findEndUserByPartyId(Long partyId) {
+        return pointRepository.findByParty_Id(partyId)
+                .stream()
+                .map(point -> modelMapper.map(point.getEndUser(), EndUserDto.class))
+                .toList();
+    }
+
+    @Override
+    public Page<EndUserDto> findEndUserByPartyId_Not(Long partyId, Pageable pageable) {
+        List<EndUserDto> endUserDtoList = pointRepository.findByParty_IdNot(partyId, pageable)
+                .stream()
+                .map(point -> modelMapper.map(point.getEndUser(), EndUserDto.class))
+                .toList();
+
+        return new PageImpl<>(endUserDtoList, pageable, endUserDtoList.size());
+    }
+
+    @Override
     public List<EndUserDto> findAllEndUser() {
         List<EndUser> endUserList = endUserRepository.findAll();
         List<EndUserDto> endUserDtoList = new ArrayList<>();
