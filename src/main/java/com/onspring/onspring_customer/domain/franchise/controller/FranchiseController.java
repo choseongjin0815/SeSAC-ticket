@@ -22,6 +22,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,9 +70,9 @@ public class FranchiseController {
 
         if (success) {
             log.info("Franchise password updated successfully");
-            return ResponseEntity.ok("password updated successfully");
+            return ResponseEntity.ok("비밀번호 재설정 되었습니다.");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("password update failed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 재설정에 실패하였습니다.");
         }
     }
 
@@ -79,6 +80,9 @@ public class FranchiseController {
     //메뉴 사진 업로드
     @PutMapping(value = "/menu")
     public ResponseEntity<String> uploadMenu(@RequestParam(value = "files", required = false) List<MultipartFile> files, @ModelAttribute FranchiseDto franchiseDto) throws IOException {
+        if (files == null || files.isEmpty()) {
+            files = Collections.emptyList();
+        }
         Long franchiseId = SecurityUtil.getCurrentUserId();
 
         FranchiseDto oldFranchiseDto = franchiseService.findFranchiseById(franchiseId);
@@ -89,7 +93,6 @@ public class FranchiseController {
 
         log.info("files : " + files);
 
-        if(files != null && files.size() > 0) {
             //새로 업로드 될 파일 이름들
             List<String> currentFileNames = customFileUtil.saveFiles(files);
 
@@ -116,7 +119,6 @@ public class FranchiseController {
                 customFileUtil.deleteFiles(removeFiles);
                 log.info("files : " + removeFiles);
             }
-        }
         return ResponseEntity.ok("메뉴 이미지 업데이트가 완료되었습니다.");
     }
 
