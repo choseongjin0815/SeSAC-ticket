@@ -223,6 +223,8 @@ public class PointServiceImpl implements PointService {
                         .stream()
                         .anyMatch(admin -> admin.getId()
                                 .equals(adminId)))
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .map(Point::getEndUser)
                 .map(endUser -> createEndUserPointDto(endUser, party, id))
                 .toList();
