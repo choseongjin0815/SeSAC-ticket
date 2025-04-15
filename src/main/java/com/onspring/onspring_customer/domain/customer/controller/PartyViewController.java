@@ -166,7 +166,7 @@ public class PartyViewController {
     }
 
     @GetMapping("/users")
-    public String getPoints(@RequestParam(value = "searchType", required = false) String searchType,
+    public String getPartyEndUserRelation(@RequestParam(value = "searchType", required = false) String searchType,
                             @RequestParam(value = "keyword", required = false) String keyword, @RequestParam(value =
                     "page", defaultValue = "1") Integer page,
                             @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
