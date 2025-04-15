@@ -6,6 +6,7 @@ import com.onspring.onspring_customer.domain.customer.service.AdminService;
 import com.onspring.onspring_customer.domain.customer.service.PartyService;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.service.EndUserService;
+import com.onspring.onspring_customer.domain.user.service.PointService;
 import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,7 @@ public class PartyViewController {
     private final PartyService partyService;
     private final AdminService adminService;
     private final EndUserService endUserService;
+    private final PointService pointService;
 
     private static Long getAdminId() {
         return SecurityUtil.getCurrentUserId();
@@ -202,5 +204,21 @@ public class PartyViewController {
         model.addAttribute("totalPages", unassociatedEndUserDto.getTotalPages());
 
         return "parties/users_edit";
+    }
+
+    @PostMapping("users/edit/{partyId}")
+    public String addPartyEndUserRelation(@PathVariable Long partyId,
+                                          @RequestParam(value = "userIds") List<Long> userIds) {
+        partyService.addEndUserToParty(partyId, userIds);
+
+        return "redirect:users/edit/{partyId}";
+    }
+
+    @DeleteMapping("users/edit/{partyId}")
+    public String removePartyEncUserRelation(@PathVariable Long partyId,
+                                             @RequestParam(value = "userIds") List<Long> userIds) {
+        pointService.deletePointByPartyIdAndEndUserId(partyId, userIds);
+
+        return "redirect:users/edit/{partyId}";
     }
 }

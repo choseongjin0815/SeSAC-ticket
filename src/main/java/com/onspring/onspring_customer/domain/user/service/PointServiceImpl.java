@@ -231,4 +231,18 @@ public class PointServiceImpl implements PointService {
 
         return new PageImpl<>(endUserPointDtoList, pageable, endUserPointDtoList.size());
     }
+
+    @Override
+    public long deletePointByPartyIdAndEndUserId(Long partyId, List<Long> endUserIds) {
+        log.info("Deleting party end user relation with end users ID {} and party ID {}", endUserIds, partyId);
+
+        long count = pointRepository.deleteByParty_IdAndEndUser_IdIn(partyId, endUserIds);
+
+        if (count == endUserIds.size()) {
+            log.info("Successfully deleted party end user relation with end users with ID {} and party ID {}",
+                    endUserIds, partyId);
+        }
+
+        return count;
+    }
 }

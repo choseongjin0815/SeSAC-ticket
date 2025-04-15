@@ -28,4 +28,6 @@ public interface PointService {
     EndUserPointDto findEndUserAndPointByPartyIdAndEndUserId(Long partyId, Long endUserId);
 
     Page<EndUserPointDto> findAllEndUserAndPointByPartyId(Long adminId, Long id, Pageable pageable);
+
+    long deletePointByPartyIdAndEndUserId(Long partyId, List<Long> endUserIds);
 }
