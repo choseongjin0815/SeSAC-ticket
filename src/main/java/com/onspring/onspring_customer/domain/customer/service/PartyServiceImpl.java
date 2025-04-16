@@ -177,6 +177,8 @@ public class PartyServiceImpl implements PartyService {
 
         List<PartyEndUserRelationDto> partyEndUserRelationDtoList = pointMap.values()
                 .stream()
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .map(points -> {
 
                     PartyDto partyDto = modelMapper.map(points.stream()

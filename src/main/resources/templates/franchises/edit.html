@@ -13,30 +13,30 @@
         <span class="path-item current">가맹점 정보 수정</span>
     </div>
 
-    <form th:action="@{/view/parties/update}" method="post" th:object="${party}">
+    <form th:action="${id}" method="post">
 
         <!-- 회원 수정 폼 -->
         <div class="form-container">
-            <table class="form-table">
+            <table class="form-table" th:object="${franchise}">
                 <tr>
                     <th>가맹점</th>
                     <td>
-                        <input type="text" id="franchise_name" class="form-input" name="franchise_name" placeholder="압구정샌드위치 압구정점"
-                                required/>
+                        <input type="text" id="name" class="form-input" name="name"
+                               th:value="*{name}" required/>
                     </td>
                 </tr>
                 <tr>
                     <th>사업자번호</th>
                     <td>
-                        <input type="number" id="franchise_number" class="form-input" name="franchise_maximumAmount"
-                               placeholder="111-22235" required/>
+                        <input type="number" id="businessNumber" class="form-input" name="businessNumber"
+                               th:value="*{businessNumber}" required/>
                     </td>
                 </tr>
                 <tr>
                     <th>대표자</th>
                     <td>
-                        <input type="text" id="owner" class="form-input" name="owner"
-                               placeholder="홍동길" required/>
+                        <input type="text" id="ownerName" class="form-input" name="ownerName"
+                               th:value="*{ownerName}" required/>
                     </td>
                 </tr>
 
@@ -44,22 +44,25 @@
                     <th>연락처</th>
                     <td>
                         <input type="number" id="phone" class="form-input" name="phone"
-                               placeholder="01095666632" required/>
+                               th:value="*{phone}" required/>
                     </td>
                 </tr>
 
                 <tr>
                     <th>주소</th>
                     <td>
-                        <input type="text" id="adress" class="form-input" name="adress"
-                               placeholder="서울시 은평구" required/>
+                        <input type="text" id="address" class="form-input" name="address"
+                               th:value="*{address}" required/>
                     </td>
                 </tr>
             </table>
         </div>
 
         <div class="btn-container" style="display: flex; justify-content: center; gap: 20px;">
-            <button type="submit" class="submit-btn" style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">확인</button>
+            <button type="submit" class="submit-btn"
+                    style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">
+                확인
+            </button>
         </div>
 
         <!-- Flatpickr 라이브러리 추가 -->

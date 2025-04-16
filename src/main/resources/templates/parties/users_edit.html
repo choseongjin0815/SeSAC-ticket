@@ -30,21 +30,54 @@
             <tr style="background-color: #f2f2f2; height: 40px;">
                 <th style="width: 10%;">이름</th>
                 <th style="width: 20%;">아이디</th>
-                <th style="width: 20%;">생년월일</th>
-                <th style="width: 45%;">과정</th>
                 <th style="width: 5%;">선택</th>
             </tr>
             </thead>
 
             <tbody>
-
+            <tr th:each="associatedUser : ${associatedUsers}" th:id="${associatedUser.id}"
+                th:object="${associatedUser}">
+                <td th:text="*{name}"></td>
+                <td th:text="*{phone}"></td>
+                <td>
+                    <input type="checkbox"/>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
 
     <div class="btn-container" style="display: flex; justify-content: center; gap: 20px;">
-        <button type="submit" class="submit-btn" style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">확인</button>
-        <button type="button" class="cancel-btn" onclick="" style="background-color: #f44336; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">취소</button>
+        <button type="submit" class="submit-btn" onclick="disassociateUsers()"
+                style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">
+            해제
+        </button>
+    </div>
+
+    <div class="unassociated-users">
+        <table>
+            <thead>
+            <tr>
+                <th>이름</th>
+                <th>아이디</th>
+                <th>선택</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="unassociatedUser : ${unassociatedUsers}" th:id="${unassociatedUser.id}"
+                th:object="${unassociatedUser}">
+                <td th:text="*{name}"></td>
+                <td th:text="*{phone}"></td>
+                <td>
+                    <input type="checkbox"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <button onclick="associateUsers()">등록</button>
     </div>
 
     <script>
@@ -64,19 +97,60 @@
             allCheckBtn.textContent = allChecked ? '전체 해제' : '전체 선택';
         }
 
-        function addPointToUsers() {
+        function disassociateUsers() {
             const userIds = [
-                ...document.querySelectorAll("tr[id]:has(input:checked)"),
+                ...document.querySelectorAll(".form-container tr[id]:has(input:checked)"),
             ].map((x) => x.id);
 
             if (userIds.length === 0) {
-                alert("포인트를 추가할 사용자를 선택해 주세요.");
+                alert("해제할 사용자를 선택해 주세요.");
                 return;
             }
 
-            let searchParams = new URLSearchParams();
-            searchParams.append("userIds", userIds);
-            window.location.href = window.location.href + "/point?" + searchParams.toString();
+            if (confirm(userIds.length + '명의 사용자를 해제하시겠습니까?')) {
+                const formData = new FormData();
+                formData.append("ids", userIds);
+
+                fetch("", {
+                    method: "DELETE",
+                    body: formData,
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('선택한 사용자가 해제되었습니다.');
+
+                        location.reload();
+                    }
+                });
+            }
+        }
+
+        function associateUsers() {
+            const userIds = [
+                ...document.querySelectorAll(".unassociated-users tr[id]:has(input:checked)"),
+            ].map((x) => x.id);
+
+            if (userIds.length === 0) {
+                alert("등록할 사용자를 선택해 주세요.");
+                return;
+            }
+
+            if (confirm(userIds.length + '명의 사용자를 등록하시겠습니까?')) {
+                const formData = new FormData();
+                formData.append("ids", userIds);
+
+                fetch("", {
+                    method: "POST",
+                    body: formData,
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('선택한 사용자가 등록되었습니다.');
+
+                        location.reload();
+                    }
+                });
+            }
         }
     </script>
 </div>

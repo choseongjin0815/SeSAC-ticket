@@ -13,6 +13,10 @@ import java.util.Optional;
 public interface PointRepository extends JpaRepository<Point, Long> {
     List<Point> findByParty_Customer_Admins_Id(@NonNull Long id);
 
+    List<Point> findByParty_Id(@NonNull Long id);
+
+    Page<Point> findByParty_IdNot(@NonNull Long id, Pageable pageable);
+
     List<Point> findByParty_IdAndEndUser_IdIn(@NonNull Long id, @NonNull Collection<Long> ids);
 
     List<Point> findByEndUserId(Long endUserId);
@@ -20,5 +24,7 @@ public interface PointRepository extends JpaRepository<Point, Long> {
     Page<Point> findByEndUser_Id(@NonNull Long id, Pageable pageable);
 
     Optional<Point> findByParty_IdAndEndUser_Id(@NonNull Long partyId, @NonNull Long endUserId);
+
+    long deleteByParty_IdAndEndUser_IdIn(@NonNull Long id, @NonNull Collection<Long> ids);
 
 }
