@@ -50,7 +50,7 @@ const MapComponent = () => {
           const center = new kakao.maps.LatLng(markerData[0].lat, markerData[0].lng);
           const map = new kakao.maps.Map(container, {
             center: center,
-            level: 5  
+            level: 1  
           });
 
           markerData.forEach(({ lat, lng, name }) => {

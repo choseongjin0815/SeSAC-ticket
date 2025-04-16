@@ -11,6 +11,7 @@ import setupInterceptors from './src/auth/interceptor';
 import TransactionStackNavigator from './src/Navigator/TransactionStackNavigator';
 import MyInfoStackNavigator from './src/Navigator/MyInfoStackNavigator';
 import FranchiseStackNavigator from './src/Navigator/FranchiseStackNavigator';
+import SplashScreen from 'react-native-splash-screen'; 
 
 const Login = lazy(() => import('./src/pages/login/LoginPage'));
 const Map = lazy(() => import('./src/pages/franchise/MapPage'));
@@ -31,6 +32,7 @@ const TabContainer = () => (
     screenOptions={{
       tabBarActiveTintColor: '#4CAF50',
       tabBarInactiveTintColor: '#BDBDBD',
+      position: 'absolute', // Android에서 절대 위치 사용
     }}
   >
     <Tab.Screen
@@ -38,7 +40,7 @@ const TabContainer = () => (
       component={FranchiseStackNavigator}
       options={{
         tabBarIcon: ({ color, size }) => (
-          <Image source={require('./images/group.png')} style={{ width: size * 1.3, height: size * 1.3, tintColor: color, resizeMode: 'contain' }} />
+          <Image source={require('./images/group.png')} style={{ width: size * 1.3, height: size * 1.3, tintColor: color, resizeMode: 'contain', marginTop: 8 }} />
         ),
         headerShown: false,
         tabBarShowLabel: false,
@@ -56,7 +58,7 @@ const TabContainer = () => (
       component={TransactionStackNavigator}
       options={{
         tabBarIcon: ({ color, size }) => (
-          <Image source={require('./images/transaction.png')} style={{ width: size * 1.3, height: size * 1.3, tintColor: color, resizeMode: 'contain' }} />
+          <Image source={require('./images/transaction.png')} style={{ width: size * 1.3, height: size * 1.3, tintColor: color, resizeMode: 'contain', marginTop: 8 }} />
         ),
         headerShown: false,
         tabBarShowLabel: false,
@@ -67,7 +69,7 @@ const TabContainer = () => (
       component={MyInfoStackNavigator}
       options={{
         tabBarIcon: ({ color, size }) => (
-          <Image source={require('./images/myinfo.png')} style={{ width: size * 1.3, height: size * 1.3, tintColor: color, resizeMode: 'contain' }} />
+          <Image source={require('./images/myinfo.png')} style={{ width: size * 1.3, height: size * 1.3, tintColor: color, resizeMode: 'contain', marginTop: 8 }} />
         ),
         headerShown: false,
         tabBarShowLabel: false,
@@ -136,6 +138,7 @@ const App = () => {
         await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'tokenExp', 'id']);
       } finally {
         setIsAppReady(true);
+        // SplashScreen.hide();
       }
     };
 

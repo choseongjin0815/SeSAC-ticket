@@ -1,5 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import React, { useState } from 'react';
 import { getMyInfo, getMyPartyInfo, getMyPoints } from '../../api/myInfoApi';
 import { 
   View, 
@@ -31,29 +31,31 @@ const MyInfoComponent = () => {
     navigation.navigate('PointDetailPage');
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const info = await getMyInfo();
-        const partyInfo = await getMyPartyInfo();
-        const pointsData = await getMyPoints();
-        
-        setUser(info);
-        setPoints(pointsData.map(item => ({
-          ...item,
-          availableAmount: Number(item.availableAmount),
-          chargedAmount: Number(item.chargedAmount)
-        })));
-        setParty(partyInfo);
-      } catch (error) {
-        console.error("데이터 불러오기 실패:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const info = await getMyInfo();
+          const partyInfo = await getMyPartyInfo();
+          const pointsData = await getMyPoints();
+          
+          setUser(info);
+          setPoints(pointsData.map(item => ({
+            ...item,
+            availableAmount: Number(item.availableAmount),
+            chargedAmount: Number(item.chargedAmount)
+          })));
+          setParty(partyInfo);
+        } catch (error) {
+          console.error("데이터 불러오기 실패:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
-    fetchData();
-  }, []);
+      fetchData();
+    }, []) // dependency array를 빈 배열로 설정하여 화면이 포커스를 받을 때마다 실행
+  );
 
   if (isLoading) {
     return (
@@ -67,30 +69,30 @@ const MyInfoComponent = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerTitle}>{user.name}</Text>
-        {/* <Text style={styles.subTitle}>은명</Text>
-        <Text style={styles.description}>학생</Text> */}
         <Text style={styles.description}>{party.name}</Text>
       </View>
 
       <View style={styles.productContainer}>
-        {points.filter((point) => point.activated).map((point, index) => (
-          <View key={index} style={styles.productItem}>
-            <Text style={styles.productName}>{point.partyName}</Text>
-            <View style={styles.productPriceContainer}>
-              <Text style={styles.productPrice}>
-                {point.availableAmount.toLocaleString()}P
-              </Text>
-              {index === 0 && (
-                <TouchableOpacity onPress={handlePointDetail}>
-                  <Image 
-                    source={require('../../../images/vector.png')} 
-                    style={styles.chevronIcon} 
-                  />
-                </TouchableOpacity>
-              )}
+        <TouchableOpacity onPress={handlePointDetail}>
+          {points.filter((point) => point.activated).map((point, index) => (
+            <View key={index} style={styles.productItem}>
+              <Text style={styles.productName}>{point.partyName}</Text>
+              <View style={styles.productPriceContainer}>
+                <Text style={styles.productPrice}>
+                  {point.availableAmount.toLocaleString()}P
+                </Text>
+                {index === 0 && (
+                  // <TouchableOpacity onPress={handlePointDetail}>
+                    <Image 
+                      source={require('../../../images/vector.png')} 
+                      style={styles.chevronIcon} 
+                    />
+                  // </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
+          </TouchableOpacity>
       </View>
 
       <TouchableOpacity style={styles.footerContainer}>
@@ -100,7 +102,6 @@ const MyInfoComponent = () => {
   );
 };
 
-// 기존 스타일 객체는 변경 없이 그대로 유지
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -115,10 +116,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10
-  },
-  subTitle: {
-    color: '#666',
-    marginBottom: 5
   },
   description: {
     color: '#888',
