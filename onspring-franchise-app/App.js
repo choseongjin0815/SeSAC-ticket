@@ -7,9 +7,9 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { Provider, useSelector } from 'react-redux';
 import store from './src/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { restoreToken } from './src/auth/loginSlice';
+import { restoreToken, refreshToken as refreshTokenAction } from './src/auth/loginSlice';
 import setupInterceptors from './src/auth/interceptor';
-import jwtDecode from 'jwt-decode';
+import SplashScreen from 'react-native-splash-screen';
 
 // 페이지 & 네비게이터
 import BillingStackNavigator from './src/Navigator/BillingStackNavigator';
@@ -26,7 +26,7 @@ const LoadingScreen = () => (
     <ActivityIndicator size="large" color="#4a90e2" />
     <Text style={styles.loadingText}>로딩 중...</Text>
   </View>
-);
+); 
 
 // 네비게이터 설정
 const Tab = createBottomTabNavigator();
@@ -44,7 +44,11 @@ const InnerStackNavigator = () => (
 );
 
 const TabContainer = () => (
-  <Tab.Navigator>
+  <Tab.Navigator
+    screenOptions={{
+      position: 'absolute', // Android에서 절대 위치 사용
+    }}
+  >
     <Tab.Screen
       name="HomeTab"
       component={InnerStackNavigator}
@@ -62,6 +66,7 @@ const TabContainer = () => (
                 height: size * 1.3,
                 tintColor: color,
                 resizeMode: 'contain',
+                marginTop: 8
               }}
             />
           ),
@@ -87,7 +92,7 @@ const MainStackNavigator = ({ isReady }) => {
       {(accessToken || refreshToken) ? (
         <Stack.Screen name="MainTab" component={TabContainer} options={{ headerShown: false }} />
       ) : (
-        <Stack.Screen name="Login" component={Login} options={{ title: "로그인", headerLeft: () => null }} />
+        <Stack.Screen name="Login" component={Login} options={{ title: "로그인", headerShown: false}} />
       )}
     </Stack.Navigator>
   );
@@ -99,30 +104,52 @@ const App = () => {
 
   useEffect(() => {
     setupInterceptors(); // axios 인터셉터 연결
-
+    // AsyncStorage.clear();
     const initApp = async () => {
       try {
-        const [[, accessToken], [, refreshToken], [, id], [, tokenExp]] = await AsyncStorage.multiGet([
-          'accessToken',
-          'refreshToken',
-          'id',
-          'tokenExp',
+        const [[, accessToken], [, refreshTokenValue], [, id], [, tokenExp]] = await AsyncStorage.multiGet([
+          'FranchiseAccessToken',
+          'FranchiseRefreshToken',
+          'FranchiseId',
+          'FranchiseTokenExp',
         ]);
 
         const now = Date.now();
 
-        // accessToken이 살아있거나 refreshToken이 있으면 복원
-        if (refreshToken && id && (
-          (accessToken && tokenExp && now < parseInt(tokenExp, 10)) || !accessToken
-        )) {
-          store.dispatch(restoreToken({ accessToken, refreshToken, id }));
+        // refreshToken이 있으면 처리
+        if (refreshTokenValue && id) {
+          // 일단 가진 정보로 상태 복원
+          store.dispatch(restoreToken({ 
+            accessToken, 
+            refreshToken: refreshTokenValue, 
+            id 
+          }));
+          
+          // accessToken이 만료되었거나 없으면 refreshToken으로 갱신 시도
+          if (!accessToken || (tokenExp && now >= parseInt(tokenExp, 10))) {
+            try {
+              console.log('App 시작 시 토큰 만료, 갱신 시도 중...');
+              await store.dispatch(refreshTokenAction()).unwrap();
+              console.log('토큰 갱신 성공');
+            } catch (refreshError) {
+              console.log('토큰 갱신 실패:', refreshError);
+              // 갱신 실패시 저장된 토큰 모두 제거
+              await AsyncStorage.multiRemove(['FranchiseAccessToken', 'FranchiseRefreshToken', 'FranchiseTokenExp', 'FranchiseId']);
+              // 상태 초기화 (로그인 화면으로 이동하게 됨)
+              store.dispatch(restoreToken({ accessToken: null, refreshToken: null, id: null }));
+            }
+          }
         } else {
-          await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'tokenExp', 'id']);
+          // refreshToken이 없으면 저장된 토큰 모두 제거
+          await AsyncStorage.multiRemove(['FranchiseAccessToken', 'FranchiseRefreshToken', 'FranchiseTokenExp', 'FranchiseId']);
         }
       } catch (e) {
         console.log('토큰 복원 실패:', e);
+        // 오류 발생 시 저장된 토큰 모두 제거
+        await AsyncStorage.multiRemove(['FranchiseAccessToken', 'FranchiseRefreshToken', 'FranchiseTokenExp', 'FranchiseId']);
       } finally {
         setIsAppReady(true);
+      
       }
     };
 

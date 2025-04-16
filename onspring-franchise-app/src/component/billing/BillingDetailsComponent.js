@@ -1,64 +1,68 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image, Modal } from "react-native";
-import { Calendar } from 'react-native-calendars'; // 이 라이브러리를 설치해야 합니다
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View, Text, TouchableOpacity, StyleSheet, Image, Modal, ScrollView, ActivityIndicator
+} from "react-native";
+import { Calendar } from "react-native-calendars";
 import { format } from "date-fns";
-import { getTransactionList } from "../../api/transactionApi"; // API 수정이 필요할 수 있음
-import { ScrollView } from "react-native-gesture-handler";
+import { getTransactionList } from "../../api/transactionApi";
+import { getSettlementList } from "../../api/transactionApi";
 
 const initState = {
   settlementDto: [],
 };
-const TransactionListComponent = ({month}) => {
-    console.log(month);
-    const [year, monthValue] = month.split('.');
-    const [settlementData, setSettlementData] = useState({ ...initState });
-    const [startDate, setStartDate] = useState( new Date(year, monthValue - 1, 1));
-    const [endDate, setEndDate] = useState(new Date(year, monthValue, 0));
-    const [period, setPeriod] = useState();
 
-    const [showStartCalendar, setShowStartCalendar] = useState(false);
-    const [showEndCalendar, setShowEndCalendar] = useState(false);
+const BillingDetailsComponent = ({ month }) => {
+  const [year, monthValue] = month.split(".");
+  const [settlementData, setSettlementData] = useState({ ...initState });
+  const [startDate, setStartDate] = useState(new Date(year, parseInt(monthValue) - 1, 1));
+  const [endDate, setEndDate] = useState(new Date(year, parseInt(monthValue), 0));
+  const [period, setPeriod] = useState();
+  const [loading, setLoading] = useState(false);
+
+  const [showStartCalendar, setShowStartCalendar] = useState(false);
+  const [showEndCalendar, setShowEndCalendar] = useState(false);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  useEffect(() => {
+    if (period !== undefined) {
+      fetchTransactions(true);
+    }
+  }, [period, startDate, endDate]);
+
+  const fetchTransactions = async (scrollToTop = false) => {
+    setLoading(true);
+    try {
+      const response = await getSettlementList({
+     
+        period,
+        startDate: formatDateForCalendar(startDate),
+        endDate: formatDateForCalendar(endDate),
+      });
+      setSettlementData({ settlementDto: response });
+      if (scrollToTop && scrollRef.current) {
+        setTimeout(() => {
+          scrollRef.current.scrollTo({ y: 0, animated: false });
+        }, 100);
+      }
+    } catch (e) {
+      console.error("정산 내역 조회 실패:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePeriodSelection = (selectedPeriod) => {
     setPeriod(selectedPeriod);
-    // period 값 설정 후 조회할 수 있도록 처리
   };
 
-  useEffect(() => {
-    
-      fetchTransactions();
-      console.log("settlement transaction: ", settlementData);
-    
-  }, [period, startDate, endDate]);
-
-  const fetchTransactions = async () => {
-    // period, startDate, endDate를 API에 전달하여 트랜잭션 목록을 가져옵니다.
-    const response = await getTransactionList({
-      period,
-      startDate: formatDateForCalendar(startDate),
-      endDate: formatDateForCalendar(endDate),
-    });
-  
-    setSettlementData({
-      settlementDto: response,
-    });
-  };
-
-  // 날짜 형식 변환 함수
-  const formatDateForCalendar = (date) => {
-    return format(date, 'yyyy.MM.dd');
-  };
-
-  const formatDateForDisplay = (date) => {
-    return format(date, 'yyyy.MM.dd');
-  };
-
-  // 캘린더에서 날짜 선택 시 처리
   const handleStartDateSelect = (day) => {
     const selectedDate = new Date(day.dateString);
     setStartDate(selectedDate);
     setShowStartCalendar(false);
-    setPeriod("");
   };
 
   const handleEndDateSelect = (day) => {
@@ -67,36 +71,38 @@ const TransactionListComponent = ({month}) => {
     setShowEndCalendar(false);
   };
 
+  const formatDateForCalendar = (date) => format(date, "yyyy.MM.dd");
+  const formatDateForDisplay = (date) => format(date, "yyyy.MM.dd");
+
   return (
     <View style={styles.container}>
-      {/* 조회 기간 설정 */}
       <View style={styles.dateContainer}>
-        <Text style={styles.label}>조회 기간</Text>
+        <Text style={styles.label}>    </Text>
         <View style={styles.datesRowContainer}>
           <View style={styles.dateInputContainer}>
             <TouchableOpacity onPress={() => setShowStartCalendar(true)} style={styles.dateInput}>
               <Text style={styles.dateText}>{formatDateForDisplay(startDate)}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setShowStartCalendar(true)} style={styles.calendarIconContainer}>
-              <Image source={require('../../../images/calendar.png')} style={styles.calendarIcon} />
+              <Image source={require("../../../images/calendar.png")} style={styles.calendarIcon} />
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.tildeText}>     ~</Text>
+          <Text style={styles.tildeText}>    ~</Text>
 
           <View style={styles.dateInputContainer}>
             <TouchableOpacity onPress={() => setShowEndCalendar(true)} style={styles.dateInput}>
               <Text style={styles.dateText}>{formatDateForDisplay(endDate)}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setShowEndCalendar(true)} style={styles.calendarIconContainer}>
-              <Image source={require('../../../images/calendar.png')} style={styles.calendarIcon} />
+              <Image source={require("../../../images/calendar.png")} style={styles.calendarIcon} />
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      {/* 시작 날짜 캘린더 모달 */}
-      <Modal animationType="fade" transparent={true} visible={showStartCalendar} onRequestClose={() => setShowStartCalendar(false)}>
+      {/* 캘린더 모달 */}
+      <Modal transparent visible={showStartCalendar} animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.calendarContainer}>
             <View style={styles.calendarHeader}>
@@ -106,23 +112,18 @@ const TransactionListComponent = ({month}) => {
               </TouchableOpacity>
             </View>
             <Calendar
-              current={formatDateForCalendar(startDate)}
+              current={format(startDate, 'yyyy-MM-dd')}
               onDayPress={handleStartDateSelect}
               markedDates={{
-                [formatDateForCalendar(startDate)]: { selected: true, selectedColor: '#3366CC' },
+                [format(startDate, 'yyyy-MM-dd')]: { selected: true, selectedColor: '#3366CC' },
               }}
-              theme={{
-                todayTextColor: '#3366CC',
-                selectedDayBackgroundColor: '#3366CC',
-                selectedDayTextColor: '#ffffff',
-              }}
+              theme={{ todayTextColor: '#3366CC' }}
             />
           </View>
         </View>
       </Modal>
 
-      {/* 종료 날짜 캘린더 모달 */}
-      <Modal animationType="fade" transparent={true} visible={showEndCalendar} onRequestClose={() => setShowEndCalendar(false)}>
+      <Modal transparent visible={showEndCalendar} animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.calendarContainer}>
             <View style={styles.calendarHeader}>
@@ -132,59 +133,48 @@ const TransactionListComponent = ({month}) => {
               </TouchableOpacity>
             </View>
             <Calendar
-              current={formatDateForCalendar(endDate)}
+              current={format(endDate, 'yyyy-MM-dd')}
               onDayPress={handleEndDateSelect}
               markedDates={{
-                [formatDateForCalendar(endDate)]: { selected: true, selectedColor: '#3366CC' },
+                [format(endDate, 'yyyy-MM-dd')]: { selected: true, selectedColor: '#3366CC' },
               }}
-              theme={{
-                todayTextColor: '#3366CC',
-                selectedDayBackgroundColor: '#3366CC',
-                selectedDayTextColor: '#ffffff',
-              }}
+              theme={{ todayTextColor: '#3366CC' }}
             />
           </View>
         </View>
       </Modal>
 
-      {/* 버튼 */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.filterButton} onPress={() => handlePeriodSelection('오늘')}>
-          <Text style={styles.buttonText}>오늘</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton} onPress={() => handlePeriodSelection('최근1주')}>
-          <Text style={styles.buttonText}>최근 1주</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton} onPress={() => handlePeriodSelection('최근2주')}>
-          <Text style={styles.buttonText}>최근 2주</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton} onPress={() => handlePeriodSelection('최근3주')}>
-          <Text style={styles.buttonText}>최근 3주</Text>
-        </TouchableOpacity>
+        {["오늘", "최근1주", "최근2주", "최근3주"].map((label) => (
+          <TouchableOpacity key={label} style={styles.filterButton} onPress={() => handlePeriodSelection(label)}>
+            <Text style={styles.buttonText}>{label}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
-      <TouchableOpacity style={styles.searchButton} onPress={fetchTransactions}>
+      <TouchableOpacity style={styles.searchButton} onPress={() => fetchTransactions(true)}>
         <Text style={styles.searchButtonText}>조회</Text>
       </TouchableOpacity>
 
+      {loading && <ActivityIndicator size="large" color="#3366CC" style={{ marginVertical: 10 }} />}
+
       <View style={styles.tableContainer}>
-        {/* 테이블 헤더 */}
         <View style={styles.tableHeader}>
           <Text style={[styles.tableHeaderText, styles.dateColumn]}>번호</Text>
           <Text style={[styles.tableHeaderText, styles.dateColumn]}>일시</Text>
           <Text style={[styles.tableHeaderText, styles.dateColumn]}>아이디</Text>
           <Text style={[styles.tableHeaderText, styles.dateColumn]}>금액</Text>
-     
         </View>
-        
-        {/* 테이블 바디 */}
-        <ScrollView style={styles.tableBody}>
-          {settlementData.settlementDto && settlementData.settlementDto.map((item, index) => (
+
+        <ScrollView ref={scrollRef} style={styles.tableBody}>
+          {settlementData.settlementDto?.map((item, index) => (
             <View key={index} style={styles.tableRow}>
               <Text style={[styles.cellText, styles.dateColumn]}>{item.id}</Text>
-              <Text style={[styles.cellText, styles.dateColumn]}>{new Date(item.transactionTime).toLocaleString()}</Text>
+              <Text style={[styles.cellText, styles.dateColumn]}>
+                {new Date(item.transactionTime).toLocaleString('ko-KR')}
+              </Text>
               <Text style={[styles.cellText, styles.dateColumn]}>{item.endUserDto.phone}</Text>
-              <Text style={[styles.cellText, styles.dateColumn]}>{item.amount.toLocaleString()}</Text>    
+              <Text style={[styles.cellText, styles.dateColumn]}>{item.amount.toLocaleString()}</Text>
             </View>
           ))}
         </ScrollView>
@@ -192,7 +182,6 @@ const TransactionListComponent = ({month}) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -202,13 +191,13 @@ const styles = StyleSheet.create({
   },
   dateContainer: {
     marginBottom: 20,
-    flexDirection: "row", // 텍스트와 캘린더가 가로로 배치되도록 설정
+    flexDirection: "row",
     alignItems: "center",
   },
   label: {
     fontSize: 16,
     fontWeight: "600",
-    marginRight: 10, // 텍스트와 캘린더 사이의 간격을 조정
+    marginRight: 10,
   },
   datesRowContainer: {
     flexDirection: "row",
@@ -240,7 +229,7 @@ const styles = StyleSheet.create({
   },
   calendarIconContainer: {
     position: "absolute",
-    right: -30, // 아이콘을 박스 밖으로 이동
+    right: -30,
     padding: 5,
   },
   calendarIcon: {
@@ -259,10 +248,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -320,7 +306,6 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: "row",
-    // backgroundColor: "#f2f2f2",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     paddingVertical: 12,
@@ -333,57 +318,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tableRow: {
-    flexDirection: "row", // 가로로 배치
+    flexDirection: "row",
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
-    alignItems: "center", // 세로로 중앙 정렬
+    alignItems: "center",
   },
   cellText: {
     textAlign: "center",
     verticalAlign: "middle",
     fontSize: 14,
   },
-  buttonCell: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  detailButton: {
-    backgroundColor: "#ff4d4d",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
-  detailButtonText: {
-    color: "#fff",
-    fontSize: 12,
-  },
-  // 컬럼별 너비 설정
-  numberColumn: {
-    flex: 0.5, // 번호 컬럼은 좁게
-    textAlign: "center",
-  },
   dateColumn: {
-    flex: 1.5, // 일시 컬럼은 넓게
-    textAlign: "center",
-  },
-  idColumn: {
-    flex: 1,
-    textAlign: "center",
-  },
-  amountColumn: {
-    flex: 1,
-    textAlign: "right",
-    paddingRight: 10,
-  },
-  statusColumn: {
-    flex: 0.8,
-    textAlign: "center",
-  },
-  cancelColumn: {
-    flex: 0.8,
+    flex: 1.5,
     textAlign: "center",
   },
 });
 
-export default TransactionListComponent;
+export default BillingDetailsComponent;

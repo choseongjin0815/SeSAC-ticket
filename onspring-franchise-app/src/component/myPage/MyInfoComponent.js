@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { getMyInfo } from '../../api/myPageApi';
+import { logoutUser } from '../../auth/loginSlice';
+import { useDispatch } from 'react-redux';
 
 const initState = {
     id : 0,
@@ -10,18 +12,25 @@ const initState = {
     address : '',
     phone : '',
     ownerName: '',
-    businessNumber: ''
+    businessNumber: '',
+    description: ''
 }
 
 const MyInfoComponent = () => {
     const [franchise, setFranchise] = useState({...initState});
     
     const navigation = useNavigation();
+    const dispatch = useDispatch();
+
+    const handleLogout = async() => {
+       await dispatch(logoutUser()).unwrap();
+      
+    }
 
     useEffect(() => {
         const fetchData = async () => {
           const info = await getMyInfo();
-          setFranchise(info); // 가져온 데이터를 state에 설정
+          setFranchise(info); 
         };
     
         fetchData();
@@ -52,6 +61,12 @@ const MyInfoComponent = () => {
           </View>
 
           <View style={styles.infoRow}>
+              <Text style={styles.labelText}>가게 설명</Text>
+              <Text style={styles.valueText}>{franchise.description}</Text>
+          </View>
+
+
+          <View style={styles.infoRow}>
               <Text style={styles.labelText}>연락처</Text>
               <Text style={styles.valueText}>{franchise.phone}</Text>
           </View>
@@ -62,10 +77,9 @@ const MyInfoComponent = () => {
               <Text style={styles.buttonText}>수정하기</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Login")}>
+              <TouchableOpacity style={styles.button} onPress={handleLogout}>
               <Text style={styles.buttonText}>로그아웃</Text>
-              </TouchableOpacity>
-              
+              </TouchableOpacity>    
           </View>
         
     </View>

@@ -1,6 +1,5 @@
 // loginSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwtDecode from 'jwt-decode';
 import { API_SERVER_HOST } from '../api/myPageApi';
@@ -20,13 +19,14 @@ export const loginUser = createAsyncThunk(
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       const decodedToken = jwtDecode(data.accessToken);
+      console.log("decode", decodedToken);
       const expTime = decodedToken.exp * 1000;
 
       await AsyncStorage.multiSet([
-        ['accessToken', data.accessToken],
-        ['refreshToken', data.refreshToken],
-        ['tokenExp', expTime.toString()], 
-        ['id', String(data.id)]
+        ['FranchiseAccessToken', data.accessToken],
+        ['FranchiseRefreshToken', data.refreshToken],
+        ['FranchiseTokenExp', expTime.toString()], 
+        ['FranchiseId', String(data.id)]
       ]);
 
       return data;
@@ -41,7 +41,7 @@ export const refreshToken = createAsyncThunk(
   'auth/refreshToken',
   async (_, { rejectWithValue }) => {
     try {
-      const refreshToken = await AsyncStorage.getItem('refreshToken');
+      const refreshToken = await AsyncStorage.getItem('FranchiseRefreshToken');
       const response = await fetch(`${API_SERVER_HOST}/api/token/refresh`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -57,13 +57,13 @@ export const refreshToken = createAsyncThunk(
       
 
       await AsyncStorage.multiSet([
-        ['accessToken', newAccessToken],
-        ['tokenExp', newExpTime.toString()]
+        ['FranchiseAccessToken', newAccessToken],
+        ['FranchiseTokenExp', newExpTime.toString()]
       ]);
 
       return newAccessToken;
     } catch (error) {
-      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'tokenExp', 'id']);
+      await AsyncStorage.multiRemove(['FranchiseAccessToken', 'FranchiseRefreshToken', 'FranchiseTokenExp', 'FranchiseId']);
       return rejectWithValue(error.response?.data || '토큰 갱신 실패');
     }
   }
@@ -73,7 +73,7 @@ export const refreshToken = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async () => {
-    await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'tokenExp', 'id']);
+    await AsyncStorage.multiRemove(['FranchiseAccessToken', 'FranchiseRefreshToken', 'FranchiseTokenExp', 'FranchiseId']);
   }
 );
 

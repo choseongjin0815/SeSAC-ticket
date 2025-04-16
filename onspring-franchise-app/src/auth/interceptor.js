@@ -6,8 +6,8 @@ import store from '../store'; // store를 직접 참조
 const setupInterceptors = () => {
   axios.interceptors.request.use(
     async (config) => {
-      const accessToken = await AsyncStorage.getItem('accessToken');
-      const tokenExp = await AsyncStorage.getItem('tokenExp');
+      const accessToken = await AsyncStorage.getItem('FranchiseAccessToken');
+      const tokenExp = await AsyncStorage.getItem('FranchiseTokenExp');
       const now = Date.now();
 
       // 토큰 만료 확인 후 자동 갱신
@@ -22,7 +22,7 @@ const setupInterceptors = () => {
       }
 
       // 최신 토큰 가져와서 요청에 추가
-      const newAccessToken = await AsyncStorage.getItem('accessToken');
+      const newAccessToken = await AsyncStorage.getItem('FranchiseAccessToken');
       if (newAccessToken) {
         config.headers['Authorization'] = `Bearer ${newAccessToken}`;
       }
@@ -45,7 +45,7 @@ const setupInterceptors = () => {
           await store.dispatch(refreshToken()).unwrap();
 
           // 새로운 토큰으로 요청 다시 시도
-          const newAccessToken = await AsyncStorage.getItem('accessToken');
+          const newAccessToken = await AsyncStorage.getItem('FranchiseAccessToken');
           originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
           return axios(originalRequest);
         } catch (refreshError) {
