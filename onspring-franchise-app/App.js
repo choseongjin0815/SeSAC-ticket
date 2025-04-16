@@ -9,6 +9,7 @@ import store from './src/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { restoreToken, refreshToken as refreshTokenAction } from './src/auth/loginSlice';
 import setupInterceptors from './src/auth/interceptor';
+import SplashScreen from 'react-native-splash-screen';
 
 // 페이지 & 네비게이터
 import BillingStackNavigator from './src/Navigator/BillingStackNavigator';
@@ -43,7 +44,11 @@ const InnerStackNavigator = () => (
 );
 
 const TabContainer = () => (
-  <Tab.Navigator>
+  <Tab.Navigator
+    screenOptions={{
+      position: 'absolute', // Android에서 절대 위치 사용
+    }}
+  >
     <Tab.Screen
       name="HomeTab"
       component={InnerStackNavigator}
@@ -61,6 +66,7 @@ const TabContainer = () => (
                 height: size * 1.3,
                 tintColor: color,
                 resizeMode: 'contain',
+                marginTop: 8
               }}
             />
           ),
@@ -143,6 +149,7 @@ const App = () => {
         await AsyncStorage.multiRemove(['FranchiseAccessToken', 'FranchiseRefreshToken', 'FranchiseTokenExp', 'FranchiseId']);
       } finally {
         setIsAppReady(true);
+      
       }
     };
 

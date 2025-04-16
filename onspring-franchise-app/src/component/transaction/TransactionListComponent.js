@@ -90,7 +90,7 @@ const TransactionListComponent = () => {
     <View style={styles.container}>
       {/* 조회 기간 선택 UI */}
       <View style={styles.dateContainer}>
-        <Text style={styles.label}>조회 기간</Text>
+        <Text style={styles.label}>    </Text>
         <View style={styles.datesRowContainer}>
           {/* 시작 날짜 */}
           <View style={styles.dateInputContainer}>
@@ -127,13 +127,21 @@ const TransactionListComponent = () => {
               </TouchableOpacity>
             </View>
             <Calendar
-              current={formatDateForCalendar(startDate)}
+              current={format(startDate, 'yyyy-MM-dd')}
+              onDayPress={handleStartDateSelect}
+              markedDates={{
+                [format(startDate, 'yyyy-MM-dd')]: { selected: true, selectedColor: '#3366CC' },
+              }}
+              theme={{ todayTextColor: '#3366CC' }}
+            />
+            {/* <Calendar
+              current={format(startDate,)}
               onDayPress={handleStartDateSelect}
               markedDates={{
                 [formatDateForCalendar(startDate)]: { selected: true, selectedColor: '#3366CC' },
               }}
               theme={{ todayTextColor: '#3366CC' }}
-            />
+            /> */}
           </View>
         </View>
       </Modal>
@@ -148,13 +156,21 @@ const TransactionListComponent = () => {
               </TouchableOpacity>
             </View>
             <Calendar
+              current={format(endDate, 'yyyy-MM-dd')}
+              onDayPress={handleEndDateSelect}
+              markedDates={{
+                [format(endDate, 'yyyy-MM-dd')]: { selected: true, selectedColor: '#3366CC' },
+              }}
+              theme={{ todayTextColor: '#3366CC' }}
+            />
+            {/* <Calendar
               current={formatDateForCalendar(endDate)}
               onDayPress={handleEndDateSelect}
               markedDates={{
                 [formatDateForCalendar(endDate)]: { selected: true, selectedColor: '#3366CC' },
               }}
               theme={{ todayTextColor: '#3366CC' }}
-            />
+            /> */}
           </View>
         </View>
       </Modal>

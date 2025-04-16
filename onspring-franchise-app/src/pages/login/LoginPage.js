@@ -36,9 +36,8 @@ const LoginPage = () => {
       console.log(result);
       // navigation.navigate('MainTab');
     } catch (error) {
-      Alert.alert(
-        '로그인 실패', 
-        error.message || '로그인 중 오류가 발생했습니다.'
+      Alert.alert( 
+        error.message || '아이디 또는 패스워드가 틀렸습니다.'
       );
     }
   };
