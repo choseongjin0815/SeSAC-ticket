@@ -64,6 +64,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("select t from Transaction t where t.isAccepted = true and t.isClosed = false")
     Page<Transaction> findByIsAcceptedTrueAndIsClosedFalse(Pageable pageable);
 
+    Page<Transaction> findByParty_Customer_Admins_IdAndIsAcceptedTrueAndIsClosedFalse(@NonNull Long id,
+                                                                                      Pageable pageable);
+
     @Transactional
     @Modifying
     @Query("update Transaction t set t.isClosed = false where t.id in ?1 and t.isAccepted = true and t.isClosed = " +

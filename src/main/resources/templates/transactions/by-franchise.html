@@ -66,12 +66,12 @@
             <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;" th:each="transaction : ${transactions}"
                 th:id="${transaction.id}" th:oject="${transaction}">
                 <td th:text="*{transaction.id}"></td>
-                <td th:text="*{transaction.transactionTime}"></td>
+                <td th:text="*{{transaction.transactionTime}}"></td>
                 <td th:text="*{transaction.franchiseDto.name}"></td>
                 <td th:text="*{transaction.franchiseDto.ownerName}"></td>
                 <td th:text="*{transaction.franchiseDto.phone}"></td>
                 <td th:text="*{transaction.franchiseDto.address}"></td>
-                <td th:text="*{transaction.amount}"></td>
+                <td th:text="*{#numbers.formatInteger(transaction.amount, 0, 'WHITESPACE')}"></td>
                 <td th:text="*{transaction.isAccepted ? '결제완료' : '결제취소'}"></td>
             </tr>
             </tbody>

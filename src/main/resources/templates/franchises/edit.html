@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::div.content-container}, 'party-edit', ~{::title})}">
+<head>
+    <title>가맹점 정보 수정 - 가맹점 관리</title>
+</head>
+<body>
+<div class="content-container">
+    <!-- 페이지 경로 표시 -->
+    <div class="page-path">
+        <span class="path-item">가맹점 관리</span>
+        <span class="path-separator">></span>
+        <span class="path-item current">가맹점 정보 수정</span>
+    </div>
+
+    <form th:action="${id}" method="post">
+
+        <!-- 회원 수정 폼 -->
+        <div class="form-container">
+            <table class="form-table" th:object="${franchise}">
+                <tr>
+                    <th>가맹점</th>
+                    <td>
+                        <input type="text" id="name" class="form-input" name="name"
+                               th:value="*{name}" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>사업자번호</th>
+                    <td>
+                        <input type="number" id="businessNumber" class="form-input" name="businessNumber"
+                               th:value="*{businessNumber}" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>대표자</th>
+                    <td>
+                        <input type="text" id="ownerName" class="form-input" name="ownerName"
+                               th:value="*{ownerName}" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>연락처</th>
+                    <td>
+                        <input type="number" id="phone" class="form-input" name="phone"
+                               th:value="*{phone}" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>주소</th>
+                    <td>
+                        <input type="text" id="address" class="form-input" name="address"
+                               th:value="*{address}" required/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="btn-container" style="display: flex; justify-content: center; gap: 20px;">
+            <button type="submit" class="submit-btn"
+                    style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">
+                확인
+            </button>
+        </div>
+
+        <!-- Flatpickr 라이브러리 추가 -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const startTime = document.getElementById('allowedTimeStart');
+                const endTime = document.getElementById('allowedTimeEnd');
+                const validPeriod = document.getElementById('validPeriod');
+
+                // 시작 시간이나 종료 시간이 변경될 때 validPeriod 값 업데이트
+                function updateValidPeriod() {
+                    if (startTime.value && endTime.value) {
+                        validPeriod.value = startTime.value + ' ~ ' + endTime.value;
+                    }
+                }
+
+                startTime.addEventListener('change', updateValidPeriod);
+                endTime.addEventListener('change', updateValidPeriod);
+
+                // 폼 제출 전에 validPeriod 값 설정
+                document.querySelector('form').addEventListener('submit', function(e) {
+                    updateValidPeriod();
+                });
+
+                // 초기 validPeriod 설정
+                updateValidPeriod();
+            });
+        </script>
+    </form>
+</div>
+</body>
+</html>

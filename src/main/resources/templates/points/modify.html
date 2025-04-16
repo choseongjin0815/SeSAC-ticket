@@ -53,7 +53,7 @@
                 th:object="${party}">
                 <td th:text="*{id}"></td>
                 <td th:text="*{name}"></td>
-                <td th:text="*{maximumAmount}"></td>
+                <td th:text="*{#numbers.formatInteger(maximumAmount, 0, 'WHITESPACE')}"></td>
                 <td th:text="*{maximumTransaction}"></td>
                 <td th:text="*{allowedTimeStart} + ' ~ ' + *{allowedTimeEnd}"></td>
                 <td>?</td>

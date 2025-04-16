@@ -6,6 +6,7 @@ import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.dto.EndUserPointDto;
 import com.onspring.onspring_customer.domain.user.service.EndUserService;
 import com.onspring.onspring_customer.domain.user.service.PointService;
+import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,10 @@ public class PointViewController {
     private final EndUserService endUserService;
     private final PointService pointService;
 
+    private static Long getAdminId() {
+        return SecurityUtil.getCurrentUserId();
+    }
+
     @GetMapping("/issue")
     public String getParty(@RequestParam(value = "searchType", required = false) String searchType,
                            @RequestParam(value = "keyword", required = false) String keyword, @RequestParam(value =
@@ -36,13 +41,13 @@ public class PointViewController {
         if (searchType != null) {
             partyDtoPage = switch (searchType) {
                 case "party" ->
-                        partyService.findAllPartyByQuery(keyword, null, null, false, false, false, false, false,
-                                false, false, null, null, pageable);
+                        partyService.findAllPartyByQuery(getAdminId(), keyword, null, null, false, false, false,
+                                false, false, false, false, null, null, pageable);
                 default -> throw new IllegalStateException("Unexpected value: " + searchType);
             };
         } else {
-            partyDtoPage = partyService.findAllPartyByQuery(null, null, null, false, false, false, false, false,
-                    false, false, null, null, pageable);
+            partyDtoPage = partyService.findAllPartyByQuery(getAdminId(), null, null, null, false, false, false,
+                    false, false, false, false, null, null, pageable);
         }
 
         model.addAttribute("parties", partyDtoPage.getContent());
@@ -57,7 +62,8 @@ public class PointViewController {
             defaultValue = "1") Integer page, @RequestParam(value = "size", defaultValue = "10") Integer size,
                                     Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<EndUserPointDto> endUserPointDtoPage = pointService.findAllEndUserAndPointByPartyId(partyId, pageable);
+        Page<EndUserPointDto> endUserPointDtoPage = pointService.findAllEndUserAndPointByPartyId(getAdminId(),
+                partyId, pageable);
 
         model.addAttribute("models", endUserPointDtoPage.getContent());
         model.addAttribute("currentPage", page);
@@ -97,13 +103,13 @@ public class PointViewController {
         if (searchType != null) {
             partyDtoPage = switch (searchType) {
                 case "party" ->
-                        partyService.findAllPartyByQuery(keyword, null, null, false, false, false, false, false,
-                                false, false, null, null, pageable);
+                        partyService.findAllPartyByQuery(getAdminId(), keyword, null, null, false, false, false,
+                                false, false, false, false, null, null, pageable);
                 default -> throw new IllegalStateException("Unexpected value: " + searchType);
             };
         } else {
-            partyDtoPage = partyService.findAllPartyByQuery(null, null, null, false, false, false, false, false,
-                    false, false, null, null, pageable);
+            partyDtoPage = partyService.findAllPartyByQuery(getAdminId(), null, null, null, false, false, false,
+                    false, false, false, false, null, null, pageable);
         }
 
         model.addAttribute("parties", partyDtoPage.getContent());
@@ -118,7 +124,8 @@ public class PointViewController {
             defaultValue = "1") Integer page, @RequestParam(value = "size", defaultValue = "10") Integer size,
                                           Model model) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<EndUserPointDto> endUserPointDtoPage = pointService.findAllEndUserAndPointByPartyId(partyId, pageable);
+        Page<EndUserPointDto> endUserPointDtoPage = pointService.findAllEndUserAndPointByPartyId(getAdminId(),
+                partyId, pageable);
 
         model.addAttribute("models", endUserPointDtoPage.getContent());
         model.addAttribute("currentPage", page);

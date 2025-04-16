@@ -40,7 +40,7 @@
                 th:id="${model.endUserDto.id}" th:object="${model}">
                 <td th:text="*{endUserDto.name}"></td>
                 <td th:text="*{endUserDto.phone}"></td>
-                <td th:text="*{pointDto.currentAmount}"></td>
+                <td th:text="*{#numbers.formatInteger(pointDto.currentAmount, 0, 'WHITESPACE')}"></td>
                 <td><input type="checkbox" class="member-checkbox" value="1"/></td>
             </tr>
 

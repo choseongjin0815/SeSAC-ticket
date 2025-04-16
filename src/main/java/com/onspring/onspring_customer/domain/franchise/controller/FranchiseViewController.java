@@ -84,10 +84,10 @@ public class FranchiseViewController {
 
         model.addAttribute("franchise", franchise);
 
-        return "franchises/update";
+        return "franchises/edit";
     }
 
-    @PutMapping("/update/{id}")
+    @PostMapping("/update/{id}")
     String updateFranchise(@PathVariable Long id, @RequestParam(value = "name") String name,
                            @RequestParam(value = "ownerName") String ownerName, @RequestParam(value = "address",
                     required = false) String address, @RequestParam(value = "phone") String phone) {

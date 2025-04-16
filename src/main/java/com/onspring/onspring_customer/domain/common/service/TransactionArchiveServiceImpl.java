@@ -5,6 +5,8 @@ import com.onspring.onspring_customer.domain.common.entity.QTransaction;
 import com.onspring.onspring_customer.domain.common.entity.TransactionArchive;
 import com.onspring.onspring_customer.domain.common.repository.TransactionArchiveRepository;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
+import com.onspring.onspring_customer.domain.customer.entity.Customer;
+import com.onspring.onspring_customer.domain.customer.repository.AdminRepository;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.entity.QFranchise;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -28,20 +31,24 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Service
 public class TransactionArchiveServiceImpl implements TransactionArchiveService {
+    private final AdminRepository adminRepository;
     private final ModelMapper modelMapper;
     private final TransactionRepository transactionRepository;
     private final TransactionArchiveRepository transactionArchiveRepository;
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Integer> closeTransactionById(List<Long> ids) {
+    public List<Integer> closeTransactionById(Long adminId, List<Long> ids) {
         log.info("Closing transaction with ID {}", ids.toString());
 
         int updatedTransactionsCount = transactionRepository.updateIsClosedByIdInAndIsAcceptedTrueAndIsClosedFalse(ids);
 
-
         log.info("{} records changed, {} records remain unchanged", updatedTransactionsCount,
                 ids.size() - updatedTransactionsCount);
+
+        Customer customer = adminRepository.findById(adminId)
+                .orElseThrow()
+                .getCustomer();
 
         QTransaction transaction = QTransaction.transaction;
         QFranchise franchise = QFranchise.franchise;
@@ -50,8 +57,7 @@ public class TransactionArchiveServiceImpl implements TransactionArchiveService 
                         transaction.amount.sumAggregate(), transaction.transactionTime.year(),
                         transaction.transactionTime.month())
                 .from(transaction)
-                .join(franchise)
-                .on(transaction.franchise.id.eq(franchise.id))
+                .join(transaction.franchise, franchise)
                 .where(transaction.id.in(ids))
                 .groupBy(franchise, transaction.transactionTime.year(), transaction.transactionTime.month())
                 .fetch();
@@ -87,6 +93,7 @@ public class TransactionArchiveServiceImpl implements TransactionArchiveService 
                 archivesToUpdate.add(transactionArchive);
             } else {
                 TransactionArchive archiveToSave = TransactionArchive.builder()
+                        .customer(customer)
                         .franchise(franchise1)
                         .transactionCount(count)
                         .amountSum(amountSum)
@@ -106,13 +113,22 @@ public class TransactionArchiveServiceImpl implements TransactionArchiveService 
     }
 
     @Override
-    public Page<TransactionArchiveDto> findAllTransactionArchive(Pageable pageable) {
-        return transactionArchiveRepository.findAll(pageable)
+    public Page<TransactionArchiveDto> findAllTransactionArchive(Long adminId, Pageable pageable) {
+        List<TransactionArchiveDto> transactionArchiveDtoList = transactionArchiveRepository.findAll()
+                .stream()
+                .filter(transactionArchive -> transactionArchive.getCustomer()
+                        .getAdmins()
+                        .stream()
+                        .anyMatch(admin -> admin.getId()
+                                .equals(adminId)))
                 .map(element -> {
                     TransactionArchiveDto transactionArchiveDto = modelMapper.map(element, TransactionArchiveDto.class);
                     transactionArchiveDto.setFranchiseDto(modelMapper.map(element.getFranchise(), FranchiseDto.class));
 
                     return transactionArchiveDto;
-                });
+                })
+                .toList();
+
+        return new PageImpl<>(transactionArchiveDtoList, pageable, transactionArchiveDtoList.size());
     }
 }

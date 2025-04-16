@@ -2,9 +2,7 @@ package com.onspring.onspring_customer.domain.customer.service;
 
 import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import com.onspring.onspring_customer.domain.customer.dto.PartyEndUserRelationDto;
-import com.onspring.onspring_customer.domain.customer.entity.Customer;
-import com.onspring.onspring_customer.domain.customer.entity.Party;
-import com.onspring.onspring_customer.domain.customer.entity.QParty;
+import com.onspring.onspring_customer.domain.customer.entity.*;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
@@ -109,12 +107,18 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public Page<PartyDto> findAllPartyByQuery(String name, LocalTime allowedTimeStart, LocalTime allowedTimeEnd,
-                                              boolean sunday, boolean monday, boolean tuesday, boolean wednesday,
-                                              boolean thursday, boolean friday, boolean saturday,
-                                              BigDecimal maximumAmount, Long maximumTransaction, Pageable pageable) {
+    public Page<PartyDto> findAllPartyByQuery(Long adminId, String name, LocalTime allowedTimeStart,
+                                              LocalTime allowedTimeEnd, boolean sunday, boolean monday,
+                                              boolean tuesday, boolean wednesday, boolean thursday, boolean friday,
+                                              boolean saturday, BigDecimal maximumAmount, Long maximumTransaction,
+                                              Pageable pageable) {
         QParty party = QParty.party;
-        JPAQuery<Party> query = queryFactory.selectFrom(party);
+        QCustomer customer = QCustomer.customer;
+        QAdmin admin = QAdmin.admin;
+        JPAQuery<Party> query = queryFactory.selectFrom(party)
+                .join(party.customer, customer)
+                .join(customer.admins, admin)
+                .where(admin.id.eq(adminId));
 
         if (name != null) {
             query.where(party.name.containsIgnoreCase(name));
@@ -164,14 +168,17 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public Page<PartyEndUserRelationDto> findAllPartyEndUserRelationByQuery(String name, Pageable pageable) {
-        Map<Long, List<Point>> pointMap = pointRepository.findAll()
+    public Page<PartyEndUserRelationDto> findAllPartyEndUserRelationByQuery(Long adminId, String name,
+                                                                            Pageable pageable) {
+        Map<Long, List<Point>> pointMap = pointRepository.findByParty_Customer_Admins_Id(adminId)
                 .stream()
                 .collect(Collectors.groupingBy(point -> point.getParty()
                         .getId()));
 
         List<PartyEndUserRelationDto> partyEndUserRelationDtoList = pointMap.values()
                 .stream()
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .map(points -> {
 
                     PartyDto partyDto = modelMapper.map(points.stream()

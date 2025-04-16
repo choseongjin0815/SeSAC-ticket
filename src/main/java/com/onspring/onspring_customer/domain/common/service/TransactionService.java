@@ -3,10 +3,8 @@ package com.onspring.onspring_customer.domain.common.service;
 import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,15 +25,16 @@ public interface TransactionService {
 
     List<TransactionDto> findAllTransaction();
 
-    Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Pageable pageable);
+    Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Long adminId, Pageable pageable);
 
-    Page<TransactionDto> findAllTransactionByQuery(String by, String name, LocalDate after,
-                                                   LocalDate before, Pageable pageable);
+    Page<TransactionDto> findAllTransactionByQuery(Long adminId, String by, String name, LocalDate after,
+                                                   LocalDate before,
+                                                   Pageable pageable);
 
     List<TransactionDto> findTransactionByFranchiseId(Long franchiseId,
-                                                LocalDateTime startDate,
-                                                LocalDateTime endDate,
-                                                String period);
+                                                      LocalDateTime startDate,
+                                                      LocalDateTime endDate,
+                                                      String period);
     Page<TransactionDto> findTransactionByEndUserId(Long userId, Pageable pageable);
 
     List<TransactionDto> findSettlementByFranchiseId(Long franchiseId,
