@@ -39,8 +39,7 @@ const LoginPage = () => {
       // navigation.navigate('MainTab');
     } catch (error) {
       Alert.alert(
-        '로그인 실패', 
-        error.message || '로그인 중 오류가 발생했습니다.'
+        error.message || '아이디 또는 비밀번호가 틀렸습니다.'
       );
     }
   };
@@ -89,6 +88,7 @@ const styles = StyleSheet.create({
   },
   keyboardView: {
     flex: 1,
+    justifyContent: 'center',
   },
   header: {
     flexDirection: 'row',
