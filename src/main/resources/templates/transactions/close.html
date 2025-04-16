@@ -42,12 +42,12 @@
             <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;" th:each="transaction : ${transactions}"
                 th:id="${transaction.id}" th:object="${transaction}">
                 <td th:text="*{id}"></td>
-                <td th:text="*{transactionTime}"></td>
+                <td th:text="*{{transactionTime}}"></td>
                 <td th:text="*{franchiseDto.name}"></td>
                 <td th:text="*{franchiseDto.ownerName}"></td>
                 <td th:text="*{franchiseDto.phone}"></td>
                 <td th:text="*{franchiseDto.address}"></td>
-                <td th:text="*{amount}"></td>
+                <td th:text="*{#numbers.formatInteger(amount, 0, 'WHITESPACE')}"></td>
                 <td>
                     <input type="checkbox" name="selectedMember" value="3" class="member-checkbox"
                            style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">

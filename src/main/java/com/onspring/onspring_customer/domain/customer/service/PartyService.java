@@ -18,12 +18,12 @@ public interface PartyService {
 
     List<PartyDto> findAllParty();
 
-    Page<PartyDto> findAllPartyByQuery(String name, LocalTime allowedTimeStart, LocalTime allowedTimeEnd,
-                                       boolean sunday, boolean monday, boolean tuesday, boolean wednesday,
-                                       boolean thursday, boolean friday, boolean saturday,
+    Page<PartyDto> findAllPartyByQuery(Long adminId, String name, LocalTime allowedTimeStart,
+                                       LocalTime allowedTimeEnd, boolean sunday, boolean monday, boolean tuesday,
+                                       boolean wednesday, boolean thursday, boolean friday, boolean saturday,
                                        BigDecimal maximumAmount, Long maximumTransaction, Pageable pageable);
 
-    Page<PartyEndUserRelationDto> findAllPartyEndUserRelationByQuery(String name, Pageable pageable);
+    Page<PartyEndUserRelationDto> findAllPartyEndUserRelationByQuery(Long adminId, String name, Pageable pageable);
 
     List<Long> addEndUserToParty(Long partyId, List<Long> endUserIds);
 

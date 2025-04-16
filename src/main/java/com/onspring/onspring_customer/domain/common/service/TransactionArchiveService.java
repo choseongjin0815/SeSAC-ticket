@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface TransactionArchiveService {
-    List<Integer> closeTransactionById(List<Long> ids);
+    List<Integer> closeTransactionById(Long adminId, List<Long> ids);
 
-    Page<TransactionArchiveDto> findAllTransactionArchive(Pageable pageable);
+    Page<TransactionArchiveDto> findAllTransactionArchive(Long adminId, Pageable pageable);
 }

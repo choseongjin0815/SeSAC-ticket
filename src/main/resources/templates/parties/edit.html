@@ -37,7 +37,7 @@
                     <th>거래금액한도</th>
                     <td>
                         <input type="number" id="maximumAmount" class="form-input" name="maximumAmount"
-                               placeholder="거래금액 한도를 입력해주세요" th:value="*{maximumAmount}" required/>
+                               placeholder="거래금액 한도를 입력해주세요" th:value="*{#numbers.formatInteger(maximumAmount, 0)}" required/>
                     </td>
                 </tr>
                 <tr>

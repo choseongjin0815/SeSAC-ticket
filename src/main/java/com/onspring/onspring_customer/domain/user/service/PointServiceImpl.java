@@ -212,15 +212,37 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public Page<EndUserPointDto> findAllEndUserAndPointByPartyId(Long id, Pageable pageable) {
+    public Page<EndUserPointDto> findAllEndUserAndPointByPartyId(Long adminId, Long id, Pageable pageable) {
         Party party = getParty(id);
 
         List<EndUserPointDto> endUserPointDtoList = party.getPoints()
                 .stream()
+                .filter(point -> point.getParty()
+                        .getCustomer()
+                        .getAdmins()
+                        .stream()
+                        .anyMatch(admin -> admin.getId()
+                                .equals(adminId)))
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .map(Point::getEndUser)
                 .map(endUser -> createEndUserPointDto(endUser, party, id))
                 .toList();
 
         return new PageImpl<>(endUserPointDtoList, pageable, endUserPointDtoList.size());
+    }
+
+    @Override
+    public long deletePointByPartyIdAndEndUserId(Long partyId, List<Long> endUserIds) {
+        log.info("Deleting party end user relation with end users ID {} and party ID {}", endUserIds, partyId);
+
+        long count = pointRepository.deleteByParty_IdAndEndUser_IdIn(partyId, endUserIds);
+
+        if (count == endUserIds.size()) {
+            log.info("Successfully deleted party end user relation with end users with ID {} and party ID {}",
+                    endUserIds, partyId);
+        }
+
+        return count;
     }
 }

@@ -20,14 +20,51 @@
     body {
       display: flex;
       height: 100vh;
+      position: relative;
     }
 
     .sidebar {
-      width: 200px;
+      width: 250px;
       height: 100%;
       border-right: 1px solid #e0e0e0;
       display: flex;
       flex-direction: column;
+      position: fixed;
+      left: -250px; /* 기본적으로 숨김 */
+      top: 0;
+      bottom: 0;
+      background-color: white;
+      z-index: 1000;
+      transition: left 0.3s ease;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    .sidebar.show {
+      left: 0; /* 버튼 클릭 시 표시 */
+    }
+
+    .nav-toggle-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #4CAF50;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 1001;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .nav-toggle-btn .line {
+      width: 20px;
+      height: 2px;
+      background-color: white;
+      margin: 2px 0;
     }
 
     .logo-container {
@@ -109,6 +146,14 @@
     .main-content {
       flex-grow: 1;
       padding: 0;
+      margin-left: 0; /* 사이드바가 숨겨져 있을 때 */
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .main-content.shifted {
+      margin-left: 250px; /* 사이드바가 표시될 때 */
+      width: calc(100% - 250px);
     }
 
     .top-bar {
@@ -117,12 +162,19 @@
       align-items: center;
       height: 80px;
       border-bottom: 1px solid #e0e0e0;
+      transition: padding-left 0.3s ease;
+      padding-left: 80px; /* 초기 상태 - 버튼을 위한 공간 */
+    }
+
+    .main-content.shifted .top-bar {
+      padding-left: 20px; /* 사이드바가 열렸을 때 패딩 제거 */
     }
 
     .user-info {
       display: flex;
       align-items: center;
       height: 100%;
+      flex: 1; /* 공간을 균등하게 차지 */
     }
 
     .info-item {
@@ -131,13 +183,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex: 1;
       border-right: 1px solid #e0e0e0;
       min-width: 380px;
     }
 
     .info-item:first-child {
-      padding-left: 20px;
-      border-left: 1px solid #e0e0e0;
+      border-left: 20px;
     }
 
     .logout-container {
@@ -168,7 +220,6 @@
     .page-path {
       margin-bottom: 20px;
       font-size: 14px;
-
     }
 
     .path-item {
@@ -191,7 +242,6 @@
       padding-bottom: 10px;
       border-top: 1px solid #4CAF50;
       border-bottom: 1px solid #4CAF50;
-
     }
 
     .form-table {
@@ -248,14 +298,19 @@
       font-size: 14px;
       margin-left: 10px;
     }
-
   </style>
 </head>
 
-
 <body>
+<!-- 내비게이션 토글 버튼 -->
+<div class="nav-toggle-btn" onclick="toggleNavigation()">
+  <div class="line"></div>
+  <div class="line"></div>
+  <div class="line"></div>
+</div>
+
 <!-- 사이드바 -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
   <!-- 로고 영역 -->
   <div class="logo-container">
     <a href="/view/home">
@@ -337,9 +392,8 @@
     </a>
   </div>
 
-
 <!-- 메인 컨텐츠 영역 -->
-<div class="main-content">
+<div class="main-content" id="mainContent">
   <!-- 상단 바 -->
   <div class="top-bar">
     <div class="user-info">
@@ -416,6 +470,20 @@
       menuItem.classList.add('active');
     }
   }
+
+  // 네비게이션 토글 함수 - 한번 열리면 계속 열린 상태 유지
+  function toggleNavigation() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    sidebar.classList.add('show');
+    mainContent.classList.add('shifted');
+
+    // 토글 버튼 숨기기
+    const toggleBtn = document.querySelector('.nav-toggle-btn');
+    toggleBtn.style.display = 'none';
+  }
+
   // activeMenu 파라미터를 활용하여 현재 메뉴 활성화
   document.addEventListener('DOMContentLoaded', function() {
     const activeMenu = "[[${activeMenu}]]";

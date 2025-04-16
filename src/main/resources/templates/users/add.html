@@ -41,9 +41,9 @@
                 <tr>
                     <th>그룹</th>
                     <td>
-                        <select id="partyId" class="form-input" name="partyId" required>
-                            <option value="base" selected>그룹을 선택하세요</option>
-                            <option th:each="party : ${parties}" th:value="${party.id}" th:text="${party.name}"></option>
+                        <select id="partyId" class="form-input" name="partyId" multiple required>
+                            <option th:each="party : ${parties}" th:value="${party.id}"
+                                    th:text="${party.name}"></option>
                         </select>
                     </td>
                 </tr>
