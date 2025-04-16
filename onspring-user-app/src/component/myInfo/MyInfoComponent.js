@@ -1,50 +1,98 @@
-import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { getMyInfo, getMyPartyInfo, getMyPoints } from '../../api/myInfoApi';
 import { 
   View, 
   Text, 
   StyleSheet, 
   SafeAreaView, 
   TouchableOpacity, 
-  Image 
+  Image,
+  ActivityIndicator
 } from 'react-native';
 
+const initState = {
+  id : 0,
+  partyId : 0,
+  name : '',
+  phone: '',
+  partyDto: [],
+  currentPoint: ''
+}
+
 const MyInfoComponent = () => {
-    const navigation = useNavigation();
-  const productDetails = [
-    { name: '런치', price: 144300 },
-    { name: '러닝메이트', price: 300000 }
-  ];
+  const navigation = useNavigation();
+  const [user, setUser] = useState({...initState});
+  const [points, setPoints] = useState([]);
+  const [party, setParty] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
   const handlePointDetail = () => {
     navigation.navigate('PointDetailPage');
   }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const info = await getMyInfo();
+          const partyInfo = await getMyPartyInfo();
+          const pointsData = await getMyPoints();
+          
+          setUser(info);
+          setPoints(pointsData.map(item => ({
+            ...item,
+            availableAmount: Number(item.availableAmount),
+            chargedAmount: Number(item.chargedAmount)
+          })));
+          setParty(partyInfo);
+        } catch (error) {
+          console.error("데이터 불러오기 실패:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchData();
+    }, []) // dependency array를 빈 배열로 설정하여 화면이 포커스를 받을 때마다 실행
+  );
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>홍길동</Text>
-        <Text style={styles.subTitle}>은명</Text>
-        <Text style={styles.description}>학생</Text>
-        <Text style={styles.description}>신입 개발자를 위한 자바 백엔드 심화 과정</Text>
+        <Text style={styles.headerTitle}>{user.name}</Text>
+        <Text style={styles.description}>{party.name}</Text>
       </View>
 
       <View style={styles.productContainer}>
-        {productDetails.map((product, index) => (
-          <View key={index} style={styles.productItem}>
-            <Text style={styles.productName}>{product.name}</Text>
-            <View style={styles.productPriceContainer}>
-              <Text style={styles.productPrice}>{product.price.toLocaleString()}P</Text>
-              {index === 0 ? (
-                <TouchableOpacity onPress={handlePointDetail}
-                >
-                  <Image 
-                    source={require('../../../images/Vector.png')} 
-                    style={styles.chevronIcon} 
-                  />
-                </TouchableOpacity>
-              ): <View style={styles.chevronIcon}/>}
+        <TouchableOpacity onPress={handlePointDetail}>
+          {points.filter((point) => point.activated).map((point, index) => (
+            <View key={index} style={styles.productItem}>
+              <Text style={styles.productName}>{point.partyName}</Text>
+              <View style={styles.productPriceContainer}>
+                <Text style={styles.productPrice}>
+                  {point.availableAmount.toLocaleString()}P
+                </Text>
+                {index === 0 && (
+                  // <TouchableOpacity onPress={handlePointDetail}>
+                    <Image 
+                      source={require('../../../images/vector.png')} 
+                      style={styles.chevronIcon} 
+                    />
+                  // </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
+          </TouchableOpacity>
       </View>
 
       <TouchableOpacity style={styles.footerContainer}>
@@ -68,10 +116,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10
-  },
-  subTitle: {
-    color: '#666',
-    marginBottom: 5
   },
   description: {
     color: '#888',
