@@ -203,6 +203,7 @@ public class EndUserServiceImpl implements EndUserService {
             List<Party> parties = element.getPoints()
                     .stream()
                     .map(Point::getParty)
+                    .sorted(Comparator.comparing(Party::getId))
                     .distinct()
                     .toList();
 
