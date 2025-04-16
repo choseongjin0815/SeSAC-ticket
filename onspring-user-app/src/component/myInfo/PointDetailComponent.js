@@ -30,10 +30,10 @@ const PointDetailComponent = ({ card }) => (
       <Text style={styles.labelText}>사용가능 시간</Text>
       <Text style={styles.valueText}>{card.availableTime}</Text>
     </View>
-    <View style={styles.detailRow}>
+    {/* <View style={styles.detailRow}>
       <Text style={styles.labelText}>지급일</Text>
       <Text style={styles.valueText}>{card.issueDate}</Text>
-    </View>
+    </View> */}
   </View>
 );
 
