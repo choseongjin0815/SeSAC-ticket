@@ -1,7 +1,9 @@
 package com.onspring.onspring_customer.domain.franchise.controller;
 
+import com.onspring.onspring_customer.domain.customer.service.CustomerService;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.service.FranchiseService;
+import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +18,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/view/franchises")
 public class FranchiseViewController {
     private final FranchiseService franchiseService;
+    private final CustomerService customerService;
     private final PasswordEncoder passwordEncoder;
+
+    private static Long getAdminId() {
+        return SecurityUtil.getCurrentUserId();
+    }
 
     @GetMapping("/add")
     String showSaveFranchise() {
@@ -24,21 +31,24 @@ public class FranchiseViewController {
     }
 
     @PostMapping("/add")
-    String saveFranchise(@RequestParam(value = "userName") String userName, @RequestParam(value = "name") String name
-            , @RequestParam(value = "ownerName") String ownerName,
-                         @RequestParam(value = "businessNumber") String businessNumber, @RequestParam(value =
-                    "address") String address, @RequestParam(value = "phone") String phone, @RequestParam(value =
-                    "password") String password) {
+    String saveFranchise(@RequestParam(value = "name") String name,
+                         @RequestParam(value = "ownerName") String ownerName,
+                         @RequestParam(value = "businessNumber") String businessNumber,
+                         @RequestParam(value = "address") String address,
+                         @RequestParam(value = "phone") String phone,
+                         @RequestParam(value = "password") String password) {
         FranchiseDto franchiseDto = FranchiseDto.builder()
-                .userName(userName)
                 .name(name)
                 .ownerName(ownerName)
                 .businessNumber(businessNumber)
                 .address(address)
                 .phone(phone)
                 .password(passwordEncoder.encode(password))
+                .isActivated(true)
                 .build();
-        franchiseService.saveFranchise(franchiseDto);
+        Long franchiseId = franchiseService.saveFranchise(franchiseDto);
+
+        customerService.addFranchiseToCustomerWithAdminId(getAdminId(), franchiseId);
 
         return "redirect:list";
     }
