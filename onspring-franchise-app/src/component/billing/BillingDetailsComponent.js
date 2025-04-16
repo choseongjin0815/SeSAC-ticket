@@ -77,7 +77,7 @@ const BillingDetailsComponent = ({ month }) => {
   return (
     <View style={styles.container}>
       <View style={styles.dateContainer}>
-        <Text style={styles.label}>조회 기간</Text>
+        <Text style={styles.label}>    </Text>
         <View style={styles.datesRowContainer}>
           <View style={styles.dateInputContainer}>
             <TouchableOpacity onPress={() => setShowStartCalendar(true)} style={styles.dateInput}>
