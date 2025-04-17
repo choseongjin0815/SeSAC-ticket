@@ -5,6 +5,7 @@ import com.onspring.onspring_customer.domain.common.repository.CustomerFranchise
 import com.onspring.onspring_customer.domain.customer.dto.CustomerDto;
 import com.onspring.onspring_customer.domain.customer.entity.Customer;
 import com.onspring.onspring_customer.domain.customer.entity.QCustomer;
+import com.onspring.onspring_customer.domain.customer.repository.AdminRepository;
 import com.onspring.onspring_customer.domain.customer.repository.CustomerRepository;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class CustomerServiceImpl implements CustomerService {
+    private final AdminRepository adminRepository;
     private final CustomerRepository customerRepository;
     private final FranchiseRepository franchiseRepository;
     private final CustomerFranchiseRepository customerFranchiseRepository;
@@ -139,6 +141,16 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Successfully added franchise with user ID {} to customer id {}", franchiseId, customerId);
 
         return id;
+    }
+
+    @Override
+    public Long addFranchiseToCustomerWithAdminId(Long adminId, Long franchiseId) {
+        Long customerId = adminRepository.findById(adminId)
+                .orElseThrow()
+                .getCustomer()
+                .getId();
+
+        return addFranchiseToCustomer(customerId, franchiseId);
     }
 
     @Override
