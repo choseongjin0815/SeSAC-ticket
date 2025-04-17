@@ -110,7 +110,7 @@ public class FranchiseViewController {
                 .build();
         franchiseService.updateFranchise(id, franchiseDto);
 
-        return "redirect:list";
+        return "redirect:/view/franchises/list";
     }
 
     @GetMapping("/activate")
