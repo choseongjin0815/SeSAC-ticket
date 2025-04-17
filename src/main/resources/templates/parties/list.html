@@ -47,8 +47,8 @@
                 <th style="width: 10%;">거래금액한도</th>
                 <th style="width: 5%;">거래횟수한도</th>
                 <th style="width: 10%;">유효시간</th>
-<!--                <th style="width: 5%;">가용시작일</th>-->
-<!--                <th style="width: 5%;">가용종료일</th>-->
+                <th style="width: 5%;">가용시작일</th>
+                <th style="width: 5%;">가용종료일</th>
                 <th style="width: 10%;">사용가능일</th>
                 <th style="width: 5%;">수정하기</th>
                 <th style="width: 5%;">선택</th>
@@ -63,8 +63,8 @@
                 <td th:text="*{#numbers.formatInteger(maximumAmount, 0, 'WHITESPACE')}"></td>
                 <td th:text="*{maximumTransaction}"></td>
                 <td th:text="*{allowedTimeStart} + ' ~ ' + *{allowedTimeEnd}"></td>
-<!--                <td>What was that now?</td>-->
-<!--                <td th:text="*{validThru}"></td>-->
+                <td>What was that now?</td>
+                <td th:text="*{validThru}"></td>
                 <td th:text="*{formattedDays}"></td>
                 <td>
                     <button th:onclick="|location.href='/view/parties/edit/*{id}'|"
