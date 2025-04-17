@@ -13,8 +13,8 @@
         <span class="path-item current">가맹점 정보 수정</span>
     </div>
 
-    <form th:action="${id}" method="post">
-
+<!--    <form th:action="${id}" method="post">z-->
+    <form th:action="@{${franchise.id}}" method="post">
         <!-- 회원 수정 폼 -->
         <div class="form-container">
             <table class="form-table" th:object="${franchise}">
@@ -28,7 +28,7 @@
                 <tr>
                     <th>사업자번호</th>
                     <td>
-                        <input type="number" id="businessNumber" class="form-input" name="businessNumber"
+                        <input type="text" id="businessNumber" class="form-input" name="businessNumber"
                                th:value="*{businessNumber}" required/>
                     </td>
                 </tr>
@@ -43,7 +43,7 @@
                 <tr>
                     <th>연락처</th>
                     <td>
-                        <input type="number" id="phone" class="form-input" name="phone"
+                        <input type="text" id="phone" class="form-input" name="phone"
                                th:value="*{phone}" required/>
                     </td>
                 </tr>
