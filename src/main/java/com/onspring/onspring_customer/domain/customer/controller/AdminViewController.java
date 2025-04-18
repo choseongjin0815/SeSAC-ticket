@@ -2,6 +2,7 @@ package com.onspring.onspring_customer.domain.customer.controller;
 
 import com.onspring.onspring_customer.domain.customer.dto.AdminDto;
 import com.onspring.onspring_customer.domain.customer.service.AdminService;
+import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,12 +42,19 @@ public class AdminViewController {
         return "admins/list";
     }
 
-    @PatchMapping("/update-password")
-    public String updateAdminPassword(@RequestParam(value = "id") Long id,
-                                      @RequestParam(value = "password") String password) {
-        adminService.updateAdminPasswordById(id, password);
+    @GetMapping("/update-password")
+    public String changePassword() {
+        return "admins/changepassword";
+    }
 
-        return "redirect:list";
+    @PostMapping("/update-password")
+    public String updateAdminPassword(@RequestParam String oldPassword, @RequestParam String newPassword) {
+
+        Long adminId = SecurityUtil.getCurrentUserId();
+
+        adminService.updateAdminPasswordById(adminId, oldPassword, newPassword);
+
+        return "redirect:/view/home";
     }
 
     @PatchMapping("/activate")
@@ -62,4 +70,6 @@ public class AdminViewController {
 
         return "redirect:list";
     }
+
+
 }

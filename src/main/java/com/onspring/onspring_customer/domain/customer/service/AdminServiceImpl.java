@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class AdminServiceImpl implements AdminService {
     private final AdminRepository adminRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
+    private final PasswordEncoder passwordEncoder;
 
 
     private Admin getAdmin(Long id) {
@@ -93,17 +95,20 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public boolean updateAdminPasswordById(Long id, String password) {
+    public boolean updateAdminPasswordById(Long id, String oldPassword, String newPassword) {
         log.info("Updating password for admin with ID {}", id);
 
         Admin admin = getAdmin(id);
 
-        admin.setPassword(password);
-        adminRepository.save(admin);
+        if (passwordEncoder.matches(oldPassword, admin.getPassword())) {
+            admin.setPassword(passwordEncoder.encode(newPassword));
+            adminRepository.save(admin);
+            return true;
+        }
 
         log.info("Successfully updated password for admin with ID {}", id);
 
-        return true;
+        return false;
     }
 
     @Override
