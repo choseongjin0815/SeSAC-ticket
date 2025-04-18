@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -89,21 +90,27 @@ public class EndUserServiceImpl implements EndUserService {
     public EndUserDto findEndUserById(Long id) {
         EndUser endUser = getEndUser(id);
 
-        List<Long> partyIds = endUser.getPoints()
-                .stream()
+        Set<Point> pointSet = endUser.getPoints();
+
+        List<Long> partyIds = pointSet.stream()
                 .map(Point::getParty)
-                .map(Party::getId)
-                .toList();
+                .map(party -> party != null ? party.getId() : null)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        log.info("partyIds: " + partyIds);
+
         List<Long> pointIds = endUser.getPoints()
                 .stream()
                 .map(Point::getId)
                 .toList();
 
         EndUserDto endUserDto = modelMapper.map(endUser, EndUserDto.class);
+
         endUserDto.setPartyIds(partyIds);
         endUserDto.setPointIds(pointIds);
 
-        return modelMapper.map(endUser, EndUserDto.class);
+        return endUserDto;
     }
 
     @Override
@@ -196,6 +203,7 @@ public class EndUserServiceImpl implements EndUserService {
             List<Party> parties = element.getPoints()
                     .stream()
                     .map(Point::getParty)
+                    .sorted(Comparator.comparing(Party::getId))
                     .distinct()
                     .toList();
 

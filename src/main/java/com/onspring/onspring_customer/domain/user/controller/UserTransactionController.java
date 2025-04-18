@@ -16,8 +16,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-
 @RequiredArgsConstructor
 @Log4j2
 @RequestMapping("/api/user/transactions")
@@ -53,8 +51,8 @@ public class UserTransactionController {
         log.info(franchiseId);
         FranchiseDto franchiseDto = franchiseService.findFranchiseById(franchiseId);
 
-        //MultiPart필드를 null로 초기화
-        franchiseDto.setFiles(new ArrayList<>());
+//        //MultiPart필드를 null로 초기화
+//        franchiseDto.setFiles(new ArrayList<>());
 
         log.info("franchiseDto: " + franchiseDto);
 

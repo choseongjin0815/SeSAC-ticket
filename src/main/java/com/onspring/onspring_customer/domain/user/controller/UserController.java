@@ -68,9 +68,9 @@ public class UserController {
 
         if (success) {
             log.info("User password updated successfully");
-            return ResponseEntity.ok("password updated successfully");
+            return ResponseEntity.ok("비밀번호가 재설정 되었습니다.");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("password update failed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 재설정에 실패하였습니다.");
         }
     }
 }

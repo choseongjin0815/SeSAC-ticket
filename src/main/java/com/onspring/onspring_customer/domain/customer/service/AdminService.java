@@ -15,7 +15,7 @@ public interface AdminService {
 
     Page<AdminDto> findAllAdminByQuery(Long customerId, String userName, boolean isActivated, Pageable pageable);
 
-    boolean updateAdminPasswordById(Long id, String password);
+    boolean updateAdminPasswordById(Long id, String oldPassword, String newPassword);
 
     boolean activateAdminById(Long id);
 

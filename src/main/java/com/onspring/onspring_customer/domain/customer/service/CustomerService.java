@@ -20,6 +20,8 @@ public interface CustomerService {
 
     Long addFranchiseToCustomer(Long customerId, Long franchiseId);
 
+    Long addFranchiseToCustomerWithAdminId(Long adminId, Long franchiseId);
+
     boolean deleteFranchiseFromCustomer(Long id);
 
     boolean activateCustomerById(Long id);

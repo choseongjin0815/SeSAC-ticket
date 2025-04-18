@@ -109,6 +109,7 @@
       transition: transform 0.3s;
     }
 
+
     .menu-item.active {
       color: #4CAF50;
       font-weight: 1000;
@@ -118,6 +119,7 @@
       transform: rotate(90deg);
       color: #4CAF50;
     }
+
 
     .submenu {
       background-color: #f6f6f6;
@@ -183,6 +185,7 @@
       justify-content: center;
       flex: 1;
       border-right: 1px solid #e0e0e0;
+      min-width: 380px;
     }
 
     .info-item:first-child {
@@ -382,12 +385,12 @@
     </div>
   </div>
 
-  <!-- 비밀번호 변경 영역 -->
-  <a href="/manager/changepassword" class="menu-item">
-    <span>비밀번호 변경</span>
-    <span class="arrow">›</span>
-  </a>
-</div>
+    <!-- 비밀번호 변경 영역 -->
+    <a href="/view/admins/update-password" class="menu-item">
+      <span>비밀번호 변경</span>
+      <span class="arrow">›</span>
+    </a>
+  </div>
 
 <!-- 메인 컨텐츠 영역 -->
 <div class="main-content" id="mainContent">
@@ -421,6 +424,7 @@
 
   <!-- 실제 컨텐츠가 들어갈 영역 -->
   <div th:replace="${content}">
+
     <!-- 기본 컨텐츠 영역 -->
     <div style="padding: 20px;">
       <h1>서울 소프트웨어 아카데미 관리 시스템</h1>
