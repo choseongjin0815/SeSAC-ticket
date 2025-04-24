@@ -27,27 +27,6 @@ public class HomeController {
         return "home";
     }
 
-    @GetMapping("/members/add")
-    public String addMember(Model model) {
-        return "members/add";
-    }
-
-    @GetMapping("/members/manage")
-    public String memberManagePage(Model model) {
-        model.addAttribute("activeMenu", "member-manage");
-        return "members/manage";
-    }
-
-    @GetMapping("/members/activated")
-    public String activatedMember(Model model) {
-        model.addAttribute("activeMenu", "member-activated");
-        return "members/activated";
-    }
-
-    @GetMapping("/manager/changepassword")
-    public String changePassword(Model model) {
-        return "manager/changepassword";
-    }
 
 
 
