@@ -8,6 +8,9 @@ import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.service.FranchiseService;
 import com.onspring.onspring_customer.global.util.file.CustomFileUtil;
 import com.onspring.onspring_customer.security.SecurityUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
@@ -26,16 +29,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/franchise")
+@Tag(name = "가맹점 API", description = "가맹점 관련 API 모음")
 public class FranchiseController {
     private final FranchiseService franchiseService;
     private final TransactionService transactionService;
     private final CustomFileUtil customFileUtil;
 
-    //프랜차이즈 정보 보기
+    @Operation(summary = "가맹점 정보 조회", description = "선택된 가맹점의 상세 정보 조회")
     @GetMapping("/info")
     public ResponseEntity<FranchiseDto> getFranchiseInfo() {
         Long franchiseId = SecurityUtil.getCurrentUserId();
@@ -45,8 +50,7 @@ public class FranchiseController {
         return ResponseEntity.ok(franchiseDto);
     }
 
-
-    // 가맹점 정보 업데이트
+    @Operation(summary = "가맹점 정보 수정", description = "가맹점의 전화번호, 가게 설명 등의 허용된 정보만 수정")
     @PutMapping("/info")
     public ResponseEntity<String> updateFranchise(@RequestBody FranchiseDto franchiseDto) {
         Long franchiseId = SecurityUtil.getCurrentUserId();
@@ -59,6 +63,7 @@ public class FranchiseController {
         }
     }
 
+    @Operation(summary = "가맹점 비밀번호 수정", description = "가맹점 비밀번호 수정")
     @PutMapping("/password")
     public ResponseEntity<String> updateFranchisePassword(
             @RequestBody PasswordUpdateRequest request) {
@@ -77,7 +82,7 @@ public class FranchiseController {
     }
 
 
-    //메뉴 사진 업로드
+    @Operation(summary = "가맹점 이미지 업로드", description = "메뉴 사진, 가게 사진 등을 업로드 하는 메소드")
     @PutMapping(value = "/menu")
     public ResponseEntity<String> uploadMenu(@RequestParam(value = "files", required = false) List<MultipartFile> files, @ModelAttribute FranchiseDto franchiseDto) throws IOException {
         if (files == null || files.isEmpty()) {
@@ -122,14 +127,14 @@ public class FranchiseController {
         return ResponseEntity.ok("메뉴 이미지 업데이트가 완료되었습니다.");
     }
 
-    //메뉴 사진 조회
+    @Operation(summary = "가맹점의 이미지 조회", description = "가맹점 메뉴, 가게 사진 등 조회")
     @GetMapping("/menu/{fileName}")
     public ResponseEntity<Resource> getMenu(@PathVariable String fileName) {
         log.info("getMenu: " + fileName);
         return customFileUtil.getFile(fileName);
     }
 
-    //정산 요약 조회
+    @Operation(summary = "가맹점의 정산 정보 묶음 조회", description = "한달 단위로 전체 정산 건수와 정산 금액 합계 조회")
     @GetMapping("/settlements")
     public ResponseEntity<List<SettlmentSummaryDto>> getSettlementsSummary() {
         Long franchiseId = SecurityUtil.getCurrentUserId();
@@ -142,6 +147,7 @@ public class FranchiseController {
 
     }
 
+    @Operation(summary = "가맹점의 결제 내역 조회", description = "가맹점 결제 내역의 기간 조회 혹은 최근 1주, 2주등 조회")
     @GetMapping("/transactions")
     public ResponseEntity<List<TransactionDto>> getFranchiseTransactions(
             @RequestParam(required = false) String period,
@@ -193,6 +199,7 @@ public class FranchiseController {
         return ResponseEntity.ok(transactionDtoList);
     }
 
+    @Operation(summary = "가맹점의 정산 내역 조회", description = "선택된 달의 정산 내역 조회")
     @GetMapping("/settlements/{month}")
     public ResponseEntity<List<TransactionDto>> getFranchiseSettlements(
             @PathVariable String month,
@@ -245,6 +252,7 @@ public class FranchiseController {
         return ResponseEntity.ok(settlementDtoList);
     }
 
+    @Operation(summary = "가맹점 결제 취소", description = "결제 취소")
     @PutMapping("/transactions/{transactionId}/cancel")
     public ResponseEntity<String> cancelTransaction(@PathVariable Long transactionId) {
         log.info(transactionId);
