@@ -269,7 +269,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Long adminId, Pageable pageable) {
-        return transactionRepository.findByParty_Customer_Admins_IdAndIsAcceptedTrueAndIsClosedFalse(adminId, pageable)
+        return transactionRepository.findByParty_Customer_Admins_IdAndIsAcceptedTrueAndIsClosedFalseOrderByIdDesc(adminId, pageable)
                 .map(element -> modelMapper.map(element, TransactionDto.class));
     }
 

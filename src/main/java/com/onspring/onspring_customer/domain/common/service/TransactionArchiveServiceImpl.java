@@ -114,21 +114,23 @@ public class TransactionArchiveServiceImpl implements TransactionArchiveService 
 
     @Override
     public Page<TransactionArchiveDto> findAllTransactionArchive(Long adminId, Pageable pageable) {
-        List<TransactionArchiveDto> transactionArchiveDtoList = transactionArchiveRepository.findAll()
+        List<TransactionArchiveDto> transactionArchiveDtoList = transactionArchiveRepository.findAllByOrderByIdDesc()
                 .stream()
                 .filter(transactionArchive -> transactionArchive.getCustomer()
                         .getAdmins()
                         .stream()
-                        .anyMatch(admin -> admin.getId()
-                                .equals(adminId)))
+                        .anyMatch(admin -> admin.getId().equals(adminId)))
                 .map(element -> {
                     TransactionArchiveDto transactionArchiveDto = modelMapper.map(element, TransactionArchiveDto.class);
                     transactionArchiveDto.setFranchiseDto(modelMapper.map(element.getFranchise(), FranchiseDto.class));
-
                     return transactionArchiveDto;
                 })
                 .toList();
 
-        return new PageImpl<>(transactionArchiveDtoList, pageable, transactionArchiveDtoList.size());
+        int start = (int) pageable.getOffset(); // 시작 인덱스
+        int end = Math.min((start + pageable.getPageSize()), transactionArchiveDtoList.size()); // 끝 인덱스
+        List<TransactionArchiveDto> pagedList = transactionArchiveDtoList.subList(start, end);
+
+        return new PageImpl<>(pagedList, pageable, transactionArchiveDtoList.size());
     }
 }

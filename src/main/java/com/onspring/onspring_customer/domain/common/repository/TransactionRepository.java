@@ -61,10 +61,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByIsClosed(boolean closed);
 
-    @Query("select t from Transaction t where t.isAccepted = true and t.isClosed = false")
-    Page<Transaction> findByIsAcceptedTrueAndIsClosedFalse(Pageable pageable);
-
-    Page<Transaction> findByParty_Customer_Admins_IdAndIsAcceptedTrueAndIsClosedFalse(@NonNull Long id,
+    Page<Transaction> findByParty_Customer_Admins_IdAndIsAcceptedTrueAndIsClosedFalseOrderByIdDesc(@NonNull Long id,
                                                                                       Pageable pageable);
 
     @Transactional
