@@ -31,7 +31,7 @@
             <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;"
                 th:each="transactionArchive : ${transactionArchives}"
                 th:id="${transactionArchive.id}" th:object="${transactionArchive}">
-                <td th:text="*{franchiseDto.id}"></td>
+                <td th:text="*{id}"></td>
                 <td th:text="*{franchiseDto.name}"></td>
                 <td th:text="*{transactionCount}"></td>
                 <td th:text="*{#numbers.formatInteger(amountSum, 0, 'WHITESPACE')}"></td>
