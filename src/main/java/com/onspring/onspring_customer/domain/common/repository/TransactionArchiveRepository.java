@@ -10,4 +10,5 @@ import java.util.List;
 
 public interface TransactionArchiveRepository extends JpaRepository<TransactionArchive, Long> {
     List<TransactionArchive> findByDurationIn(@NonNull Collection<LocalDate> durations);
+    List<TransactionArchive> findAllByOrderByIdDesc();
 }
