@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout(~{::div}, 'member-manage', ~{::title})">
+<head>
+    <title>적용 회원 선택 - 그룹 회원 관리</title>
+    <style>
+        /* 테이블 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        /* 테이블 헤더 */
+        thead tr {
+            background-color: #f2f2f2;
+            height: 42px;
+        }
+
+        /* 세로 구분선 스타일 */
+        th, td {
+            border-bottom: 1px solid #ddd;
+            position: relative;
+            padding: 12px 10px; /* 상하 여백 조정 */
+        }
+
+        /* 이름과 아이디 사이 세로선 */
+        th:first-child, td:first-child {
+            border-right: 2px solid #bbb;
+        }
+
+        /* 아이디와 선택 사이 세로선 */
+        th:nth-child(2), td:nth-child(2) {
+            border-right: 2px solid #bbb;
+        }
+
+        /* 행 구분 강화 */
+        tbody tr {
+            border-bottom: 1px solid #ddd;
+            line-height: 1.3; /* 줄 간격 조정 */
+        }
+
+        /* 행 호버 효과 */
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+<div class="content-container">
+    <!-- 페이지 경로 -->
+    <div class="page-path">
+        <span class="path-item">그룹 회원 관리</span>
+        <span class="path-separator">></span>
+        <span class="path-item current">적용 회원 선택</span>
+    </div>
+
+
+    <!-- 해제 테이블 제목 -->
+    <div style="margin-top: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="color: #4CAF50; margin: 0; font-weight: bold;">회원 해제</h3>
+        <button id="allCheckAssociated" onclick="toggleAllCheckboxes('associated')"
+                style="background-color: #f2f2f2; color: black; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer;">
+            전체 선택
+        </button>
+    </div>
+
+    <!-- 회원 목록 테이블 (해제 대상) -->
+    <div class="form-container" style="border-top: 2px solid #4CAF50; border-bottom: 2px solid #4CAF50; padding: 10px 0;">
+        <!-- 회원 해제 테이블 -->
+        <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <thead>
+            <tr style="background-color: #f2f2f2; height: 42px;">
+                <th>이름</th>
+                <th>아이디</th>
+                <th>선택</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="associatedUser : ${associatedUsers}" th:id="${associatedUser.id}"
+                th:object="${associatedUser}" style="border-bottom: 1px solid #ddd; height: 42px;">
+                <td th:text="*{name}"></td>
+                <td th:text="*{phone}"></td>
+                <td>
+                    <input type="checkbox" class="member-checkbox-associated" style="transform: scale(1.1);"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="btn-container" style="display: flex; justify-content: center; gap: 20px;">
+        <button type="submit" class="submit-btn" onclick="disassociateUsers()"
+                style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">
+            해제
+        </button>
+    </div>
+
+    <!-- 등록 테이블 제목 -->
+    <div style="margin-top: 30px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="color: #4CAF50; margin: 0; font-weight: bold;">회원 등록</h3>
+        <button id="allCheckUnassociated" onclick="toggleAllCheckboxes('unassociated')"
+                style="background-color: #f2f2f2; color: black; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer;">
+            전체 선택
+        </button>
+    </div>
+
+    <div class="unassociated-users" style="border-top: 2px solid #4CAF50; border-bottom: 2px solid #4CAF50; padding: 10px 0;">
+        <!-- 회원 등록 테이블 -->
+        <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <thead>
+            <tr style="background-color: #f2f2f2; height: 50px;">
+                <th>이름</th>
+                <th>아이디</th>
+                <th>선택</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="unassociatedUser : ${unassociatedUsers}" th:id="${unassociatedUser.id}"
+                th:object="${unassociatedUser}" style="border-bottom: 1px solid #ddd; height: 42px;">
+                <td th:text="*{name}"></td>
+                <td th:text="*{phone}"></td>
+                <td>
+                    <input type="checkbox" class="member-checkbox-unassociated" style="transform: scale(1.1);"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin-top: 20px;">
+        <button onclick="associateUsers()"
+                style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">
+            등록
+        </button>
+    </div>
+
+    <script>
+        // 전체선택 버튼 기능
+        let associatedChecked = false;
+        let unassociatedChecked = false;
+
+        function toggleAllCheckboxes(type) {
+            if(type === 'associated') {
+                associatedChecked = !associatedChecked;
+
+                const checkboxes = document.querySelectorAll('.member-checkbox-associated');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = associatedChecked;
+                    // 행 배경색 변경
+                    updateRowBackground(checkbox);
+                });
+
+                const allCheckBtn = document.getElementById('allCheckAssociated');
+                allCheckBtn.textContent = associatedChecked ? '전체 해제' : '전체 선택';
+            } else if(type === 'unassociated') {
+                unassociatedChecked = !unassociatedChecked;
+
+                const checkboxes = document.querySelectorAll('.member-checkbox-unassociated');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = unassociatedChecked;
+                    // 행 배경색 변경
+                    updateRowBackground(checkbox);
+                });
+
+                const allCheckBtn = document.getElementById('allCheckUnassociated');
+                allCheckBtn.textContent = unassociatedChecked ? '전체 해제' : '전체 선택';
+            }
+        }
+
+        // 체크박스 선택 시 행 배경색 변경 함수
+        function updateRowBackground(checkbox) {
+            const row = checkbox.closest('tr');
+            if(checkbox.checked) {
+                row.style.backgroundColor = '#e0e0e0'; // 선택 시 회색 배경
+            } else {
+                row.style.backgroundColor = ''; // 선택 해제 시 기본 배경
+            }
+        }
+
+        // 페이지 로드 시 모든 체크박스에 이벤트 리스너 추가
+        document.addEventListener('DOMContentLoaded', function() {
+            // 해제 테이블 체크박스
+            document.querySelectorAll('.member-checkbox-associated').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateRowBackground(this);
+                });
+            });
+
+            // 등록 테이블 체크박스
+            document.querySelectorAll('.member-checkbox-unassociated').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateRowBackground(this);
+                });
+            });
+        });
+
+        function disassociateUsers() {
+            const userIds = [
+                ...document.querySelectorAll(".form-container tr[id]:has(input.member-checkbox-associated:checked)"),
+            ].map((x) => x.id);
+
+            if (userIds.length === 0) {
+                alert("해제할 사용자를 선택해 주세요.");
+                return;
+            }
+
+            if (confirm(userIds.length + '명의 사용자를 해제하시겠습니까?')) {
+                const formData = new FormData();
+                formData.append("ids", userIds);
+
+                fetch("", {
+                    method: "DELETE",
+                    body: formData,
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('선택한 사용자가 해제되었습니다.');
+
+                            location.reload();
+                        }
+                    });
+            }
+        }
+
+        function associateUsers() {
+            const userIds = [
+                ...document.querySelectorAll(".unassociated-users tr[id]:has(input.member-checkbox-unassociated:checked)"),
+            ].map((x) => x.id);
+
+            if (userIds.length === 0) {
+                alert("등록할 사용자를 선택해 주세요.");
+                return;
+            }
+
+            if (confirm(userIds.length + '명의 사용자를 등록하시겠습니까?')) {
+                const formData = new FormData();
+                formData.append("ids", userIds);
+
+                fetch("", {
+                    method: "POST",
+                    body: formData,
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('선택한 사용자가 등록되었습니다.');
+
+                            location.reload();
+                        }
+                    });
+            }
+        }
+    </script>
+</div>
+
+
+</body>
+</html>

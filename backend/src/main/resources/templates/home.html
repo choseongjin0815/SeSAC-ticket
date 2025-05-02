@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::div.home-content}, '', ~{::title})}">
+<head>
+  <title>SeSAC 관리자 페이지</title>
+</head>
+<body>
+<div class="home-content" style="padding: 20px; text-align: center;">
+  <!-- Lottie 애니메이션을 맨 위에 표시 -->
+  <div id="lottie-container" style="width: 60vw; height: 60vh; margin: 20px auto;"></div>
+
+
+  <!-- Lottie 스크립트와 애니메이션 초기화 인라인으로 추가 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.0/lottie.min.js"></script>
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+      // Lottie 애니메이션 초기화
+      var animation = lottie.loadAnimation({
+        container: document.getElementById('lottie-container'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: [[@{/animations/sesaclogo.json}]]
+    });
+    });
+  </script>
+</div>
+</body>
+</html>
