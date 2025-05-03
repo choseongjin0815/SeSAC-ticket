@@ -18,6 +18,7 @@ public interface TransactionService {
 
     Long saveTransaction(TransactionDto transactionDto);
 
+
     TransactionDto findTransactionById(Long id);
 
     // 정산처리가 완료된 가맹점별 월별 정리 요약 표시 메소드 추가
