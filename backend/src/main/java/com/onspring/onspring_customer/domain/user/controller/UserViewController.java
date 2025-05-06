@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -101,6 +102,24 @@ public class UserViewController {
 
         return "users/activate";
     }
+
+
+    @PatchMapping("/activate")
+    @ResponseBody
+    public ResponseEntity<Void> activateUser(@RequestParam(value = "ids") List<Long> ids) {
+        endUserService.activateEndUserById(ids);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/deactivate")
+    @ResponseBody
+    ResponseEntity<Void> deactivateUser(@RequestParam(value = "ids") List<Long> ids) {
+        endUserService.deactivateEndUserById(ids);
+
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/edit/{id}")
     String showEditForm(@PathVariable Long id, Model model) {
         // 회원 정보 가져오기

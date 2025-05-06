@@ -120,6 +120,67 @@ public class PartyServiceImpl implements PartyService {
                 .join(customer.admins, admin)
                 .where(admin.id.eq(adminId));
 
+        query.where(party.isActivated.eq(true));
+
+        if (name != null) {
+            query.where(party.name.containsIgnoreCase(name));
+        }
+        if (allowedTimeStart != null && allowedTimeEnd != null) {
+            query.where(party.allowedTimeStart.before(allowedTimeStart)
+                    .and(party.allowedTimeEnd.after(allowedTimeEnd)));
+        }
+        if (maximumAmount != null) {
+            query.where(party.maximumAmount.loe(maximumAmount));
+        }
+        if (maximumTransaction != null) {
+            query.where(party.maximumTransaction.loe(maximumTransaction));
+        }
+        if (sunday || monday || tuesday || wednesday || thursday || friday || saturday) {
+            query.where(party.sunday.eq(sunday));
+            query.where(party.monday.eq(monday));
+            query.where(party.tuesday.eq(tuesday));
+            query.where(party.wednesday.eq(wednesday));
+            query.where(party.thursday.eq(thursday));
+            query.where(party.friday.eq(friday));
+            query.where(party.saturday.eq(saturday));
+        }
+
+        Long count = Objects.requireNonNull(query.clone()
+                .select(party.count())
+                .fetchOne());
+
+        query.offset(pageable.getOffset());
+        query.limit(pageable.getPageSize());
+
+        List<Party> partyList = query.fetch();
+
+        List<PartyDto> partyDtoList = new ArrayList<>();
+
+        for (Party element : partyList) {
+            PartyDto map = modelMapper.map(element, PartyDto.class);
+            map.setEndUserIds(element.getPoints()
+                    .stream()
+                    .map(Point::getEndUser)
+                    .map(EndUser::getId)
+                    .toList());
+            partyDtoList.add(map);
+        }
+
+        return new PageImpl<>(partyDtoList, pageable, count);
+    }
+
+    @Override
+    public Page<PartyDto> findAllDeActivatePartyByQuery(Long adminId, String name, LocalTime allowedTimeStart, LocalTime allowedTimeEnd, boolean sunday, boolean monday, boolean tuesday, boolean wednesday, boolean thursday, boolean friday, boolean saturday, BigDecimal maximumAmount, Long maximumTransaction, Pageable pageable) {
+        QParty party = QParty.party;
+        QCustomer customer = QCustomer.customer;
+        QAdmin admin = QAdmin.admin;
+        JPAQuery<Party> query = queryFactory.selectFrom(party)
+                .join(party.customer, customer)
+                .join(customer.admins, admin)
+                .where(admin.id.eq(adminId));
+
+        query.where(party.isActivated.eq(false));
+
         if (name != null) {
             query.where(party.name.containsIgnoreCase(name));
         }
@@ -259,29 +320,24 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public boolean activatePartyById(Long id) {
-        log.info("Activating party with ID {}", id);
+    public boolean activatePartyById(List<Long> ids) {
+        for (Long id : ids) {
+            Party party = getParty(id);
 
-        Party party = getParty(id);
-
-        party.setActivated(true);
-        partyRepository.save(party);
-
-        log.info("Successfully activated party with ID {}", id);
-
+            party.setActivated(true);
+            partyRepository.save(party);
+        }
         return true;
     }
 
     @Override
-    public boolean deactivatePartyById(Long id) {
-        log.info("Deactivating party with ID {}", id);
-
-        Party party = getParty(id);
-
-        party.setActivated(false);
-        partyRepository.save(party);
-
-        log.info("Successfully deactivated party with ID {}", id);
+    public boolean deactivatePartyById(List<Long> ids) {
+        for (Long id : ids) {
+            Party party = getParty(id);
+            log.info("Deactivating party with ID {}", id);
+            party.setActivated(false);
+            partyRepository.save(party);
+        }
 
         return true;
     }

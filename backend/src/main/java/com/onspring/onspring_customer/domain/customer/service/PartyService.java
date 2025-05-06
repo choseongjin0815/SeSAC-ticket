@@ -23,13 +23,18 @@ public interface PartyService {
                                        boolean wednesday, boolean thursday, boolean friday, boolean saturday,
                                        BigDecimal maximumAmount, Long maximumTransaction, Pageable pageable);
 
+    Page<PartyDto> findAllDeActivatePartyByQuery(Long adminId, String name, LocalTime allowedTimeStart,
+                                       LocalTime allowedTimeEnd, boolean sunday, boolean monday, boolean tuesday,
+                                       boolean wednesday, boolean thursday, boolean friday, boolean saturday,
+                                       BigDecimal maximumAmount, Long maximumTransaction, Pageable pageable);
+
     Page<PartyEndUserRelationDto> findAllPartyEndUserRelationByQuery(Long adminId, String name, Pageable pageable);
 
     List<Long> addEndUserToParty(Long partyId, List<Long> endUserIds);
 
     boolean updateParty(PartyDto partyDto);
 
-    boolean activatePartyById(Long id);
+    boolean activatePartyById(List<Long> ids);
 
-    boolean deactivatePartyById(Long id);
+    boolean deactivatePartyById(List<Long> ids);
 }
