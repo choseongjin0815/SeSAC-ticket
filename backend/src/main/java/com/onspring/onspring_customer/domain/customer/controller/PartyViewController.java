@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -91,6 +92,33 @@ public class PartyViewController {
         return "parties/list";
     }
 
+    @GetMapping("/activate")
+    public String getDeactivatedParties(@RequestParam(value = "searchType", required = false) String searchType,
+                                        @RequestParam(value = "keyword", required = false) String keyword, @RequestParam(value =
+                    "page", defaultValue = "1") Integer page,
+                                        @RequestParam(value = "size", defaultValue = "10") Integer size, Model model) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<PartyDto> partyDtoPage;
+        if (searchType != null) {
+            partyDtoPage = switch (searchType) {
+                case "name" ->
+                        partyService.findAllDeActivatePartyByQuery(getAdminId(), keyword, null, null, false, false, false,
+                                false, false, false, false, null, null, pageable);
+                default -> throw new IllegalStateException("Unexpected value: " + searchType);
+            };
+        } else {
+            partyDtoPage = partyService.findAllDeActivatePartyByQuery(getAdminId(), null, null, null, false, false, false,
+                    false, false, false, false, null, null, pageable);
+        }
+
+        model.addAttribute("parties", partyDtoPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", partyDtoPage.getTotalPages());
+
+        return "parties/activate";
+
+    }
+
 
     @RequestMapping(value = "/update", method = {RequestMethod.PUT, RequestMethod.POST})
     public String updateParty(@RequestParam(value = "id") Long id,
@@ -144,10 +172,11 @@ public class PartyViewController {
     }
 
     @PatchMapping("/activate")
-    public String activateParty(@RequestParam(value = "id") Long id) {
-        partyService.activatePartyById(id);
+    @ResponseBody
+    public ResponseEntity<Void> activateParty(@RequestParam(value = "ids") List<Long> ids) {
+        partyService.activatePartyById(ids);
 
-        return "redirect:list";
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/edit/{id}")
@@ -159,10 +188,12 @@ public class PartyViewController {
     }
 
     @PatchMapping("/deactivate")
-    public String deactivateParty(@RequestParam(value = "id") Long id) {
-        partyService.deactivatePartyById(id);
+    @ResponseBody
+    public ResponseEntity<Void> deactivateParty(@RequestParam(value = "ids") List<Long> ids) {
+        System.out.println("ids: " + ids);
+        partyService.deactivatePartyById(ids);
 
-        return "redirect:list";
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/users")
