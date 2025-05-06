@@ -8,10 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -132,5 +135,21 @@ public class FranchiseViewController {
         model.addAttribute("totalPages", franchiseDtoPage.getTotalPages());
 
         return "franchises/activate";
+    }
+
+    @PatchMapping("/activate")
+    @ResponseBody
+    public ResponseEntity<Void> activateFranchise(@RequestParam(value = "ids") List<Long> ids) {
+        franchiseService.activateFranchiseById(ids);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/deactivate")
+    @ResponseBody
+    public ResponseEntity<Void> deactivateFranchise(@RequestParam(value = "ids") List<Long> ids) {
+        franchiseService.deactivateFranchiseById(ids);
+
+        return ResponseEntity.ok().build();
     }
 }
