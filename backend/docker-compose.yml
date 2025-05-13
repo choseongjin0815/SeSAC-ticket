@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   app:
-    build: .
+    build: src/main/java
     container_name: sesac-container
     ports:
       - "8080:8080"
