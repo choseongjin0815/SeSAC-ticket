@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    container_name: sesac-container
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7.2
+    container_name: sesac-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:

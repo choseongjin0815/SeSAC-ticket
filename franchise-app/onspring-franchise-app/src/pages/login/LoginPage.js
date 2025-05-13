@@ -10,22 +10,40 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Modal,
 } from 'react-native';
 import { loginUser } from '../../auth/loginSlice';
 
 const LoginPage = () => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
-  
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+
   const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const showModal = (message) => {
+    setModalMessage(message);
+    setModalVisible(true);
+  };
 
   const handleLogin = async () => {
-    console.log('Login button pressed'); // 버튼 클릭 로그
+    if (!userName.trim()) {
+      showModal('아이디를 입력해주세요.');
+      return;
+    }
+
+    if (!password.trim()) {
+      showModal('비밀번호를 입력해주세요.');
+      return;
+    }
+
+    console.log('Login button pressed');
     console.log('Username:', userName);
     console.log('Password:', password);
+
     try {
-     
       const result = await dispatch(loginUser({
         credentials: {
           userName: userName,
@@ -36,9 +54,7 @@ const LoginPage = () => {
       console.log(result);
       // navigation.navigate('MainTab');
     } catch (error) {
-      Alert.alert( 
-        error.message || '아이디 또는 패스워드가 틀렸습니다.'
-      );
+      showModal(error.message || '아이디 또는 패스워드가 틀렸습니다.');
     }
   };
 
@@ -49,8 +65,6 @@ const LoginPage = () => {
         style={styles.keyboardView}
       >
         <View style={styles.formContainer}>
-
-          {/* 아이디(사용자명) 입력 필드 */}
           <TextInput
             style={styles.input}
             placeholder="아이디를 입력해주세요"
@@ -58,8 +72,7 @@ const LoginPage = () => {
             onChangeText={setUserName}
             autoCapitalize="none"
           />
-          
-          {/* 비밀번호 입력 필드 */}
+
           <TextInput
             style={styles.input}
             placeholder="비밀번호를 입력해주세요"
@@ -67,8 +80,7 @@ const LoginPage = () => {
             onChangeText={setPassword}
             secureTextEntry
           />
-          
-          {/* 로그인 버튼 */}
+
           <TouchableOpacity 
             style={styles.loginButton} 
             onPress={handleLogin}
@@ -77,6 +89,21 @@ const LoginPage = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+
+      {/* 모달 */}
+      <Modal transparent visible={modalVisible} animationType="fade">
+        <View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.modalButtonText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -92,13 +119,6 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     padding: 20,
-  },
-  pageTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 30,
-    color: '#2B579A',
   },
   input: {
     borderWidth: 1,
@@ -119,6 +139,36 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: 'white',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  // 모달 스타일
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 24,
+    borderRadius: 8,
+    minWidth: '70%',
+    alignItems: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#2B579A',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  modalButtonText: {
+    color: '#fff',
     fontWeight: 'bold',
   },
 });

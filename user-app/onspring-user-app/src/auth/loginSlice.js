@@ -75,8 +75,26 @@ export const refreshToken = createAsyncThunk(
 // 로그아웃
 export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
-  async () => {
-    await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'tokenExp', 'id']);
+  async (_, { rejectWithValue }) => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
+
+      // 서버에 로그아웃 요청
+      await fetch(`${API_SERVER_HOST}/api/user/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      // 클라이언트 토큰 삭제
+      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'tokenExp', 'id']);
+    } catch (error) {
+      return rejectWithValue('서버 로그아웃 실패');
+    }
   }
 );
 

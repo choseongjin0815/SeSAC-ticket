@@ -9,25 +9,41 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Modal,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { loginUser } from '../../auth/loginSlice';
 
-
 const LoginPage = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-    
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const showModal = (message) => {
+    setModalMessage(message);
+    setModalVisible(true);
+  };
 
   const handleLogin = async () => {
-    console.log('Login button pressed'); // 버튼 클릭 로그
-    console.log('phone:', phone);
+    if (!phone.trim()) {
+      showModal('핸드폰 번호를 입력해주세요.');
+      return;
+    }
+
+    if (!password.trim()) {
+      showModal('비밀번호를 입력해주세요.');
+      return;
+    }
+
+    console.log('Login button pressed');
+    console.log('Phone:', phone);
     console.log('Password:', password);
+
     try {
-     
       const result = await dispatch(loginUser({
         credentials: {
           phone: phone,
@@ -38,9 +54,7 @@ const LoginPage = () => {
       console.log(result);
       // navigation.navigate('MainTab');
     } catch (error) {
-      Alert.alert(
-        error.message || '아이디 또는 비밀번호가 틀렸습니다.'
-      );
+      showModal(error.message || '아이디 또는 비밀번호가 틀렸습니다.');
     }
   };
 
@@ -50,33 +64,46 @@ const LoginPage = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-
         <View style={styles.formContainer}>
-          {/* 입력 필드 */}
           <TextInput
             style={styles.input}
             placeholder="핸드폰 번호를 입력해주세요"
             value={phone}
             onChangeText={setPhone}
             keyboardType="default"
-            // keyboardType="phone-pad"
           />
-          
+
           <TextInput
             style={styles.input}
             placeholder="비밀번호를 입력해주세요"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
-          />         
+          />
 
-          {/* 로그인 버튼 */}
-          <TouchableOpacity style={styles.loginButton} onPress={() => handleLogin('MainTab')}>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={handleLogin}
+          >
             <Text style={styles.loginButtonText}>로그인</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
 
+      {/* 모달 */}
+      <Modal transparent visible={modalVisible} animationType="fade">
+        <View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.modalButtonText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -90,28 +117,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
-  },
-  backButton: {
-    paddingHorizontal: 15,
-  },
-  backButtonText: {
-    fontSize: 24,
-    fontWeight: '300',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  placeholder: {
-    width: 40,
-  },
   formContainer: {
     padding: 20,
   },
@@ -122,37 +127,6 @@ const styles = StyleSheet.create({
     padding: 15,
     marginVertical: 10,
     backgroundColor: 'white',
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: '#2B579A',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 8,
-  },
-  checkmark: {
-    width: 14,
-    height: 14,
-    borderRadius: 14,
-    backgroundColor: '#2B579A',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkmarkText: {
-    color: 'white',
-    fontSize: 12,
-  },
-  checkboxLabel: {
-    fontSize: 14,
-    color: '#333',
   },
   loginButton: {
     backgroundColor: '#4CAF50',
@@ -166,14 +140,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  footer: {
-    alignItems: 'center',
+  // 모달 스타일
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
-    paddingBottom: 30,
+    alignItems: 'center',
   },
-  signUpText: {
-    fontSize: 14,
-    color: '#666',
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 24,
+    borderRadius: 8,
+    minWidth: '70%',
+    alignItems: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 
