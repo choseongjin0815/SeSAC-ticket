@@ -81,6 +81,9 @@ dependencies {
 	implementation 'software.amazon.awssdk:s3:2.17.121'  // AWS SDK v2 버전, 최신 버전 사용
 	implementation 'software.amazon.awssdk:auth:2.17.121'  // 인증 관련 의존성 추가
 
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 
 }
 
