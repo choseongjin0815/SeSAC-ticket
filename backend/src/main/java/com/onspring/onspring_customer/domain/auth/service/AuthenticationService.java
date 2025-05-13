@@ -28,7 +28,7 @@ public class AuthenticationService {
     public LoginResponseDto franchiseLogin(String userName, String password) {
 
         Franchise franchise = franchiseRepository.findByUserName(userName);
-
+        Long franchiseId = franchise.getId();
 
         if (!passwordEncoder.matches(password, franchise.getPassword())) {
             throw new BadCredentialsException("잘못된 비밀번호");
@@ -44,7 +44,8 @@ public class AuthenticationService {
                 franchise.getUserName(),
                 "ROLE_FRANCHISE"
         );
-        refreshTokenService.saveRefreshToken(franchise.getId(), refreshToken);
+
+        refreshTokenService.saveRefreshToken("franchise" + franchiseId, refreshToken);
 
 
         FranchiseDto franchiseDto = modelMapper.map(franchise, FranchiseDto.class);
@@ -55,6 +56,7 @@ public class AuthenticationService {
     public LoginResponseDto userLogin(String phone, String password) {
 
         EndUser endUser = endUserRepository.findByPhone(phone);
+        Long endUserId = endUser.getId();
 
         if (!passwordEncoder.matches(password, endUser.getPassword())) {
             throw new BadCredentialsException("잘못된 비밀번호");
@@ -71,7 +73,7 @@ public class AuthenticationService {
                 "ROLE_USER"
         );
 
-        refreshTokenService.saveRefreshToken(endUser.getId(), refreshToken);
+        refreshTokenService.saveRefreshToken("user" + endUserId, refreshToken);
 
         return new LoginResponseDto(accessToken, refreshToken, endUser.getId());
     }

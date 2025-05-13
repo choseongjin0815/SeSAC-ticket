@@ -83,11 +83,18 @@ public class JwtTokenProvider {
             String username = claims.getSubject();
             String role = claims.get("role", String.class);
 
-            String savedRefreshToken = refreshTokenService.getRefreshToken(id);
+            try {
+                if(role.equals("ROLE_USER")) {
+                    String savedRefreshToken = refreshTokenService.getRefreshToken("user" + id);
 
-            if(savedRefreshToken == null || !savedRefreshToken.equals(refreshToken)) {
-                throw new RuntimeException("not equal to refresh token(from redis)");
+                } else {
+                    String savedRefreshToken = refreshTokenService.getRefreshToken("franchise" + id);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
+
+
 
             return createToken(id, username, role); // userId 포함 생성
         }

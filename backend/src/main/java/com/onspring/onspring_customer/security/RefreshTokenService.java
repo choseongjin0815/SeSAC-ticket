@@ -14,16 +14,16 @@ public class RefreshTokenService {
         this.redisTemplate = redisTemplate;
     }
 
-    public void saveRefreshToken(Long id, String refreshToken) {
+    public void saveRefreshToken(String id, String refreshToken) {
         String key = String.format("refresh_token:%s", id);
         redisTemplate.opsForValue().set(key, refreshToken, Duration.ofDays(7));
     }
 
-    public String getRefreshToken(Long id) {
-        return redisTemplate.opsForValue().get("refresh_token:" + id);
+    public String getRefreshToken(String id) {
+        return redisTemplate.opsForValue().get("refresh_token:%s" + id);
     }
 
-    public void deleteRefreshToken(Long id) {
+    public void deleteRefreshToken(String id) {
         redisTemplate.delete(String.format("refresh_token:%s", id));
     }
 }

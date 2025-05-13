@@ -56,7 +56,7 @@ public class AuthController {
         }
 
         Long userId = SecurityUtil.getCurrentUserId();
-        refreshTokenService.deleteRefreshToken(userId);
+        refreshTokenService.deleteRefreshToken("franchise" + userId);
 
         return ResponseEntity.ok("로그아웃 성공");
     }
@@ -85,7 +85,7 @@ public class AuthController {
         }
 
         Long userId = SecurityUtil.getCurrentUserId();
-        refreshTokenService.deleteRefreshToken(userId);
+        refreshTokenService.deleteRefreshToken("user" + userId);
 
         return ResponseEntity.ok("로그아웃 성공");
     }
