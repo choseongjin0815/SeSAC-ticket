@@ -214,7 +214,7 @@ graph TB
 
 
 ### ERD
-![스크린샷 2025-04-16 오후 12 11 45](https://github.com/user-attachments/assets/dd6073fd-f2a1-4e2f-8b80-04f3033d8b77)
+![스크린샷 2025-05-14 오후 2 01 03](https://github.com/user-attachments/assets/7b544d73-b9b0-4b51-951d-5afd44b038d8)
 
 
 
