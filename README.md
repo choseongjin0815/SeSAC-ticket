@@ -93,8 +93,11 @@
 
 <details>
 <summary>관리자 로그인</summary>
+  
 ![Image](https://github.com/user-attachments/assets/2e91d776-a42c-42ab-875d-ee1b2e2847b2)
+
 </details>
+
 
 <details>
 <summary>회원목록 조회 및 검색</summary>
