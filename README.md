@@ -119,7 +119,6 @@
 ![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge)
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-005F0F?style=for-the-badge)
 
-좋습니다. 요청하신 Redis와 Docker 추가, CI/CD는 미적용, 그리고 기술 스택 분류를 명확히 구분하여 아래와 같이 정리해드릴게요.
 
 ⸻
 
@@ -168,9 +167,6 @@ Slack	팀원 간 실시간 커뮤니케이션
 
 
 ⸻
-
-필요하다면 기술 항목별로 실제 사용한 예시(예: Docker로 Redis와 Spring을 같은 네트워크로 실행)나 그림 추가도 가능합니다.
-README, 발표 자료, 블로그용 등 최종 목적에 맞춰 조정해드릴게요.
 
 
 ## 프로젝트 구조도
