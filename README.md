@@ -88,7 +88,86 @@
 
 ---
 
+## 🎬 시연화면
 
+아래 항목을 클릭하면 각 기능별 시연 GIF를 확인할 수 있습니다.
+
+<details>
+<summary>로그인</summary>
+<img src="gif/로그인.gif" alt="로그인 시연화면" />
+</details>
+
+<details>
+<summary>회원목록 조회 및 검색</summary>
+<img src="gif/회원목록_조회_검색.gif" alt="회원목록 조회 및 검색 시연화면" />
+</details>
+
+<details>
+<summary>회원 생성</summary>
+<img src="gif/회원_생성.gif" alt="회원 생성 시연화면" />
+</details>
+
+<details>
+<summary>회원 비활성화/활성화</summary>
+<img src="gif/회원_비활성화_활성화.gif" alt="회원 비활성화/활성화 시연화면" />
+</details>
+
+<details>
+<summary>그룹목록 조회 및 검색</summary>
+<img src="gif/그룹목록_조회_검색.gif" alt="그룹목록 조회 및 검색 시연화면" />
+</details>
+
+<details>
+<summary>그룹 생성</summary>
+<img src="gif/그룹_생성.gif" alt="그룹 생성 시연화면" />
+</details>
+
+<details>
+<summary>가맹점 목록 조회 및 검색</summary>
+<img src="gif/가맹점_목록_조회_검색.gif" alt="가맹점 목록 조회 및 검색 시연화면" />
+</details>
+
+<details>
+<summary>가맹점 추가</summary>
+<img src="gif/가맹점_추가.gif" alt="가맹점 추가 시연화면" />
+</details>
+
+<details>
+<summary>가맹점 수정</summary>
+<img src="gif/가맹점_수정.gif" alt="가맹점 수정 시연화면" />
+</details>
+
+<details>
+<summary>가맹점 비활성화/활성화</summary>
+<img src="gif/가맹점_비활성화_활성화.gif" alt="가맹점 비활성화/활성화 시연화면" />
+</details>
+
+<details>
+<summary>포인트 지급</summary>
+<img src="gif/포인트_지급.gif" alt="포인트 지급 시연화면" />
+</details>
+
+<details>
+<summary>포인트 수정</summary>
+<img src="gif/포인트_수정.gif" alt="포인트 수정 시연화면" />
+</details>
+
+<details>
+<summary>거래 내역 조회 및 검색</summary>
+<img src="gif/거래내역_조회_검색.gif" alt="거래 내역 조회 및 검색 시연화면" />
+</details>
+
+<details>
+<summary>사용자앱에서 결제 이후 관리자 거래 내역 반영 확인</summary>
+<img src="gif/결제_후_관리자_거래내역_반영.gif" alt="결제 이후 관리자 거래 내역 반영 시연화면" />
+</details>
+
+<details>
+<summary>관리자 정산 처리 이후 관리자, 가맹점 정산 내역 확인</summary>
+<img src="gif/정산_처리_후_정산내역_확인.gif" alt="정산 처리 후 관리자, 가맹점 정산 내역 확인 시연화면" />
+</details>
+
+---
 
 ### 🧑‍🤝‍🧑 맴버 구성
 
