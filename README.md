@@ -120,6 +120,7 @@
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-005F0F?style=for-the-badge)
 
 
+
 ⸻
 
 🧱 기술 스택 및 사용 목적
@@ -167,6 +168,8 @@ Slack	팀원 간 실시간 커뮤니케이션
 
 
 ⸻
+
+
 
 
 ## 프로젝트 구조도
