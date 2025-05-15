@@ -370,49 +370,49 @@
 
 ## 프로젝트 구조도
 ### 전체 구조
-``` mermaid
+```mermaid
 graph TB
-  %% 클라이언트
-  RN[React Native 앱 (APK)]:::client
+%% 클라이언트
+RN[React Native 앱 (APK)]:::client
 
-  %% EC2 인스턴스
-  EC2[AWS EC2 인스턴스]:::ec2
+%% EC2 인스턴스
+EC2[AWS EC2 인스턴스]:::ec2
 
-  %% EC2 내부 구성
-  NGINX[Nginx (EC2 직접 설치, 80/443)]:::nginx
-  subgraph Docker Compose (EC2)
-    SPRING[Spring Boot (8080)]:::docker
-    REDIS[Redis (6379)]:::docker
-  end
+%% EC2 내부 구성
+NGINX[Nginx (EC2 직접설치, 80/443)]:::nginx
+subgraph Docker Compose (EC2)
+SPRING[Spring Boot (8080)]:::docker
+REDIS[Redis (6379)]:::docker
+end
 
-  %% AWS 서비스
-  RDS[(RDS MySQL)]:::aws
-  S3[(S3 Bucket)]:::aws
+%% AWS 서비스
+RDS[(RDS MySQL)]:::aws
+S3[(S3 Bucket)]:::aws
 
-  %% 연결 관계
-  RN -- "1. HTTPS API 요청\n(https://EC2도메인/api)" --> NGINX
-  RN -- "2. 이미지 직접 다운로드" --> S3
-  NGINX -- "3. Reverse Proxy (80/443 → 8080)" --> SPRING
-  SPRING -- "4. 세션/캐시" --> REDIS
-  SPRING -- "5. DB CRUD" --> RDS
-  SPRING -- "6. 이미지 업로드/다운로드" --> S3
+%% 연결 관계
+RN -- "1. HTTPS API 요청\n(https://EC2도메인/api)" --> NGINX
+RN -- "2. 이미지 직접 다운로드" --> S3
+NGINX -- "3. Reverse Proxy (80/443 → 8080)" --> SPRING
+SPRING -- "4. 세션/캐시" --> REDIS
+SPRING -- "5. DB CRUD" --> RDS
+SPRING -- "6. 이미지 업로드/다운로드" --> S3
 
-  EC2 -. "Docker Compose로 관리" .- SPRING
-  EC2 -. "Docker Compose로 관리" .- REDIS
-  EC2 -. "직접 설치" .- NGINX
+EC2 -. "Docker Compose로 관리" .- SPRING
+EC2 -. "Docker Compose로 관리" .- REDIS
+EC2 -. "직접 설치" .- NGINX
 
-  %% 스타일
-  classDef client fill:#ffe4e1,stroke:#333,stroke-width:2px;
-  classDef ec2 fill:#e0f7fa,stroke:#333,stroke-width:2px;
-  classDef nginx fill:#f7e7ce,stroke:#333,stroke-width:2px;
-  classDef docker fill:#e6e6fa,stroke:#333,stroke-width:2px;
-  classDef aws fill:#f5f5dc,stroke:#333,stroke-width:2px;
+%% 스타일
+classDef client fill:#ffe4e1,stroke:#333,stroke-width:2px;
+classDef ec2 fill:#e0f7fa,stroke:#333,stroke-width:2px;
+classDef nginx fill:#f7e7ce,stroke:#333,stroke-width:2px;
+classDef docker fill:#e6e6fa,stroke:#333,stroke-width:2px;
+classDef aws fill:#f5f5dc,stroke:#333,stroke-width:2px;
 
-  class RN client;
-  class EC2 ec2;
-  class NGINX nginx;
-  class SPRING,REDIS docker;
-  class RDS,S3 aws;
+class RN client;
+class EC2 ec2;
+class NGINX nginx;
+class SPRING,REDIS docker;
+class RDS,S3 aws;
 ```
 
 
