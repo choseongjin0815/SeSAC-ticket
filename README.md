@@ -90,11 +90,10 @@
 
 ## 🎬 시연화면
 
-아래 항목을 클릭하면 각 기능별 시연 GIF를 확인할 수 있습니다.
 
 <details>
-<summary>로그인</summary>
-<img src="gif/로그인.gif" alt="로그인 시연화면" />
+<summary>관리자 로그인</summary>
+![로그인](https://github.com/user-attachments/assets/4c315648-61cc-4a2a-98ab-28bcec878d3d)
 </details>
 
 <details>
