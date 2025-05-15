@@ -93,7 +93,7 @@
 
 <details>
 <summary>관리자 로그인</summary>
-![로그인](https://github.com/user-attachments/assets/4c315648-61cc-4a2a-98ab-28bcec878d3d)
+![Image](https://github.com/user-attachments/assets/2e91d776-a42c-42ab-875d-ee1b2e2847b2)
 </details>
 
 <details>
