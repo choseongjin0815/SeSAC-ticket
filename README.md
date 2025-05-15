@@ -1,4 +1,3 @@
-![react-native-architecture (2)](https://github.com/user-attachments/assets/7f0b13e0-de6b-4add-bdba-0313b5888123)## 새싹식권
 
 
 ####  피그마
@@ -456,6 +455,8 @@
 
 
 ## 프로젝트 구조도
+![react-native-architecture (2)](https://github.com/user-attachments/assets/7f0b13e0-de6b-4add-bdba-0313b5888123)
+
 ### 전체 구조
 
 graph TB
