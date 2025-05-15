@@ -1,4 +1,4 @@
-## 새싹식권
+![react-native-architecture (2)](https://github.com/user-attachments/assets/7f0b13e0-de6b-4add-bdba-0313b5888123)## 새싹식권
 
 
 ####  피그마
@@ -370,51 +370,146 @@
 
 ## 프로젝트 구조도
 ### 전체 구조
-```mermaid
-graph TB
-%% 클라이언트
-RN[React Native 앱 (APK)]:::client
 
-%% EC2 인스턴스
-EC2[AWS EC2 인스턴스]:::ec2
+![Uploading<svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#68D391;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#48BB78;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4299E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3182CE;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- 배경 -->
+  <rect width="1000" height="700" fill="#F7FAFC"/>
+  
 
-%% EC2 내부 구성
-NGINX[Nginx (EC2 직접설치, 80/443)]:::nginx
-subgraph Docker Compose (EC2)
-SPRING[Spring Boot (8080)]:::docker
-REDIS[Redis (6379)]:::docker
-end
+  
+  <!-- React Native App (Mobile) -->
+  <g transform="translate(50, 100)">
+    <rect x="0" y="0" width="200" height="120" rx="10" fill="url(#greenGradient)" filter="url(#shadow)"/>
+    <text x="100" y="40" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">
+      React Native App
+    </text>
+    <text x="100" y="65" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">
+      (APK 파일)
+    </text>
 
-%% AWS 서비스
-RDS[(RDS MySQL)]:::aws
-S3[(S3 Bucket)]:::aws
+  </g>
+  
+  <!-- EC2 Instance -->
+  <g transform="translate(400, 100)">
+    <rect x="0" y="0" width="300" height="400" rx="15" fill="#EDF2F7" stroke="#CBD5E0" stroke-width="2" filter="url(#shadow)"/>
+    <text x="150" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#2D3748">
+      AWS EC2 Instance
+    </text>
+    
+    <!-- Nginx -->
+    <g transform="translate(50, 60)">
+      <rect x="0" y="0" width="200" height="80" rx="10" fill="#48BB78" filter="url(#shadow)"/>
+      <text x="100" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">
+        Nginx
+      </text>
+      <text x="100" y="60" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">
+        Reverse Proxy :8080
+      </text>
+    </g>
+    
+    <!-- Docker Container -->
+    <g transform="translate(50, 170)">
+      <rect x="0" y="0" width="200" height="180" rx="10" fill="url(#blueGradient)" filter="url(#shadow)"/>
+      <text x="100" y="30" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">
+        Docker Container
+      </text>
+      
+      <!-- Spring Boot -->
+      <rect x="20" y="50" width="160" height="50" rx="5" fill="white" opacity="0.9"/>
+      <text x="100" y="80" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2D3748">
+        Spring Boot
+      </text>
+      
+      <!-- Redis -->
+      <rect x="20" y="110" width="160" height="50" rx="5" fill="white" opacity="0.9"/>
+      <text x="100" y="140" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2D3748">
+        Redis
+      </text>
+    </g>
+  </g>
+  
+  <!-- RDS MySQL -->
+  <g transform="translate(800, 200)">
+    <rect x="0" y="0" width="150" height="100" rx="10" fill="#3182CE" filter="url(#shadow)"/>
+    <text x="75" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">
+      AWS RDS
+    </text>
+    <text x="75" y="60" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">
+      MySQL
+    </text>
 
-%% 연결 관계
-RN -- "1. HTTPS API 요청\n(https://EC2도메인/api)" --> NGINX
-RN -- "2. 이미지 직접 다운로드" --> S3
-NGINX -- "3. Reverse Proxy (80/443 → 8080)" --> SPRING
-SPRING -- "4. 세션/캐시" --> REDIS
-SPRING -- "5. DB CRUD" --> RDS
-SPRING -- "6. 이미지 업로드/다운로드" --> S3
-
-EC2 -. "Docker Compose로 관리" .- SPRING
-EC2 -. "Docker Compose로 관리" .- REDIS
-EC2 -. "직접 설치" .- NGINX
-
-%% 스타일
-classDef client fill:#ffe4e1,stroke:#333,stroke-width:2px;
-classDef ec2 fill:#e0f7fa,stroke:#333,stroke-width:2px;
-classDef nginx fill:#f7e7ce,stroke:#333,stroke-width:2px;
-classDef docker fill:#e6e6fa,stroke:#333,stroke-width:2px;
-classDef aws fill:#f5f5dc,stroke:#333,stroke-width:2px;
-
-class RN client;
-class EC2 ec2;
-class NGINX nginx;
-class SPRING,REDIS docker;
-class RDS,S3 aws;
-```
-
+  </g>
+  
+  <!-- S3 Bucket -->
+  <g transform="translate(800, 350)">
+    <rect x="0" y="0" width="150" height="100" rx="10" fill="#F56565" filter="url(#shadow)"/>
+    <text x="75" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">
+      AWS S3
+    </text>
+    <text x="75" y="60" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">
+      이미지 파일
+    </text>
+    <text x="75" y="80" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">
+      업로드/다운로드
+    </text>
+  </g>
+  
+  <!-- Connections -->
+  <!-- Mobile to EC2 -->
+  <path d="M 250 160 L 400 160" stroke="#3182CE" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="325" y="150" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#3182CE">
+    API 호출
+  </text>
+  
+  <!-- Nginx to Docker -->
+  <path d="M 550 200 L 550 270" stroke="#48BB78" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Docker to RDS -->
+  <path d="M 700 290 L 800 250" stroke="#3182CE" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Docker to S3 -->
+  <path d="M 700 350 L 800 400" stroke="#F56565" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Arrow marker -->
+  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#4A5568"/>
+  </marker>
+  
+  <!-- Annotations -->
+  <text x="50" y="270" font-family="Arial, sans-serif" font-size="12" fill="#718096">
+    • APK 파일로 빌드
+  </text>
+  <text x="50" y="290" font-family="Arial, sans-serif" font-size="12" fill="#718096">
+    • EC2 주소로 API 호출
+  </text>
+  
+  <text x="450" y="550" font-family="Arial, sans-serif" font-size="12" fill="#718096">
+    • Spring Boot + Redis를 Docker로 컨테이너화
+  </text>
+  <text x="450" y="570" font-family="Arial, sans-serif" font-size="12" fill="#718096">
+    • Nginx로 8080 포트 리버스 프록시
+  </text>
+  
+  <!-- Port Info -->
+  <rect x="300" y="30" width="100" height="30" rx="5" fill="#F7FAFC" stroke="#CBD5E0"/>
+  <text x="350" y="50" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#4A5568">
+    Port: 8080
+  </text>
+</svg> react-native-architecture (2).svg…]()
 
 
 
