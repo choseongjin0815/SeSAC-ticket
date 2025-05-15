@@ -279,12 +279,6 @@
 
 
 
-
-
-
-
-
-
 ### 🧑‍🤝‍🧑 맴버 구성
 
 
@@ -296,110 +290,13 @@
 
 ---
 
-## 기술 스택 및 사용 목적
-
-
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge)
-![Java 17](https://img.shields.io/badge/Java-007396?style=for-the-badge)
-![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?style=for-the-badge)
-![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge)
-![QueryDSL](https://img.shields.io/badge/QueryDSL-3b6e4f?style=for-the-badge)
-![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge)
-![AWS RDS](https://img.shields.io/badge/AWS%20RDS-232F3E?style=for-the-badge)
-![AWS EC2](https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge)
-![AWS S3](https://img.shields.io/badge/AWS%20S3-569A31?style=for-the-badge)
-![React Native](https://img.shields.io/badge/React%20Native-61DAFB?style=for-the-badge)
-![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge)
-![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge)
-![Jira](https://img.shields.io/badge/Jira-0052CC?style=for-the-badge)
-![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge)
-![Thymeleaf](https://img.shields.io/badge/Thymeleaf-005F0F?style=for-the-badge)
-
-
-
-### 💻 백엔드
-
-| 기술 | 설명 |
-|------|------|
-| **Java (JDK 17)** | 안정성과 성능이 검증된 최신 LTS 버전. 유지보수 및 최신 기능 활용 가능 |
-| **Spring Boot** | REST API 서버 구축에 사용. 설정이 간편하고 빠른 개발 지원 |
-| **Spring Data JPA** | CRUD 자동화 및 객체지향적인 DB 접근 방식 제공 |
-| **QueryDSL** | 동적 쿼리 생성 시 타입 안정성과 가독성 확보 |
-| **MySQL** | 관계형 DBMS로 정형 데이터 저장 및 트랜잭션 처리에 강점 |
-| **Redis** | 리프레시 토큰 저장소로 사용. 빠른 속도와 TTL 기반 자동 만료 관리 |
-| **Swagger** | API 명세 자동화 도구. 프론트/백엔드 간 명확한 협업 지원 |
-
----
-
-### ☁️ 인프라 & 클라우드
-
-| 기술 | 설명 |
-|------|------|
-| **AWS EC2** | 백엔드 서버를 배포하고 외부 접속이 가능하도록 구성 |
-| **AWS RDS (MySQL)** | 관리형 관계형 데이터베이스. 백업, 장애 복구 등 안정성 확보 |
-| **AWS S3** | 이미지 및 정적 파일 저장소. 대용량 데이터 처리에 적합 |
-| **Docker** | Redis 및 Spring Boot 컨테이너 구성으로 실행 환경 통일 및 이식성 확보<br/>
-
----
-
-### 📱 프론트엔드 (모바일 앱)
-
-| 기술 | 설명 |
-|------|------|
-| **React Native** | 하나의 코드베이스로 iOS/Android 앱을 동시에 개발 가능 |
-| **AsyncStorage** | 로컬에 토큰, 사용자 정보를 저장하여 로그인 유지 구현 |
-| **Redux Toolkit** | 상태 관리 도구. 비동기 처리와 데이터 흐름 관리에 용이 |
-
----
-
-### 🤝 협업 도구
-
-| 도구 | 설명 |
-|------|------|
-| **GitHub** | 소스코드 버전 관리 및 협업 플랫폼 |
-| **Jira** | 이슈 추적, 스프린트 관리, 업무 분배를 위한 프로젝트 관리 도구 |
-| **Slack** | 팀원 간 실시간 커뮤니케이션을 위한 메신저 |
-
----
 
 
 
 
 ## 프로젝트 구조도
-![react-native-architecture (2)](https://github.com/user-attachments/assets/7f0b13e0-de6b-4add-bdba-0313b5888123)
-
 ### 전체 구조
-
-graph TB
-  %% 클라이언트
-  RN["React Native 앱 (APK)"]
-
-  %% EC2 인스턴스
-  EC2["AWS EC2 인스턴스"]
-
-  %% EC2 내부 구성
-  NGINX["Nginx (EC2 직접설치, 80/443)"]
-  subgraph "Docker Compose (EC2)"
-    SPRING["Spring Boot (8080)"]
-    REDIS["Redis (6379)"]
-  end
-
-  %% AWS 서비스
-  RDS["RDS MySQL"]
-  S3["S3 Bucket"]
-
-  %% 연결 관계
-  RN -- "1. HTTPS API 요청 (https://EC2도메인/api)" --> NGINX
-  RN -- "2. 이미지 직접 다운로드" --> S3
-  NGINX -- "3. Reverse Proxy (80/443 → 8080)" --> SPRING
-  SPRING -- "4. 세션/캐시" --> REDIS
-  SPRING -- "5. DB CRUD" --> RDS
-  SPRING -- "6. 이미지 업로드/다운로드" --> S3
-
-  EC2 -- "Docker Compose로 관리" --> SPRING
-  EC2 -- "Docker Compose로 관리" --> REDIS
-  EC2 -- "직접 설치" --> NGINX
+![react-native-architecture (2)](https://github.com/user-attachments/assets/7f0b13e0-de6b-4add-bdba-0313b5888123)
 
 
 
