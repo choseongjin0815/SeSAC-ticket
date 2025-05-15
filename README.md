@@ -371,14 +371,19 @@
 ## 프로젝트 구조도
 ### 전체 구조
 
-```mermaid
 graph TB
   subgraph "사용자 인터페이스"
     RN[React Native 모바일 앱]
   end
 
-  subgraph "백엔드 서비스"
-    API[Spring Boot API 서버]
+  subgraph "AWS 클라우드 인프라"
+    EC2[AWS EC2]
+  end
+
+  subgraph "Docker Compose (EC2 내부)"
+    NGINX[Nginx (Reverse Proxy)]
+    SPRING[Spring Boot Application]
+    REDIS[Redis]
   end
 
   subgraph "데이터 저장소"
@@ -386,25 +391,26 @@ graph TB
     S3[(Amazon S3)]
   end
 
-  subgraph "AWS 클라우드 인프라"
-    EC2[AWS EC2]
-  end
-
-  RN -- "RESTful API 요청/응답" --> API
-  API -- "쿼리/트랜잭션" --> RDS
-  API -- "파일 업로드/다운로드" --> S3
-  EC2 -- "서버 호스팅" --> API
+  RN -- "RESTful API 요청/응답" --> NGINX
+  NGINX -- "Reverse Proxy" --> SPRING
+  SPRING -- "쿼리/트랜잭션" --> RDS
+  SPRING -- "파일 업로드/다운로드" --> S3
+  SPRING -- "캐시/세션" --> REDIS
+  EC2 -- "서버 호스팅 및 Docker Compose" --> NGINX
+  EC2 -- "서버 호스팅 및 Docker Compose" --> SPRING
+  EC2 -- "서버 호스팅 및 Docker Compose" --> REDIS
 
   classDef mobile fill:#f9a,stroke:#333,stroke-width:2px;
   classDef backend fill:#adf,stroke:#333,stroke-width:2px;
   classDef database fill:#ad5,stroke:#333,stroke-width:2px;
   classDef cloud fill:#ddf,stroke:#333,stroke-width:2px;
+  classDef docker fill:#c2e0ff,stroke:#333,stroke-width:2px;
 
   class RN mobile;
-  class API backend;
+  class NGINX,SPRING,REDIS docker;
   class RDS,S3 database;
   class EC2 cloud;
-```
+
 
 
 
