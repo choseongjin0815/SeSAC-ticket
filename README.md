@@ -191,7 +191,8 @@
 </details>
 
 <details>
-  
+<summary>관리자 정산 이후 사용자 앱과 관리자 정산내역 확인</summary>
+
 ![Image](https://github.com/user-attachments/assets/05d2db3e-369b-4a1c-a19c-ef798f073705)
 
 </details>
