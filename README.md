@@ -367,16 +367,6 @@
 
 
 
-
-## 프로젝트 구조도
-### 전체 구조
-## 시스템 아키텍처
-
-![React Native Architecture](https://github.com/choseongjin0815/SeSAC-ticket/raw/main/assets/react-native-architecture.jpeg)
-
-
-
-
 ### ERD
 ![스크린샷 2025-05-14 오후 2 01 03](https://github.com/user-attachments/assets/7b544d73-b9b0-4b51-951d-5afd44b038d8)
 
