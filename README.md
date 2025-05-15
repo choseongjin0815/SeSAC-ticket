@@ -512,40 +512,35 @@ class RDS,S3 aws;
 ## 프로젝트 구조도
 ### 전체 구조
 
-```mermaid
 graph TB
-  subgraph "사용자 인터페이스"
-    RN[React Native 모바일 앱]
+  %% 클라이언트
+  RN["React Native 앱 (APK)"]
+
+  %% EC2 인스턴스
+  EC2["AWS EC2 인스턴스"]
+
+  %% EC2 내부 구성
+  NGINX["Nginx (EC2 직접설치, 80/443)"]
+  subgraph "Docker Compose (EC2)"
+    SPRING["Spring Boot (8080)"]
+    REDIS["Redis (6379)"]
   end
 
-  subgraph "백엔드 서비스"
-    API[Spring Boot API 서버]
-  end
+  %% AWS 서비스
+  RDS["RDS MySQL"]
+  S3["S3 Bucket"]
 
-  subgraph "데이터 저장소"
-    RDS[(Amazon RDS MySQL)]
-    S3[(Amazon S3)]
-  end
+  %% 연결 관계
+  RN -- "1. HTTPS API 요청 (https://EC2도메인/api)" --> NGINX
+  RN -- "2. 이미지 직접 다운로드" --> S3
+  NGINX -- "3. Reverse Proxy (80/443 → 8080)" --> SPRING
+  SPRING -- "4. 세션/캐시" --> REDIS
+  SPRING -- "5. DB CRUD" --> RDS
+  SPRING -- "6. 이미지 업로드/다운로드" --> S3
 
-  subgraph "AWS 클라우드 인프라"
-    EC2[AWS EC2]
-  end
-
-  RN -- "RESTful API 요청/응답" --> API
-  API -- "쿼리/트랜잭션" --> RDS
-  API -- "파일 업로드/다운로드" --> S3
-  EC2 -- "서버 호스팅" --> API
-
-  classDef mobile fill:#f9a,stroke:#333,stroke-width:2px;
-  classDef backend fill:#adf,stroke:#333,stroke-width:2px;
-  classDef database fill:#ad5,stroke:#333,stroke-width:2px;
-  classDef cloud fill:#ddf,stroke:#333,stroke-width:2px;
-
-  class RN mobile;
-  class API backend;
-  class RDS,S3 database;
-  class EC2 cloud;
-```
+  EC2 -- "Docker Compose로 관리" --> SPRING
+  EC2 -- "Docker Compose로 관리" --> REDIS
+  EC2 -- "직접 설치" --> NGINX
 
 
 
