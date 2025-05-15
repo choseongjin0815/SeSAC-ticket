@@ -94,79 +94,106 @@
 <details>
 <summary>관리자 로그인</summary>
   
-![Image](https://github.com/user-attachments/assets/2e91d776-a42c-42ab-875d-ee1b2e2847b2)
+![Image](https://github.com/user-attachments/assets/7f9e9d20-1b77-4f58-ab4b-2522f0e7b1a7)
 
 </details>
 
 
 <details>
 <summary>회원목록 조회 및 검색</summary>
-<img src="gif/회원목록_조회_검색.gif" alt="회원목록 조회 및 검색 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/25d46c5d-a351-4601-bf6d-969129521ab4)
+
 </details>
 
 <details>
 <summary>회원 생성</summary>
-<img src="gif/회원_생성.gif" alt="회원 생성 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/c33f506a-1382-4f3d-b90e-5ada917a6a43)
+
 </details>
 
 <details>
 <summary>회원 비활성화/활성화</summary>
-<img src="gif/회원_비활성화_활성화.gif" alt="회원 비활성화/활성화 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/2009dd0e-f12e-48b7-9ab7-1c3ea21482ae)
+
 </details>
 
 <details>
 <summary>그룹목록 조회 및 검색</summary>
-<img src="gif/그룹목록_조회_검색.gif" alt="그룹목록 조회 및 검색 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/a9a0c703-8a1e-4c37-bcce-9985320088db)
+
 </details>
 
 <details>
 <summary>그룹 생성</summary>
-<img src="gif/그룹_생성.gif" alt="그룹 생성 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/4dbcd6ef-93ef-4919-8290-de233e1c2c1a)
+
 </details>
 
 <details>
 <summary>가맹점 목록 조회 및 검색</summary>
-<img src="gif/가맹점_목록_조회_검색.gif" alt="가맹점 목록 조회 및 검색 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/1e5340a3-111d-4be0-aa39-be01cbb08cfe)
+
 </details>
 
 <details>
 <summary>가맹점 추가</summary>
-<img src="gif/가맹점_추가.gif" alt="가맹점 추가 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/3ac44d9a-4a23-4fbf-a4e5-f68e0f173c35)
+
 </details>
 
 <details>
 <summary>가맹점 수정</summary>
-<img src="gif/가맹점_수정.gif" alt="가맹점 수정 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/81f3469b-774a-48d4-98fe-7536ea90b2b8)
+
 </details>
 
 <details>
 <summary>가맹점 비활성화/활성화</summary>
-<img src="gif/가맹점_비활성화_활성화.gif" alt="가맹점 비활성화/활성화 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/f70089c8-3c76-4a20-8b14-ad7924218cd1)
+
 </details>
 
 <details>
 <summary>포인트 지급</summary>
-<img src="gif/포인트_지급.gif" alt="포인트 지급 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/133a5529-5525-4a1e-b99f-d8848815c142)
+
 </details>
 
 <details>
 <summary>포인트 수정</summary>
-<img src="gif/포인트_수정.gif" alt="포인트 수정 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/a5ea8193-25c4-42e7-99df-26ddc7b4c33b)
+
 </details>
 
 <details>
 <summary>거래 내역 조회 및 검색</summary>
-<img src="gif/거래내역_조회_검색.gif" alt="거래 내역 조회 및 검색 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/1890f29a-11b6-4248-a836-168c8bf3a348)
+
 </details>
 
 <details>
 <summary>사용자앱에서 결제 이후 관리자 거래 내역 반영 확인</summary>
-<img src="gif/결제_후_관리자_거래내역_반영.gif" alt="결제 이후 관리자 거래 내역 반영 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/2cdaadcc-55e7-482c-8c44-a5cfd69aefd9)
+
 </details>
 
 <details>
-<summary>관리자 정산 처리 이후 관리자, 가맹점 정산 내역 확인</summary>
-<img src="gif/정산_처리_후_정산내역_확인.gif" alt="정산 처리 후 관리자, 가맹점 정산 내역 확인 시연화면" />
+  
+![Image](https://github.com/user-attachments/assets/05d2db3e-369b-4a1c-a19c-ef798f073705)
+
 </details>
 
 ---
