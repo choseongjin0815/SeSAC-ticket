@@ -114,7 +114,7 @@
 
 <details>
 <summary>그룹목록 조회 및 검색</summary>
-<img src="https://github.com/user-attachments/assets/a9a0c703-8a1e-4c37-bcce-9985320088db" width="800"/>
+<img src="https://github.com/user-attachments/assets/231c8fed-60f5-484f-ab04-30d647289e4c" width="800"/>
 </details>
 
 <details>
@@ -124,17 +124,17 @@
 
 <details>
 <summary>가맹점 목록 조회 및 검색</summary>
-<img src="https://github.com/user-attachments/assets/1e5340a3-111d-4be0-aa39-be01cbb08cfe" width="800"/>
+<img src="https://github.com/user-attachments/assets/e9bcd417-6f0e-4f42-b93c-958f843faed2" width="800"/>
 </details>
 
 <details>
-<summary>가맹점 추가</summary>
-<img src="https://github.com/user-attachments/assets/3ac44d9a-4a23-4fbf-a4e5-f68e0f173c35" width="800"/>
+<summary>가맹점 등록</summary>
+<img src="https://github.com/user-attachments/assets/1839ee3a-a9cf-4e89-bc13-ad4992241bb9" width="800"/>
 </details>
 
 <details>
 <summary>가맹점 수정</summary>
-<img src="https://github.com/user-attachments/assets/81f3469b-774a-48d4-98fe-7536ea90b2b8" width="800"/>
+<img src="https://github.com/user-attachments/assets/ff789a18-87f4-45e4-b956-5c38ec894059" width="800"/>
 </details>
 
 <details>
