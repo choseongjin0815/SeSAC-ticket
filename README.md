@@ -94,109 +94,78 @@
 
 <details>
 <summary>관리자 로그인</summary>
-  
-<img src="https://github.com/user-attachments/assets/7f9e9d20-1b77-4f58-ab4b-2522f0e7b1a7" width="800"/>
-
+<img src="https://github.com/user-attachments/assets/c6606e4b-0ab9-4062-8961-14143cc4c571" width="800"/>
 </details>
 
 <details>
 <summary>회원목록 조회 및 검색</summary>
-  
-<img src="https://github.com/user-attachments/assets/25d46c5d-a351-4601-bf6d-969129521ab4" width="800"/>
-
+<img src="https://github.com/user-attachments/assets/5ed12328-60a3-4790-b7fb-6d272f16445b" width="800"/>
 </details>
 
 <details>
 <summary>회원 생성</summary>
-  
-<img src="https://github.com/user-attachments/assets/c33f506a-1382-4f3d-b90e-5ada917a6a43" width="800"/>
-
+<img src="https://github.com/user-attachments/assets/1ad63c52-6abb-4eed-8ac1-60e7cf014bd7" width="800"/>
 </details>
 
 <details>
 <summary>회원 비활성화/활성화</summary>
-  
-<img src="https://github.com/user-attachments/assets/2009dd0e-f12e-48b7-9ab7-1c3ea21482ae" width="800"/>
-
+<img src="https://github.com/user-attachments/assets/fe7da004-16ef-453d-b2ff-22392b213fed" width="800"/>
 </details>
 
 <details>
 <summary>그룹목록 조회 및 검색</summary>
-  
 <img src="https://github.com/user-attachments/assets/a9a0c703-8a1e-4c37-bcce-9985320088db" width="800"/>
-
 </details>
 
 <details>
 <summary>그룹 생성</summary>
-  
-<img src="https://github.com/user-attachments/assets/4dbcd6ef-93ef-4919-8290-de233e1c2c1a" width="800"/>
-
+<img src="https://github.com/user-attachments/assets/e4d12a6f-04ad-42c8-8dd0-c3d86a0cfc5c" width="800"/>
 </details>
 
 <details>
 <summary>가맹점 목록 조회 및 검색</summary>
-  
 <img src="https://github.com/user-attachments/assets/1e5340a3-111d-4be0-aa39-be01cbb08cfe" width="800"/>
-
 </details>
 
 <details>
 <summary>가맹점 추가</summary>
-  
 <img src="https://github.com/user-attachments/assets/3ac44d9a-4a23-4fbf-a4e5-f68e0f173c35" width="800"/>
-
 </details>
 
 <details>
 <summary>가맹점 수정</summary>
-  
 <img src="https://github.com/user-attachments/assets/81f3469b-774a-48d4-98fe-7536ea90b2b8" width="800"/>
-
 </details>
 
 <details>
 <summary>가맹점 비활성화/활성화</summary>
-  
-<img src="https://github.com/user-attachments/assets/f70089c8-3c76-4a20-8b14-ad7924218cd1" width="800"/>
-
+<img src="https://github.com/user-attachments/assets/8309b17a-5637-4459-ae98-ea42df17cb25" width="800"/>
 </details>
 
 <details>
 <summary>포인트 지급</summary>
-  
-<img src="https://github.com/user-attachments/assets/133a5529-5525-4a1e-b99f-d8848815c142" width="800"/>
-
+<img src="https://github.com/user-attachments/assets/4ae27e07-e234-4292-a4cb-85da7d048e4a" width="800"/>
 </details>
 
 <details>
 <summary>포인트 수정</summary>
-  
-<img src="https://github.com/user-attachments/assets/a5ea8193-25c4-42e7-99df-26ddc7b4c33b" width="800"/>
-
+<img src="https://github.com/user-attachments/assets/8803fcc5-de11-44df-9f18-50443406e740" width="800"/>
 </details>
 
 <details>
 <summary>거래 내역 조회 및 검색</summary>
-  
 <img src="https://github.com/user-attachments/assets/1890f29a-11b6-4248-a836-168c8bf3a348" width="800"/>
-
 </details>
 
 <details>
 <summary>사용자앱에서 결제 이후 관리자 거래 내역 반영 확인</summary>
-  
-<img src="https://github.com/user-attachments/assets/2cdaadcc-55e7-482c-8c44-a5cfd69aefd9" width="800"/>
-
+<img src="https://github.com/user-attachments/assets/f56e68f6-7b98-4cb4-93ac-9753f01a81b4" width="800"/>
 </details>
 
 <details>
 <summary>관리자 정산 이후 사용자 앱과 관리자 정산내역 확인</summary>
-
 <img src="https://github.com/user-attachments/assets/05d2db3e-369b-4a1c-a19c-ef798f073705" width="800"/>
-
 </details>
-
 ---
 
 ### 🧑‍🤝‍🧑 맴버 구성
