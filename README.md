@@ -154,7 +154,7 @@
 
 <details>
 <summary>거래 내역 조회 및 검색</summary>
-<img src="https://github.com/user-attachments/assets/1890f29a-11b6-4248-a836-168c8bf3a348" width="800"/>
+<img src="https://github.com/user-attachments/assets/ab5efa93-1006-465f-9f2f-041c9137a8a7" width="800"/>
 </details>
 
 <details>
@@ -164,7 +164,7 @@
 
 <details>
 <summary>관리자 정산 이후 사용자 앱과 관리자 정산내역 확인</summary>
-<img src="https://github.com/user-attachments/assets/05d2db3e-369b-4a1c-a19c-ef798f073705" width="800"/>
+<img src="https://github.com/user-attachments/assets/c95688ad-882e-4fc9-be94-38a5f293865f" width="800"/>
 </details>
 
 ---
