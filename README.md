@@ -164,7 +164,7 @@
 
 <details>
 <summary>관리자 정산 이후 사용자 앱과 관리자 정산내역 확인</summary>
-<img src="https://github.com/user-attachments/assets/c95688ad-882e-4fc9-be94-38a5f293865f" width="800"/>
+<img src="https://github.com/user-attachments/assets/790e4c87-58b4-49e0-8d07-1d90fc4bef5f" width="800"/>
 </details>
 
 ---
