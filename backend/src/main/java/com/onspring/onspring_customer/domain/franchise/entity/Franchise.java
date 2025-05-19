@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -67,7 +68,7 @@ public class Franchise extends BaseEntity {
     @OneToMany(mappedBy = "franchise")
     private Set<Transaction> transactions = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY) @BatchSize(size = 20)
     List<FranchiseMenuImages> menuImages = new ArrayList<>();
 
     public void addImage(FranchiseMenuImages image) {

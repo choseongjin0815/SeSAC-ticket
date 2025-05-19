@@ -13,9 +13,11 @@ import com.onspring.onspring_customer.domain.customer.entity.QParty;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
+import com.onspring.onspring_customer.domain.franchise.entity.QFranchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
+import com.onspring.onspring_customer.domain.user.entity.QEndUser;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -172,105 +174,131 @@ public class TransactionServiceImpl implements TransactionService {
     public List<TransactionDto> findMonthlySettlementSummary() {
         log.info("Finding monthly settlement summary by franchise");
 
-        // 정산 완료된(isClosed=true) 모든 트랜잭션 조회
-        List<Transaction> closedTransactions = transactionRepository.findByIsClosed(true);
+        QTransaction transaction = QTransaction.transaction;
+        QFranchise franchise = QFranchise.franchise;
+
+        // fetchJoin으로 N+1 문제 해결
+        List<Transaction> closedTransactions = queryFactory.selectFrom(transaction)
+                .join(transaction.franchise, franchise).fetchJoin()
+                .where(transaction.isClosed.eq(true))
+                .fetch();
 
         if (closedTransactions.isEmpty()) {
             log.info("No closed transactions found");
             return new ArrayList<>();
         }
 
-        // 가맹점 ID와 월별로 트랜잭션 그룹화
         Map<String, List<Transaction>> groupedTransactions = closedTransactions.stream()
-                .collect(Collectors.groupingBy(transaction -> {
-                    // 가맹점 ID와 연월을 조합한 키 생성 (예: "franchiseId-2025-02")
-                    LocalDateTime date = transaction.getTransactionTime();
+                .collect(Collectors.groupingBy(t -> {
+                    LocalDateTime date = t.getTransactionTime();
                     String yearMonth = date.getYear() + "-" + String.format("%02d", date.getMonthValue());
-                    return transaction.getFranchise().getId() + "-" + yearMonth;
+                    return t.getFranchise().getId() + "-" + yearMonth;
                 }));
 
-        // 그룹화된 트랜잭션으로부터 가맹점별 월간 요약 정보 생성
         List<TransactionDto> summaries = new ArrayList<>();
 
         groupedTransactions.forEach((key, transactions) -> {
-            // 키에서 가맹점 ID와 연월 추출
             String[] parts = key.split("-");
             Long franchiseId = Long.parseLong(parts[0]);
             String yearMonth = parts[1] + "-" + parts[2];
 
-            // 가맹점 이름 가져오기
             String franchiseName = transactions.get(0).getFranchise().getName();
-
-            // 거래 건수
             int totalCount = transactions.size();
-
-            // 정산 총액 계산
             BigDecimal totalAmount = transactions.stream()
                     .map(Transaction::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            // 정산 기간 계산 (해당 월의 첫날부터 마지막 날까지)
-            LocalDate firstDay = LocalDate.of(
-                    Integer.parseInt(parts[1]),
-                    Integer.parseInt(parts[2]),
-                    1
-            );
+            LocalDate firstDay = LocalDate.of(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), 1);
             LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
-            String settlementPeriod = firstDay.toString() + " ~ " + lastDay.toString();
 
-            // TransactionDto를 활용하여 요약 정보 생성
             TransactionDto summaryDto = new TransactionDto();
-
-            // franchiseDto 객체 생성하고 설정
             FranchiseDto franchiseDto = new FranchiseDto();
             franchiseDto.setId(franchiseId);
             franchiseDto.setName(franchiseName);
 
-            // 설정된 franchiseDto 객체를 summaryDto에 설정
             summaryDto.setFranchiseDto(franchiseDto);
-
-            // 다른 필드들 설정
             summaryDto.setAmount(totalAmount);
-            summaryDto.setClosed(true); // 정산 완료된 내역임을 표시
-
-            // 트랜잭션 시간을 해당 월의 마지막 날로 설정 (월별 요약이므로)
+            summaryDto.setClosed(true);
             summaryDto.setTransactionTime(lastDay.atTime(23, 59, 59));
 
             summaries.add(summaryDto);
         });
 
-        // 정렬 - 트랜잭션 시간 (월) 기준 내림차순, 동일 월이면 가맹점 이름 기준 오름차순
         summaries.sort((a, b) -> {
             int timeCompare = b.getTransactionTime().compareTo(a.getTransactionTime());
-            if (timeCompare != 0) {
-                return timeCompare;
-            }
+            if (timeCompare != 0) return timeCompare;
             return a.getFranchiseDto().getName().compareTo(b.getFranchiseDto().getName());
         });
 
         return summaries;
     }
-
     // 거래내역 중 미정산된 (isClosed = False) 모든 거래 내역 띄우기 => Figma 홈_정산관리_정산
     @Override
     public List<TransactionDto> findAllTransaction() {
-        List<Transaction> transactions = transactionRepository.findByIsClosed(false);
+        QTransaction transaction = QTransaction.transaction;
+        QFranchise franchise = QFranchise.franchise;
+        QParty party = QParty.party;
+        QEndUser endUser = QEndUser.endUser;
+
+        List<Transaction> transactions = queryFactory.selectFrom(transaction)
+                .join(transaction.franchise, franchise).fetchJoin()
+                .join(transaction.party, party).fetchJoin()
+                .join(transaction.endUser, endUser).fetchJoin()
+                .where(transaction.isClosed.eq(false))
+                .fetch();
 
         if (transactions.isEmpty()) {
             log.info("No open transactions found");
             return new ArrayList<>();
         }
 
-        // Entity를 DTO로 변환하여 반환
         return transactions.stream()
-                .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
+                .map(tx -> modelMapper.map(tx, TransactionDto.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Long adminId, Pageable pageable) {
-        return transactionRepository.findByParty_Customer_Admins_IdAndIsAcceptedTrueAndIsClosedFalseOrderByIdDesc(adminId, pageable)
-                .map(element -> modelMapper.map(element, TransactionDto.class));
+        QTransaction tx = QTransaction.transaction;
+        QFranchise franchise = QFranchise.franchise;
+        QParty party = QParty.party;
+        QCustomer customer = QCustomer.customer;
+        QAdmin admin = QAdmin.admin;
+        QEndUser endUser = QEndUser.endUser;
+
+        // content 쿼리
+        List<Transaction> content = queryFactory.selectFrom(tx)
+                .join(tx.party, party).fetchJoin()
+                .join(party.customer, customer)
+                .join(customer.admins, admin)
+                .join(tx.franchise, franchise).fetchJoin()
+                .join(tx.endUser, endUser).fetchJoin()
+                .where(
+                        admin.id.eq(adminId),
+                        tx.isAccepted.isTrue(),
+                        tx.isClosed.isFalse()
+                )
+                .orderBy(tx.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // count 쿼리 (fetchJoin X)
+        Long total = queryFactory.select(tx.count())
+                .from(tx)
+                .join(tx.party, party)
+                .join(party.customer, customer)
+                .join(customer.admins, admin)
+                .where(
+                        admin.id.eq(adminId),
+                        tx.isAccepted.isTrue(),
+                        tx.isClosed.isFalse()
+                )
+                .fetchOne();
+
+        return new PageImpl<>(content.stream()
+                .map(t -> modelMapper.map(t, TransactionDto.class))
+                .toList(), pageable, total);
     }
 
     @Override
