@@ -3,9 +3,9 @@ import { Platform } from 'react-native';
 
 export const API_SERVER_HOST =
   Platform.select({
-    ios: 'http://43.200.223.231:8080', // iOS 시뮬레이터
-    android: 'http://43.200.223.231:8080', // 안드로이드 에뮬레이터
-    web: 'http://43.200.223.231:8080', // 웹 브라우저
+    ios: 'http://52.79.216.140', // iOS 시뮬레이터
+    android: 'http://52.79.216.140', // 안드로이드 에뮬레이터
+    web: 'http://52.79.216.140', // 웹 브라우저
   }); 
 
 
