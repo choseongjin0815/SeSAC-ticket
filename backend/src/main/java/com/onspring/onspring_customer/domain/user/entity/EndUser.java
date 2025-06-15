@@ -11,7 +11,6 @@ import java.util.Set;
 
 @Builder
 @Getter
-@Setter
 @Entity
 @Table(name = "end_user")
 @NoArgsConstructor

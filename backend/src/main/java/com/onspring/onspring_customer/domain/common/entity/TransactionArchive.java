@@ -11,7 +11,6 @@ import java.time.LocalDate;
 
 @Builder
 @Getter
-@Setter
 @Entity
 @Table(name = "transaction_archive")
 @NoArgsConstructor

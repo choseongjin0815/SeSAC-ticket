@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "customer_franchise")
 public class CustomerFranchise extends BaseEntity {

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "franchise")
 public class Franchise extends BaseEntity {

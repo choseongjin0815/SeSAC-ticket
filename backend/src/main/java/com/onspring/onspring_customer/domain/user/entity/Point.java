@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 @Builder
 @Getter
-@Setter
 @Entity
 @Table(name = "point")
 @NoArgsConstructor
