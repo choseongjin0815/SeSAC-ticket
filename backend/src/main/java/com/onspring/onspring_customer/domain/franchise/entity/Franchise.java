@@ -71,13 +71,11 @@ public class Franchise extends BaseEntity {
     List<FranchiseMenuImages> menuImages = new ArrayList<>();
 
     public void addImage(FranchiseMenuImages image) {
-        image.setOrd(this.menuImages.size());
         menuImages.add(image);
     }
 
     public void addImageString(String fileName) {
-        FranchiseMenuImages image = new FranchiseMenuImages();
-        image.setFileName(fileName);
+        FranchiseMenuImages image = new FranchiseMenuImages(fileName, this.menuImages.size());
         addImage(image);
     }
 

@@ -14,4 +14,9 @@ public class FranchiseMenuImages {
 
     private int ord;
 
+    public FranchiseMenuImages(String fileName, int ord) {
+        this.fileName = fileName;
+        this.ord = ord;
+    }
+
 }
