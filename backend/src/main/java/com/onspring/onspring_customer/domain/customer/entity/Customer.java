@@ -44,4 +44,8 @@ public class Customer extends BaseEntity {
     @OneToMany(mappedBy = "customer")
     private Set<Party> parties = new HashSet<>();
 
+    public void changeActivated(boolean isActivated) {
+        this.isActivated = isActivated;
+    }
+
 }
