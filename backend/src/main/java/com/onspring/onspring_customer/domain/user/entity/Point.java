@@ -37,4 +37,17 @@ public class Point extends BaseEntity {
 
     private LocalDateTime validThru;
 
+    public void changeCurrentAmount(BigDecimal amount) {
+        this.currentAmount = amount;
+    }
+
+    public void changeAssignedAmount(BigDecimal amount) {
+        this.assignedAmount = amount;
+    }
+
+    public void changeValidThru(LocalDateTime validThru) {
+        this.validThru = validThru;
+    }
+
+
 }

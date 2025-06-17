@@ -126,10 +126,10 @@ public class PointServiceImpl implements PointService {
         }
         Point point = pointRepository.findById(pointId).orElse(null);
 
-        point.setCurrentAmount(point.getCurrentAmount().subtract(amount));
-
-        pointRepository.save(point);
-
+        if (point != null) {
+            point.changeCurrentAmount(point.getCurrentAmount().subtract(amount));
+            pointRepository.save(point);
+        }
         return true;
     }
 
@@ -146,11 +146,14 @@ public class PointServiceImpl implements PointService {
         List<Point> pointList = pointRepository.findByParty_IdAndEndUser_IdIn(partyId, endUserIds);
 
         pointList.forEach(point -> {
-            point.setAssignedAmount(point.getCurrentAmount()
-                    .add(amount));
-            point.setCurrentAmount(point.getCurrentAmount()
-                    .add(amount));
-            point.setValidThru(validThru);
+            point.changeCurrentAmount(point.getCurrentAmount().add(amount));
+            point.changeAssignedAmount(point.getAssignedAmount().add(amount));
+            point.changeValidThru(validThru);
+//            point.setAssignedAmount(point.getCurrentAmount()
+//                    .add(amount));
+//            point.setCurrentAmount(point.getCurrentAmount()
+//                    .add(amount));
+//            point.setValidThru(validThru);
         });
 
         pointRepository.saveAll(pointList);
@@ -167,9 +170,12 @@ public class PointServiceImpl implements PointService {
 
         Point point = pointRepository.findByParty_IdAndEndUser_Id(partyId, endUserId).orElseThrow();
 
-        point.setAssignedAmount(amount);
-        point.setCurrentAmount(amount);
-        point.setValidThru(validThru);
+        point.changeAssignedAmount(amount);
+        point.changeCurrentAmount(amount);
+        point.changeValidThru(validThru);
+//        point.setAssignedAmount(amount);
+//        point.setCurrentAmount(amount);
+//        point.setValidThru(validThru);
 
         pointRepository.save(point);
 
@@ -186,9 +192,12 @@ public class PointServiceImpl implements PointService {
         List<Point> pointList = pointRepository.findByParty_IdAndEndUser_IdIn(partyId, endUserIds);
 
         pointList.forEach(point -> {
-            point.setAssignedAmount(amount);
-            point.setCurrentAmount(amount);
-            point.setValidThru(validThru);
+            point.changeAssignedAmount(amount);
+            point.changeCurrentAmount(amount);
+            point.changeValidThru(validThru);
+//            point.setAssignedAmount(amount);
+//            point.setCurrentAmount(amount);
+//            point.setValidThru(validThru);
         });
 
         pointRepository.saveAll(pointList);
