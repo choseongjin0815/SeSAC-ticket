@@ -70,6 +70,14 @@ public class Franchise extends BaseEntity {
     @ElementCollection(fetch = FetchType.LAZY) @BatchSize(size = 20)
     List<FranchiseMenuImages> menuImages = new ArrayList<>();
 
+    public Franchise(Long id, String name, String address, String phone, String description) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.phone = phone;
+        this.description = description;
+    }
+
     public void addImage(FranchiseMenuImages image) {
         menuImages.add(image);
     }
