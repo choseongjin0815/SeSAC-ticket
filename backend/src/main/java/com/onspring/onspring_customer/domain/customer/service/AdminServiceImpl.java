@@ -101,7 +101,7 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = getAdmin(id);
 
         if (passwordEncoder.matches(oldPassword, admin.getPassword())) {
-            admin.setPassword(passwordEncoder.encode(newPassword));
+            admin.changePassword(passwordEncoder.encode(newPassword));
             adminRepository.save(admin);
             return true;
         }
@@ -117,7 +117,7 @@ public class AdminServiceImpl implements AdminService {
 
         Admin admin = getAdmin(id);
 
-        admin.setActivated(true);
+        admin.changeActivated(true);
         adminRepository.save(admin);
 
         log.info("Successfully activated admin with ID {}", id);
@@ -137,7 +137,7 @@ public class AdminServiceImpl implements AdminService {
             return false;
         }
 
-        admin.setActivated(false);
+        admin.changeActivated(false);
         adminRepository.save(admin);
 
         log.info("Successfully deactivated admin with ID {}", id);

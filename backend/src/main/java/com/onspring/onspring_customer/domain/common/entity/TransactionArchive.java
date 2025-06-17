@@ -37,4 +37,12 @@ public class TransactionArchive {
 
     @NotNull
     private LocalDate duration;
+
+    public void changeTransactionCount(Long transactionCount) {
+        this.transactionCount = transactionCount;
+    }
+
+    public void changeAmountSum(BigDecimal amountSum) {
+        this.amountSum = amountSum;
+    }
 }

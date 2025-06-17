@@ -26,4 +26,12 @@ public class PlatformAdmin extends BaseEntity {
     @NotNull
     private boolean isActivated;
 
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeActivateStatus(boolean isActivated) {
+        this.isActivated = isActivated;
+    }
+
 }

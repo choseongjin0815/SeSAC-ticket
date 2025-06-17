@@ -31,4 +31,12 @@ public class Admin extends BaseEntity {
     @NotNull
     private boolean isActivated;
 
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeActivated(boolean activated) {
+        this.isActivated = activated;
+    }
+
 }

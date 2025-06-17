@@ -46,4 +46,22 @@ public class Transaction extends BaseEntity {
     @NotNull
     private boolean isClosed;
 
+    public Transaction(Franchise franchise, EndUser endUser, BigDecimal amount, boolean isClosed, Party party) {
+        this.franchise = franchise;
+        this.endUser = endUser;
+        this.amount = amount;
+        this.isAccepted = true;
+        this.isClosed = isClosed;
+        this.party = party;
+        this.transactionTime = LocalDateTime.now();
+    }
+
+    public void cancelTransaction() {
+        this.isAccepted = false;
+    }
+
+    public void closeTransaction() {
+        this.isClosed = true;
+    }
+
 }
