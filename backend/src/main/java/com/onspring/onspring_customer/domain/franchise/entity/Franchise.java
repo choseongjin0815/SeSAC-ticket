@@ -112,6 +112,30 @@ public class Franchise extends BaseEntity {
         return franchiseDto;
     }
 
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeAddress(String address) {
+        this.address = address;
+    }
+
+    public void changePhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void changeDescription(String description) {
+        this.description = description;
+    }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeActivated(boolean isActivated) {
+        this.isActivated = isActivated;
+    }
+
 
 
 }
