@@ -231,61 +231,6 @@ public class EndUserServiceImpl implements EndUserService {
     }
 
 
-//    @Override
-//    public Page<EndUserDto> findAllEndUserByQuery(String name, String partyName, String phone, boolean isActivated,
-//                                                  Pageable pageable) {
-//        QEndUser endUser = QEndUser.endUser;
-//        JPAQuery<EndUser> query = queryFactory.selectFrom(endUser);
-//
-//        if (name != null) {
-//            query.where(endUser.name.containsIgnoreCase(name));
-//        }
-//        if (partyName != null) {
-//            QParty party = QParty.party;
-//            List<Long> partyIds = queryFactory.select(party.id)
-//                    .from(party)
-//                    .where(party.name.containsIgnoreCase(partyName))
-//                    .fetch();
-//
-//            query.where(endUser.points.any().party.id.in(partyIds));
-//        }
-//        if (phone != null) {
-//            query.where(endUser.phone.contains(phone));
-//        }
-//
-//        query.where(endUser.isActivated.eq(isActivated));
-//
-//        Long count = Objects.requireNonNull(query.clone()
-//                .select(endUser.count())
-//                .fetchOne());
-//
-//        query.orderBy(endUser.id.desc());
-//        query.offset(pageable.getOffset());
-//        query.limit(pageable.getPageSize());
-//
-//        List<EndUser> endUserList = query.fetch();
-//
-//        List<EndUserDto> endUserDtoList = new ArrayList<>();
-//
-//        for (EndUser element : endUserList) {
-//            EndUserDto map = modelMapper.map(element, EndUserDto.class);
-//            map.setPartyIds(element.getPoints()
-//                    .stream()
-//                    .map(Point::getParty)
-//                    .map(Party::getId)
-//                    .toList());
-//            map.setPointIds(element.getPoints()
-//                    .stream()
-//                    .map(Point::getId)
-//                    .toList());
-//            endUserDtoList.add(map);
-//        }
-//
-//        log.info(endUserDtoList.toString());
-//
-//        return new PageImpl<>(endUserDtoList, pageable, count);
-//    }
-
     @Override
     public Page<PointDto> findPointByEndUserId(Long id, Pageable pageable) {
         return pointRepository.findByEndUser_Id(id, pageable)
@@ -297,8 +242,8 @@ public class EndUserServiceImpl implements EndUserService {
     public boolean updateEndUser(EndUserDto endUserDto) {
 
         EndUser endUser = getEndUser(endUserDto.getId());
-        endUser.setPhone(endUserDto.getPhone());
-        endUser.setName(endUserDto.getName());
+        endUser.changePhone(endUserDto.getPhone());
+        endUser.changeName(endUserDto.getName());
 
         log.info("partyIds:{}", endUserDto.getPartyIds());
         Set<Party> newParties = new HashSet<>();
@@ -373,7 +318,7 @@ public class EndUserServiceImpl implements EndUserService {
         log.info("Updating password for end user with ID {}", id);
 
         EndUser endUser = getEndUser(id);
-        endUser.setPassword(password);
+        endUser.changePassword(password);
 
         endUserRepository.save(endUser);
 
@@ -394,7 +339,7 @@ public class EndUserServiceImpl implements EndUserService {
     public boolean updateEndUserPasswordById(Long id, String oldPassword, String newPassword) {
         EndUser endUser = getEndUser(id);
         if (passwordEncoder.matches(oldPassword, endUser.getPassword())) {
-            endUser.setPassword(passwordEncoder.encode(newPassword));
+            endUser.changePassword(passwordEncoder.encode(newPassword));
             endUserRepository.save(endUser);
             return true;
         }
@@ -425,7 +370,7 @@ public class EndUserServiceImpl implements EndUserService {
         log.info("Activating end user with ID {}", id);
 
         EndUser endUser = getEndUser(id);
-        endUser.setActivated(true);
+        endUser.changeActivated(true);
 
         endUserRepository.save(endUser);
 
@@ -446,7 +391,7 @@ public class EndUserServiceImpl implements EndUserService {
         log.info("Deactivating end user with ID {}", id);
 
         EndUser endUser = getEndUser(id);
-        endUser.setActivated(false);
+        endUser.changeActivated(false);
 
         endUserRepository.save(endUser);
 
