@@ -7,7 +7,7 @@ import { Platform } from 'react-native';
 //     android: 'http://52.79.216.140:8080', // 안드로이드 에뮬레이터
 //     web: 'http://52.79.216.140', // 웹 브라우저
 //   }) 
-export const API_SERVER_HOST = 'http://52.79.216.140:8080'; // EC2 공인 IP (혹은 도메인)
+export const API_SERVER_HOST = 'https://sesacticket.site';
 
 const prefix = `${API_SERVER_HOST}/api/user`;
 
