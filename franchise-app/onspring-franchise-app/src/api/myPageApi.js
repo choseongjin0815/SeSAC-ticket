@@ -3,9 +3,9 @@ import { Platform } from 'react-native';
 
 export const API_SERVER_HOST =
   Platform.select({
-    ios: 'http://52.79.216.140', // iOS 시뮬레이터
-    android: 'http://52.79.216.140', // 안드로이드 에뮬레이터
-    web: 'http://52.79.216.140', // 웹 브라우저
+    ios: 'https://sesacticket.site', // iOS 시뮬레이터
+    android: 'https://sesacticket.site', // 안드로이드 에뮬레이터
+    web: 'https://sesacticket.site', // 웹 브라우저
   }); 
 
 
