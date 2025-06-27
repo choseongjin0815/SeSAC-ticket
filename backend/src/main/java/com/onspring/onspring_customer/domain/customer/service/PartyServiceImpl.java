@@ -59,7 +59,7 @@ public class PartyServiceImpl implements PartyService {
                                                                + " found"));
 
         Party party = modelMapper.map(partyDto, Party.class);
-        party.setCustomer(customer);
+        party.changeCustomer(customer);
 
         Long id = partyRepository.save(party)
                 .getId();
@@ -292,25 +292,26 @@ public class PartyServiceImpl implements PartyService {
         // Customer 관계 유지
         Customer customer = party.getCustomer();
 
+        party.updatePartyInfo(partyDto);
         // 기본 필드 업데이트
-        party.setName(partyDto.getName());
-        party.setPeriod(partyDto.getPeriod());
-        party.setAmount(partyDto.getAmount());
-        party.setAllowedTimeStart(partyDto.getAllowedTimeStart());
-        party.setAllowedTimeEnd(partyDto.getAllowedTimeEnd());
-        party.setValidThru(partyDto.getValidThru());
-        party.setSunday(partyDto.isSunday());
-        party.setMonday(partyDto.isMonday());
-        party.setTuesday(partyDto.isTuesday());
-        party.setWednesday(partyDto.isWednesday());
-        party.setThursday(partyDto.isThursday());
-        party.setFriday(partyDto.isFriday());
-        party.setSaturday(partyDto.isSaturday());
-        party.setMaximumAmount(partyDto.getMaximumAmount());
-        party.setMaximumTransaction(partyDto.getMaximumTransaction());
+//        party.setName(partyDto.getName());
+//        party.setPeriod(partyDto.getPeriod());
+//        party.setAmount(partyDto.getAmount());
+//        party.setAllowedTimeStart(partyDto.getAllowedTimeStart());
+//        party.setAllowedTimeEnd(partyDto.getAllowedTimeEnd());
+//        party.setValidThru(partyDto.getValidThru());
+//        party.setSunday(partyDto.isSunday());
+//        party.setMonday(partyDto.isMonday());
+//        party.setTuesday(partyDto.isTuesday());
+//        party.setWednesday(partyDto.isWednesday());
+//        party.setThursday(partyDto.isThursday());
+//        party.setFriday(partyDto.isFriday());
+//        party.setSaturday(partyDto.isSaturday());
+//        party.setMaximumAmount(partyDto.getMaximumAmount());
+//        party.setMaximumTransaction(partyDto.getMaximumTransaction());
 
         // customer 관계 유지
-        party.setCustomer(customer);
+        party.changeCustomer(customer);
 
         partyRepository.save(party);
 
@@ -324,7 +325,7 @@ public class PartyServiceImpl implements PartyService {
         for (Long id : ids) {
             Party party = getParty(id);
 
-            party.setActivated(true);
+            party.changeActivated(true);
             partyRepository.save(party);
         }
         return true;
@@ -335,7 +336,7 @@ public class PartyServiceImpl implements PartyService {
         for (Long id : ids) {
             Party party = getParty(id);
             log.info("Deactivating party with ID {}", id);
-            party.setActivated(false);
+            party.changeActivated(false);
             partyRepository.save(party);
         }
 

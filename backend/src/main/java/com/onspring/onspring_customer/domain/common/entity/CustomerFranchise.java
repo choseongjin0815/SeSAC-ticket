@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "customer_franchise")
 public class CustomerFranchise extends BaseEntity {
@@ -23,5 +22,13 @@ public class CustomerFranchise extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "franchise_id")
     private Franchise franchise;
+
+    public void changeCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public void changeFranchise(Franchise franchise) {
+        this.franchise = franchise;
+    }
 
 }

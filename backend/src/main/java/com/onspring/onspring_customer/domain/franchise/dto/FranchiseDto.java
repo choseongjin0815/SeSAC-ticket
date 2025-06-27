@@ -51,6 +51,7 @@ public class FranchiseDto implements Serializable {
 
     String description;
 
+
 //    @Builder.Default
 //    private List<MultipartFile> files = new ArrayList<>();
 
@@ -58,12 +59,12 @@ public class FranchiseDto implements Serializable {
     private List<String> uploadFileNames = new ArrayList<>();
 
     public Franchise dtoToEntity() {
-        Franchise franchise = new Franchise();
-        franchise.setId(this.id);
-        franchise.setName(this.name);
-        franchise.setAddress(this.address);
-        franchise.setPhone(this.phone);
-        franchise.setDescription(this.description);
+        Franchise franchise = new Franchise(this.id, this.name, this.address, this.phone, this.description);
+//        franchise.setId(this.id);
+//        franchise.setName(this.name);
+//        franchise.setAddress(this.address);
+//        franchise.setPhone(this.phone);
+//        franchise.setDescription(this.description);
 
         // 파일 처리
         List<String> uploadFileNames = this.uploadFileNames;

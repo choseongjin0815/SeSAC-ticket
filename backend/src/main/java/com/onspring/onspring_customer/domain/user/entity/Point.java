@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 @Builder
 @Getter
-@Setter
 @Entity
 @Table(name = "point")
 @NoArgsConstructor
@@ -37,5 +36,18 @@ public class Point extends BaseEntity {
     private BigDecimal currentAmount;
 
     private LocalDateTime validThru;
+
+    public void changeCurrentAmount(BigDecimal amount) {
+        this.currentAmount = amount;
+    }
+
+    public void changeAssignedAmount(BigDecimal amount) {
+        this.assignedAmount = amount;
+    }
+
+    public void changeValidThru(LocalDateTime validThru) {
+        this.validThru = validThru;
+    }
+
 
 }

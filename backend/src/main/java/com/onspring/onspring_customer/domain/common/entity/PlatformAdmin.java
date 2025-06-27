@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "platform_admin")
 public class PlatformAdmin extends BaseEntity {
@@ -26,5 +25,13 @@ public class PlatformAdmin extends BaseEntity {
 
     @NotNull
     private boolean isActivated;
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeActivateStatus(boolean isActivated) {
+        this.isActivated = isActivated;
+    }
 
 }

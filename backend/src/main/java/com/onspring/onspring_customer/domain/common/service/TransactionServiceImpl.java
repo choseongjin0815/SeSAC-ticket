@@ -66,7 +66,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         // 정산 처리로 상태 변경 (isClosed = true)
-        existingTransaction.setClosed(true);
+        existingTransaction.closeTransaction();
 
         // 변경된 내용 저장
         Transaction savedTransaction = transactionRepository.save(existingTransaction);
@@ -97,7 +97,7 @@ public class TransactionServiceImpl implements TransactionService {
                 }
 
                 // 정산 처리로 상태 변경 (isClosed = true)
-                transaction.setClosed(true);
+                transaction.closeTransaction();
 
 
                 // 변경된 내용 저장
@@ -147,15 +147,21 @@ public class TransactionServiceImpl implements TransactionService {
                 .orElseThrow(() -> new RuntimeException("Party not found"));
 
         // TransactionDto -> Transaction 엔티티로 변환
-        Transaction transaction = new Transaction();
-        transaction.setFranchise(franchise);
-        transaction.setEndUser(endUser);
-        transaction.setTransactionTime(LocalDateTime.now());
-        transaction.setAmount(transactionDto.getAmount());
-        transaction.setAccepted(transactionDto.isAccepted());
-        transaction.setClosed(transactionDto.isClosed());
-        transaction.setAccepted(true);
-        transaction.setParty(party);
+        Transaction transaction = new Transaction(
+                franchise,
+                endUser,
+                transactionDto.getAmount(),
+                transactionDto.isClosed(),
+                party
+        );
+//        transaction.setFranchise(franchise);
+//        transaction.setEndUser(endUser);
+//        transaction.setTransactionTime(LocalDateTime.now());
+//        transaction.setAmount(transactionDto.getAmount());
+//
+//        transaction.setClosed(transactionDto.isClosed());
+//
+//        transaction.setParty(party);
 
         log.info("Saving transaction: {}", transaction);
 
@@ -520,7 +526,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         // 취소 처리: isAccepted를 false로 변경
-        transaction.setAccepted(false);
+        transaction.cancelTransaction();
         transactionRepository.save(transaction);
 
         return true;

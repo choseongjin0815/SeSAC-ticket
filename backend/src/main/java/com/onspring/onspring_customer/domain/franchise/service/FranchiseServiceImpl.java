@@ -148,17 +148,17 @@ public class FranchiseServiceImpl implements FranchiseService {
     public void updateFranchiseFields(Franchise franchise, FranchiseDto franchiseDto) {
         log.info(franchiseDto);
         if (franchiseDto.getName() != null) {
-            franchise.setName(franchiseDto.getName());
+            franchise.changeName(franchiseDto.getName());
         }
         if (franchiseDto.getAddress() != null) {
-            franchise.setAddress(franchiseDto.getAddress());
+            franchise.changeAddress(franchiseDto.getAddress());
         }
         if (franchiseDto.getPhone() != null) {
-            franchise.setPhone(franchiseDto.getPhone());
+            franchise.changePhone(franchiseDto.getPhone());
         }
         if (franchiseDto.getDescription() != null) {
             log.info(franchiseDto.getDescription());
-            franchise.setDescription(franchiseDto.getDescription());
+            franchise.changeDescription(franchiseDto.getDescription());
         }
     }
 
@@ -191,7 +191,7 @@ public class FranchiseServiceImpl implements FranchiseService {
     public boolean updateFranchisePassword(Long id, String oldPassword, String newPassword) {
         Franchise franchise = getFranchise(id);
         if (passwordEncoder.matches(oldPassword, franchise.getPassword())) {
-            franchise.setPassword(passwordEncoder.encode(newPassword));
+            franchise.changePassword(passwordEncoder.encode(newPassword));
             franchiseRepository.save(franchise);
             return true;
         }
@@ -234,7 +234,7 @@ public class FranchiseServiceImpl implements FranchiseService {
 
         Franchise franchise = getFranchise(id);
 
-        franchise.setActivated(true);
+        franchise.changeActivated(true);
         franchiseRepository.save(franchise);
 
         log.info("Successfully activated franchise with id {}", id);
@@ -255,7 +255,7 @@ public class FranchiseServiceImpl implements FranchiseService {
 
         Franchise franchise = getFranchise(id);
 
-        franchise.setActivated(false);
+        franchise.changeActivated(false);
         franchiseRepository.save(franchise);
 
         log.info("Successfully deactivated franchise with id {}", id);

@@ -11,7 +11,6 @@ import java.util.Set;
 
 @Builder
 @Getter
-@Setter
 @Entity
 @Table(name = "end_user")
 @NoArgsConstructor
@@ -39,5 +38,21 @@ public class EndUser extends BaseEntity {
 
     @OneToMany(mappedBy = "endUser")
     private Set<Transaction> transactions = new HashSet<>();
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changePhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeActivated(boolean isActivated) {
+        this.isActivated = isActivated;
+    }
 
 }

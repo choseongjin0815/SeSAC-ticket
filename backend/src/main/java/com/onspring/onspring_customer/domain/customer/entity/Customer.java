@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "customer")
 @Builder
@@ -44,5 +43,9 @@ public class Customer extends BaseEntity {
 
     @OneToMany(mappedBy = "customer")
     private Set<Party> parties = new HashSet<>();
+
+    public void changeActivated(boolean isActivated) {
+        this.isActivated = isActivated;
+    }
 
 }

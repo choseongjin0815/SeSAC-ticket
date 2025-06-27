@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "franchise")
 public class Franchise extends BaseEntity {
@@ -71,14 +70,20 @@ public class Franchise extends BaseEntity {
     @ElementCollection(fetch = FetchType.LAZY) @BatchSize(size = 20)
     List<FranchiseMenuImages> menuImages = new ArrayList<>();
 
+    public Franchise(Long id, String name, String address, String phone, String description) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.phone = phone;
+        this.description = description;
+    }
+
     public void addImage(FranchiseMenuImages image) {
-        image.setOrd(this.menuImages.size());
         menuImages.add(image);
     }
 
     public void addImageString(String fileName) {
-        FranchiseMenuImages image = new FranchiseMenuImages();
-        image.setFileName(fileName);
+        FranchiseMenuImages image = new FranchiseMenuImages(fileName, this.menuImages.size());
         addImage(image);
     }
 
@@ -105,6 +110,30 @@ public class Franchise extends BaseEntity {
         franchiseDto.setUploadFileNames(fileNames);
 
         return franchiseDto;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeAddress(String address) {
+        this.address = address;
+    }
+
+    public void changePhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void changeDescription(String description) {
+        this.description = description;
+    }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeActivated(boolean isActivated) {
+        this.isActivated = isActivated;
     }
 
 

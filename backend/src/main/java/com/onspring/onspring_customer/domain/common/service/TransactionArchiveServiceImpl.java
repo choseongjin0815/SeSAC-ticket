@@ -87,8 +87,8 @@ public class TransactionArchiveServiceImpl implements TransactionArchiveService 
             TransactionArchive transactionArchive = existingArchives.get(key);
 
             if (transactionArchive != null) {
-                transactionArchive.setTransactionCount(transactionArchive.getTransactionCount() + count);
-                transactionArchive.setAmountSum(transactionArchive.getAmountSum()
+                transactionArchive.changeTransactionCount(transactionArchive.getTransactionCount() + count);
+                transactionArchive.changeAmountSum(transactionArchive.getAmountSum()
                         .add(amountSum));
                 archivesToUpdate.add(transactionArchive);
             } else {
