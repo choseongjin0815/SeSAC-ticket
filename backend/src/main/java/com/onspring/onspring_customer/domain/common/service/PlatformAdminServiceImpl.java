@@ -126,7 +126,7 @@ public class PlatformAdminServiceImpl implements PlatformAdminService {
 
         PlatformAdmin platformAdmin = getPlatformAdmin(id);
 
-        platformAdmin.setPassword(password);
+        platformAdmin.changePassword(password);
         platformAdminRepository.save(platformAdmin);
 
         log.info("Successfully updated password for platform admin with ID {}", id);
@@ -147,7 +147,7 @@ public class PlatformAdminServiceImpl implements PlatformAdminService {
 
         PlatformAdmin platformAdmin = getPlatformAdmin(id);
 
-        platformAdmin.setActivated(true);
+        platformAdmin.changeActivateStatus(true);
         platformAdminRepository.save(platformAdmin);
 
         log.info("Successfully activated platform admin with ID {}", id);
@@ -174,7 +174,7 @@ public class PlatformAdminServiceImpl implements PlatformAdminService {
             return false;
         }
 
-        platformAdmin.setActivated(false);
+        platformAdmin.changeActivateStatus(false);
         platformAdminRepository.save(platformAdmin);
 
         log.info("Successfully deactivated a super platform admin with ID {}", id);

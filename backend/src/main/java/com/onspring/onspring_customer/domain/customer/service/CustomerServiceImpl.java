@@ -132,8 +132,8 @@ public class CustomerServiceImpl implements CustomerService {
                                                                               + "not found"));
 
         CustomerFranchise customerFranchise = new CustomerFranchise();
-        customerFranchise.setCustomer(customer);
-        customerFranchise.setFranchise(franchise);
+        customerFranchise.changeCustomer(customer);
+        customerFranchise.changeFranchise(franchise);
 
         Long id = customerFranchiseRepository.save(customerFranchise)
                 .getId();
@@ -177,7 +177,7 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Activating customer with ID {}", id);
 
         Customer customer = getCustomer(id);
-        customer.setActivated(true);
+        customer.changeActivated(true);
 
         customerRepository.save(customer);
 
@@ -191,7 +191,7 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Deactivating customer with ID {}", id);
 
         Customer customer = getCustomer(id);
-        customer.setActivated(false);
+        customer.changeActivated(false);
 
         customerRepository.save(customer);
 

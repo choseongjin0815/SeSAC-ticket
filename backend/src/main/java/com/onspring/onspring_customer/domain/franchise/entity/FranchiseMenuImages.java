@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @Embeddable
 public class FranchiseMenuImages {
@@ -14,5 +13,10 @@ public class FranchiseMenuImages {
     private String fileName;
 
     private int ord;
+
+    public FranchiseMenuImages(String fileName, int ord) {
+        this.fileName = fileName;
+        this.ord = ord;
+    }
 
 }

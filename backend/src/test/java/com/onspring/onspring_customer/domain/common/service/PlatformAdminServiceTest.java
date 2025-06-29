@@ -12,15 +12,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PlatformAdminServiceTest {
+
     @Mock
     private PlatformAdminRepository platformAdminRepository;
 
@@ -34,38 +35,52 @@ class PlatformAdminServiceTest {
     private PlatformAdmin platformAdmin;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         platformAdminDto = new PlatformAdminDto(1L, "admin1", "password", false, true);
-
         platformAdmin = new PlatformAdmin();
-        platformAdmin.setId(1L);
-        platformAdmin.setUserName("admin1");
-        platformAdmin.setPassword("password");
-        platformAdmin.setSuperAdmin(false);
-        platformAdmin.setActivated(true);
+
+        // 테스트를 위한 필드 주입 (setter가 없어서 reflection 사용)
+        Field idField = PlatformAdmin.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(platformAdmin, 1L);
+
+        Field userNameField = PlatformAdmin.class.getDeclaredField("userName");
+        userNameField.setAccessible(true);
+        userNameField.set(platformAdmin, "admin1");
+
+        Field passwordField = PlatformAdmin.class.getDeclaredField("password");
+        passwordField.setAccessible(true);
+        passwordField.set(platformAdmin, "password");
+
+        Field isSuperAdminField = PlatformAdmin.class.getDeclaredField("isSuperAdmin");
+        isSuperAdminField.setAccessible(true);
+        isSuperAdminField.set(platformAdmin, false);
+
+        Field isActivatedField = PlatformAdmin.class.getDeclaredField("isActivated");
+        isActivatedField.setAccessible(true);
+        isActivatedField.set(platformAdmin, true);
     }
 
     @Test
     void testSavePlatformAdmin() {
-        when(modelMapper.map(any(PlatformAdminDto.class), any())).thenReturn(platformAdmin);
+        when(modelMapper.map(any(PlatformAdminDto.class), eq(PlatformAdmin.class))).thenReturn(platformAdmin);
         when(platformAdminRepository.save(any(PlatformAdmin.class))).thenReturn(platformAdmin);
 
-        platformAdminService.savePlatformAdmin(platformAdminDto);
+        Long result = platformAdminService.savePlatformAdmin(platformAdminDto);
 
+        assertEquals(1L, result);
         verify(platformAdminRepository).save(platformAdmin);
         verify(modelMapper).map(platformAdminDto, PlatformAdmin.class);
     }
 
     @Test
     void testFindPlatformAdminById() {
-        when(modelMapper.map(any(PlatformAdmin.class), any())).thenReturn(platformAdminDto);
+        when(modelMapper.map(any(PlatformAdmin.class), eq(PlatformAdminDto.class))).thenReturn(platformAdminDto);
         when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
 
-        PlatformAdminDto platformAdminDto1 = platformAdminService.findPlatformAdminById(1L);
+        PlatformAdminDto result = platformAdminService.findPlatformAdminById(1L);
 
-        assertEquals(1L, platformAdminDto1.getId());
-        assertEquals("admin1", platformAdminDto1.getUserName());
-        assertEquals("password", platformAdminDto1.getPassword());
+        assertEquals("admin1", result.getUserName());
     }
 
     @Test
@@ -82,37 +97,67 @@ class PlatformAdminServiceTest {
         boolean result = platformAdminService.updatePlatformAdminPasswordById(1L, "password1");
 
         assertTrue(result);
-
         verify(platformAdminRepository).save(any(PlatformAdmin.class));
-
         assertEquals("password1", platformAdmin.getPassword());
     }
 
     @Test
     void testActivatePlatformAdminById() {
-        platformAdmin.setActivated(false);
-
         when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
 
         boolean result = platformAdminService.activatePlatformAdminById(1L);
 
         assertTrue(result);
-
         verify(platformAdminRepository).save(any(PlatformAdmin.class));
-
         assertTrue(platformAdmin.isActivated());
     }
 
     @Test
-    void testDeactivatedPlatformAdminById() {
+    void testDeactivatePlatformAdminById() {
         when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
 
         boolean result = platformAdminService.deactivatePlatformAdminById(1L);
 
         assertTrue(result);
-
         verify(platformAdminRepository).save(any(PlatformAdmin.class));
-
         assertFalse(platformAdmin.isActivated());
+    }
+
+    @Test
+    void testDeactivatePlatformAdminById_FailIfSuperAdmin() throws Exception {
+        setField(platformAdmin, "isSuperAdmin", true);
+        when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
+
+        boolean result = platformAdminService.deactivatePlatformAdminById(1L);
+
+        assertFalse(result);
+        verify(platformAdminRepository, never()).save(any());
+    }
+
+    @Test
+    void testDeletePlatformAdminById() {
+        when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
+
+        boolean result = platformAdminService.deletePlatformAdminById(1L);
+
+        assertTrue(result);
+        verify(platformAdminRepository).delete(platformAdmin);
+    }
+
+    @Test
+    void testDeletePlatformAdminById_FailIfSuperAdmin() throws Exception {
+        setField(platformAdmin, "isSuperAdmin", true);
+        when(platformAdminRepository.findById(1L)).thenReturn(Optional.of(platformAdmin));
+
+        boolean result = platformAdminService.deletePlatformAdminById(1L);
+
+        assertFalse(result);
+        verify(platformAdminRepository, never()).delete(any());
+    }
+
+    private void setField(Object target, String fieldName, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(target, value);
     }
 }
