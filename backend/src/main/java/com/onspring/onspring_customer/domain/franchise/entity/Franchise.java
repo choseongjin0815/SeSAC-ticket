@@ -7,6 +7,7 @@ import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
 
@@ -17,6 +18,7 @@ import java.util.Set;
 
 @Getter
 @Entity
+@NoArgsConstructor
 @Table(name = "franchise")
 public class Franchise extends BaseEntity {
     @Id

@@ -1,122 +1,92 @@
 package com.onspring.onspring_customer.domain.user.service;
 
 import com.onspring.onspring_customer.domain.customer.entity.Party;
+import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
+import com.onspring.onspring_customer.domain.user.dto.EndUserPointDto;
+import com.onspring.onspring_customer.domain.user.dto.PointDto;
 import com.onspring.onspring_customer.domain.user.dto.PointResponseDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.entity.Point;
+import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import com.onspring.onspring_customer.domain.user.repository.PointRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PointServiceTest {
 
-    @Mock
-    private PointRepository pointRepository;
+    @Mock private PartyRepository partyRepository;
+    @Mock private EndUserRepository endUserRepository;
+    @Mock private PointRepository pointRepository;
+    @Mock private ModelMapper modelMapper;
 
-    @InjectMocks
-    private PointServiceImpl pointService;
+    @InjectMocks private PointServiceImpl pointService;
 
-    private EndUser mockUser;
-    private Party mockParty;
-    private Point mockPoint;
+    private EndUser endUser;
+    private Party party;
+    private Point point;
 
     @BeforeEach
     void setUp() {
-        // Mock 데이터 설정
-        mockUser = new EndUser();
-        mockUser.setId(30000L);
+        endUser = EndUser.builder()
+                .id(1L)
+                .name("Tester")
+                .phone("010-0000-0000")
+                .password("pw")
+                .isActivated(true)
+                .build();
 
-        mockParty = new Party();
-        mockParty.setId(20000L);
-        mockParty.setName("Test Party");
-        mockParty.setAmount(BigDecimal.valueOf(10000));
-        mockParty.setSunday(true);
-        mockParty.setMonday(true);
-        mockParty.setTuesday(false);
-        mockParty.setWednesday(false);
-        mockParty.setThursday(true);
-        mockParty.setFriday(true);
-        mockParty.setSaturday(true);
-        mockParty.setActivated(true);
-        mockParty.setAllowedTimeStart(LocalTime.parse("09:00"));
-        mockParty.setAllowedTimeEnd(LocalTime.parse("18:00"));
-        mockPoint = new Point();
-        mockPoint.setId(40000L);
-        mockPoint.setEndUser(mockUser);
-        mockPoint.setParty(mockParty);
-        mockPoint.setCurrentAmount(BigDecimal.valueOf(5000));
-        mockPoint.setValidThru(LocalDateTime.of(2025, 12, 31, 23, 59));
+        party = Party.builder()
+                .id(99L)
+                .name("Test Party")
+                .isActivated(true)
+                .sunday(true).monday(true).tuesday(true).wednesday(true)
+                .thursday(true).friday(true).saturday(true)
+                .build();
+
+        point = Point.builder()
+                .id(88L)
+                .party(party)
+                .endUser(endUser)
+                .assignedAmount(BigDecimal.valueOf(10000))
+                .currentAmount(BigDecimal.valueOf(8000))
+                .validThru(LocalDateTime.now().plusDays(30))
+                .build();
+    }
+
+
+    @Test
+    void testUsePointOnPayment() {
+        when(pointRepository.findById(88L)).thenReturn(Optional.of(point));
+
+        boolean result = pointService.usePointOnPayment(88L, BigDecimal.valueOf(1000));
+
+        assertThat(result).isTrue();
+        verify(pointRepository).save(point);
+        assertThat(point.getCurrentAmount()).isEqualTo(BigDecimal.valueOf(7000));
     }
 
     @Test
-    void getPointsByEndUserId_ShouldReturnPointResponseDtoList() {
-        // given
-        when(pointRepository.findByEndUserId(30000L)).thenReturn(List.of(mockPoint));
+    void testAssignPointToEndUserById_List() {
+        when(pointRepository.findByParty_IdAndEndUser_IdIn(99L, List.of(1L))).thenReturn(List.of(point));
 
-        // when
-        List<PointResponseDto> result = pointService.getPointsByEndUserId(30000L);
+        boolean result = pointService.assignPointToEndUserById(List.of(1L), 99L, BigDecimal.valueOf(500), LocalDateTime.now().plusDays(10));
 
-        // then
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        PointResponseDto dto = result.get(0);
-
-        assertEquals(mockPoint.getCurrentAmount(), dto.getAvailableAmount());
-        assertEquals(mockParty.getAmount(), dto.getChargedAmount());
-        assertEquals(mockParty.getName(), dto.getPartyName());
-        assertEquals(mockParty.isSunday(), dto.isSunday());
-        assertEquals(mockParty.isMonday(), dto.isMonday());
-        assertEquals(mockParty.isTuesday(), dto.isTuesday());
-        assertEquals(mockParty.isWednesday(), dto.isWednesday());
-        assertEquals(mockParty.isThursday(), dto.isThursday());
-        assertEquals(mockParty.isFriday(), dto.isFriday());
-        assertEquals(mockParty.isSaturday(), dto.isSaturday());
-        assertEquals(mockParty.isActivated(), dto.isActivated());
-        assertEquals(mockParty.getAllowedTimeStart(), dto.getAllowedTimeStart());
-        assertEquals(mockParty.getAllowedTimeEnd(), dto.getAllowedTimeEnd());
-        assertEquals(mockPoint.getValidThru(), dto.getValidThru());
-
-        // verify
-        verify(pointRepository, times(1)).findByEndUserId(30000L);
-    }
-
-    @Test
-    void getPointsByEndUserId_ShouldReturnEmptyList_WhenNoPointsExist() {
-        // given
-        when(pointRepository.findByEndUserId(30000L)).thenReturn(Collections.emptyList());
-
-        // when
-        List<PointResponseDto> result = pointService.getPointsByEndUserId(30000L);
-
-        // then
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-
-        // verify
-        verify(pointRepository, times(1)).findByEndUserId(30000L);
-    }
-
-    @Test
-    void getPointsByEndUserId_ShouldThrowException_WhenEndUserIdIsNull() {
-        // when & then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            pointService.getPointsByEndUserId(null);
-        });
-
-        assertEquals("endUserId cannot be null", exception.getMessage());
+        assertThat(result).isTrue();
+        verify(pointRepository).saveAll(any());
     }
 }

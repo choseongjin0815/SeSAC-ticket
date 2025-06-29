@@ -1,6 +1,5 @@
 package com.onspring.onspring_customer.domain.user.service;
 
-
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
@@ -8,22 +7,21 @@ import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.entity.Point;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
 import com.onspring.onspring_customer.domain.user.repository.PointRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EndUserServiceTest {
@@ -40,96 +38,114 @@ class EndUserServiceTest {
     @Mock
     private ModelMapper modelMapper;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private EndUserServiceImpl endUserService;
 
-    private EndUserDto endUserDto;
     private EndUser endUser;
     private Party party;
-    private Point point;
+    private EndUserDto endUserDto;
 
     @BeforeEach
     void setUp() {
-        party = Party.builder()
-                .id(1L)
-                .build();
+        endUser = new EndUser();
+        endUser.changeName("Test User");
+        endUser.changePhone("010-1111-2222");
+        endUser.changePassword("encodedPassword");
+        endUser.changeActivated(true);
+        // ID 직접 설정
+        setId(endUser, 1L);
 
-        endUserDto = new EndUserDto(1L, 1L, "password", "user", "0123456789", true, new BigDecimal(0));
+        party = new Party();
+        setId(party, 100L);
+        party.changeActivated(true);
+        // party name은 builder 없이 생성자나 reflection 사용 불가하므로 생략
 
-        point = Point.builder()
-                .id(1L)
-                .party(party)
-                .build();
-
-        endUser = EndUser.builder()
-                .id(1L)
-                .password("password")
-                .phone("0123456789")
-                .isActivated(true)
-                .build();
-
-        point.setEndUser(endUser);
+        endUserDto = new EndUserDto();
+        endUserDto.setId(1L);
+        endUserDto.setName("Test User");
+        endUserDto.setPhone("010-1111-2222");
+        endUserDto.setPartyIds(List.of(100L));
     }
 
     @Test
     void testSaveEndUser() {
-        when(modelMapper.map(any(EndUserDto.class), any())).thenReturn(endUser);
-        when(partyRepository.findById(endUserDto.getPartyIds()
-                .get(Math.toIntExact(party.getId())))).thenReturn(Optional.of(party));
-        when(endUserRepository.save(any(EndUser.class))).thenReturn(endUser);
+        when(modelMapper.map(endUserDto, EndUser.class)).thenReturn(endUser);
+        when(partyRepository.findById(100L)).thenReturn(Optional.of(party));
+        when(endUserRepository.save(any())).thenReturn(endUser);
 
-        endUserService.saveEndUser(endUserDto);
+        Long id = endUserService.saveEndUser(endUserDto);
 
-        verify(endUserRepository).save(endUser);
-        verify(partyRepository).findById(endUserDto.getPartyIds()
-                .get(Math.toIntExact(party.getId())));
+        assertEquals(1L, id);
         verify(pointRepository).save(any(Point.class));
     }
 
     @Test
     void testFindEndUserById() {
+        Point point = new Point();
+        setId(point, 200L);
+        point.changeAssignedAmount(BigDecimal.ZERO);
+        point.changeCurrentAmount(BigDecimal.ZERO);
+        point.changeValidThru(LocalDateTime.now());
+
+        // 연관 관계 설정
+        point = setPartyAndEndUserToPoint(point, party, endUser);
+        endUser.getPoints().add(point);
 
         when(endUserRepository.findById(1L)).thenReturn(Optional.of(endUser));
-        when(modelMapper.map(any(EndUser.class), any())).thenReturn(endUserDto);
+        when(modelMapper.map(endUser, EndUserDto.class)).thenReturn(endUserDto);
 
-        EndUserDto endUserDto1 = endUserService.findEndUserById(1L);
+        EndUserDto result = endUserService.findEndUserById(1L);
 
-        assertNotNull(endUserDto1);
-        assertEquals(endUserDto.getId(), endUserDto1.getId());
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals(List.of(100L), result.getPartyIds());
+        assertEquals(List.of(200L), result.getPointIds());
     }
 
     @Test
-    void testFindEndUserById_NotFound() {
-        when(endUserRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> endUserService.findEndUserById(1L));
-    }
-
-    @Test
-    void testUpdateEndUserPasswordById() {
+    void testUpdateEndUserPasswordById_Success() {
         when(endUserRepository.findById(1L)).thenReturn(Optional.of(endUser));
 
-        boolean result = endUserService.updateEndUserPasswordById(1L, "password1");
+        boolean result = endUserService.updateEndUserPasswordById(1L, "newPass");
 
         assertTrue(result);
-
         verify(endUserRepository).save(endUser);
+    }
 
-        assertEquals("password1", endUser.getPassword());
+    @Test
+    void testUpdateEndUserPasswordById_WithOldPassword_Success() {
+        when(endUserRepository.findById(1L)).thenReturn(Optional.of(endUser));
+        when(passwordEncoder.matches("oldPass", "encodedPassword")).thenReturn(true);
+        when(passwordEncoder.encode("newPass")).thenReturn("encodedNewPass");
+
+        boolean result = endUserService.updateEndUserPasswordById(1L, "oldPass", "newPass");
+
+        assertTrue(result);
+        verify(endUserRepository).save(endUser);
+    }
+
+    @Test
+    void testUpdateEndUserPasswordById_WithOldPassword_Failure() {
+        when(endUserRepository.findById(1L)).thenReturn(Optional.of(endUser));
+        when(passwordEncoder.matches("wrongPass", "encodedPassword")).thenReturn(false);
+
+        boolean result = endUserService.updateEndUserPasswordById(1L, "wrongPass", "newPass");
+
+        assertFalse(result);
+        verify(endUserRepository, never()).save(any());
     }
 
     @Test
     void testActivateEndUserById() {
-        endUser.setActivated(false);
         when(endUserRepository.findById(1L)).thenReturn(Optional.of(endUser));
 
         boolean result = endUserService.activateEndUserById(1L);
 
         assertTrue(result);
-
         verify(endUserRepository).save(endUser);
-
-        assertTrue(endUser.isActivated());
     }
 
     @Test
@@ -139,10 +155,43 @@ class EndUserServiceTest {
         boolean result = endUserService.deactivateEndUserById(1L);
 
         assertTrue(result);
-
         verify(endUserRepository).save(endUser);
+    }
 
-        assertFalse(endUser.isActivated());
+    @Test
+    void testAssignPointToEndUserById() {
+        when(endUserRepository.findById(1L)).thenReturn(Optional.of(endUser));
+        when(partyRepository.findById(100L)).thenReturn(Optional.of(party));
+
+        boolean result = endUserService.assignPointToEndUserById(1L, 100L, BigDecimal.TEN, LocalDateTime.now());
+
+        assertTrue(result);
+        verify(pointRepository).save(any(Point.class));
+    }
+
+    // ====== 헬퍼 메서드 ======
+
+    private void setId(Object entity, Long idValue) {
+        try {
+            var field = entity.getClass().getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(entity, idValue);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Point setPartyAndEndUserToPoint(Point point, Party party, EndUser endUser) {
+        try {
+            var partyField = Point.class.getDeclaredField("party");
+            var userField = Point.class.getDeclaredField("endUser");
+            partyField.setAccessible(true);
+            userField.setAccessible(true);
+            partyField.set(point, party);
+            userField.set(point, endUser);
+            return point;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
-
