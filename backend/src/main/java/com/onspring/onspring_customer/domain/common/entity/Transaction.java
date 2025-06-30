@@ -6,6 +6,7 @@ import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @Entity
+@NoArgsConstructor
 @Table(name = "transaction")
 public class Transaction extends BaseEntity {
     @Id
