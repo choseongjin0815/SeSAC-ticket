@@ -266,7 +266,8 @@
 
 ## 프로젝트 구조도
 ### 전체 구조
-![react-native-architecture (2)](https://github.com/user-attachments/assets/7f0b13e0-de6b-4add-bdba-0313b5888123)
+![KakaoTalk_20250630_170542548](https://github.com/user-attachments/assets/da1dbd7a-8dda-4dd8-84f0-b7631edb7288)
+
 
 
 
