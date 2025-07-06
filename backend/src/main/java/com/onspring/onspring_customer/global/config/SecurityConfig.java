@@ -51,10 +51,10 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain sessionFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/view/**")
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/view/login", "/view/public/**").permitAll()
+                        .requestMatchers("/", "/images/**", "/view/login", "/view/public/**").permitAll()
+                        .requestMatchers("/view/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
