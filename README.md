@@ -91,7 +91,13 @@
 ---
 
 ## 🎬 시연화면
+### 사용자(학생) 앱 시연 영상
+https://www.youtube.com/shorts/RRFe7e79BSQ
 
+### 가맹점 앱 시연 영상
+https://www.youtube.com/shorts/KIAW-j7cIB0
+
+### 관리자 화면
 <details>
 <summary>관리자 로그인</summary>
 <img src="https://github.com/user-attachments/assets/c6606e4b-0ab9-4062-8961-14143cc4c571" width="800"/>
