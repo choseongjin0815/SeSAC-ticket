@@ -43,7 +43,6 @@ public interface TransactionService {
                                                      String period,
                                                      LocalDateTime startDate,
                                                      LocalDateTime endDate);
-
     List<SettlmentSummaryDto> getMonthlySettlementSummaries(Long franchiseId);
 
     boolean cancelTransaction(Long franchiseId, Long transactionId);

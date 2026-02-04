@@ -149,11 +149,6 @@ public class PointServiceImpl implements PointService {
             point.changeCurrentAmount(point.getCurrentAmount().add(amount));
             point.changeAssignedAmount(point.getAssignedAmount().add(amount));
             point.changeValidThru(validThru);
-//            point.setAssignedAmount(point.getCurrentAmount()
-//                    .add(amount));
-//            point.setCurrentAmount(point.getCurrentAmount()
-//                    .add(amount));
-//            point.setValidThru(validThru);
         });
 
         pointRepository.saveAll(pointList);
@@ -173,9 +168,6 @@ public class PointServiceImpl implements PointService {
         point.changeAssignedAmount(amount);
         point.changeCurrentAmount(amount);
         point.changeValidThru(validThru);
-//        point.setAssignedAmount(amount);
-//        point.setCurrentAmount(amount);
-//        point.setValidThru(validThru);
 
         pointRepository.save(point);
 
@@ -195,9 +187,6 @@ public class PointServiceImpl implements PointService {
             point.changeAssignedAmount(amount);
             point.changeCurrentAmount(amount);
             point.changeValidThru(validThru);
-//            point.setAssignedAmount(amount);
-//            point.setCurrentAmount(amount);
-//            point.setValidThru(validThru);
         });
 
         pointRepository.saveAll(pointList);

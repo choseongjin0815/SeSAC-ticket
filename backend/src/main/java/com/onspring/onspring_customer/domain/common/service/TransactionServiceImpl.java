@@ -17,8 +17,10 @@ import com.onspring.onspring_customer.domain.franchise.entity.QFranchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
+import com.onspring.onspring_customer.domain.user.entity.Point;
 import com.onspring.onspring_customer.domain.user.entity.QEndUser;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
+import com.onspring.onspring_customer.domain.user.repository.PointRepository;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
@@ -48,6 +50,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final FranchiseRepository franchiseRepository;
     private final EndUserRepository endUserRepository;
     private final PartyRepository partyRepository;
+    private final PointRepository pointRepository;
     private final ModelMapper modelMapper;
     private final JPAQueryFactory queryFactory;
 
@@ -115,10 +118,6 @@ public class TransactionServiceImpl implements TransactionService {
         return processedIds;
     }
 
-    @Override
-    public Long saveTransaction(TransactionDto transactionDto) {
-        return 0L;
-    }
 
     @Override
     public TransactionDto findTransactionById(Long id) {
@@ -130,46 +129,44 @@ public class TransactionServiceImpl implements TransactionService {
      * @param transactionDto    결제 정보를 담은 transactionDto
      * @return transaction id
      */
+    @Transactional
     @Override
-    public Long saveTransaction(Long partyId, TransactionDto transactionDto) {
-        log.info("Saving transaction: {}", transactionDto);
+    public Long saveTransactionWithPoint(Long partyId, TransactionDto dto, Long pointId) {
 
-        // FranchiseId와 UserId를 통해 가맹점과 사용자 정보를 조회
-        Franchise franchise = franchiseRepository.findById(transactionDto.getFranchiseDto().getId())
+        Franchise franchise = franchiseRepository.findById(dto.getFranchiseDto().getId())
                 .orElseThrow(() -> new RuntimeException("Franchise not found"));
-        log.info("franchise: " + franchise);
 
-        EndUser endUser = endUserRepository.findById(transactionDto.getEndUserDto().getId())
+        EndUser endUser = endUserRepository.findById(dto.getEndUserDto().getId())
                 .orElseThrow(() -> new RuntimeException("EndUser not found"));
-        log.info("endUser: " + endUser);
 
         Party party = partyRepository.findById(partyId)
                 .orElseThrow(() -> new RuntimeException("Party not found"));
 
-        // TransactionDto -> Transaction 엔티티로 변환
+        Point point = pointRepository.findByIdForUpdate(pointId)
+                .orElseThrow(() -> new RuntimeException("Point not found"));
+
+        BigDecimal amount = dto.getAmount();
+
+        // 잔액 검증 (이 시점에 다른 트랜잭션 접근 못함)
+        if (point.getCurrentAmount().compareTo(amount) < 0) {
+            throw new RuntimeException("잔액 부족");
+        }
+
+        // 포인트 차감
+        point.changeCurrentAmount(point.getCurrentAmount().subtract(amount));
+
+        // 거래 생성
         Transaction transaction = new Transaction(
                 franchise,
                 endUser,
-                transactionDto.getAmount(),
-                transactionDto.isClosed(),
+                amount,
+                dto.isClosed(),
                 party
         );
-//        transaction.setFranchise(franchise);
-//        transaction.setEndUser(endUser);
-//        transaction.setTransactionTime(LocalDateTime.now());
-//        transaction.setAmount(transactionDto.getAmount());
-//
-//        transaction.setClosed(transactionDto.isClosed());
-//
-//        transaction.setParty(party);
 
-        log.info("Saving transaction: {}", transaction);
+        transactionRepository.save(transaction);
 
-        // 트랜잭션 저장
-        Transaction savedTransaction = transactionRepository.save(transaction);
-
-        // 저장된 트랜잭션 ID 반환
-        return savedTransaction.getId();
+        return transaction.getId();
     }
 
 
