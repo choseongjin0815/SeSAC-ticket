@@ -6,15 +6,16 @@ import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.Setter;
+
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
-@ToString
 @Entity
+@NoArgsConstructor
 @Table(name = "transaction")
 public class Transaction extends BaseEntity {
     @Id
@@ -22,15 +23,15 @@ public class Transaction extends BaseEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "franchise_id")
     private Franchise franchise;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "party_id")
     private Party party;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "end_user_id")
     private EndUser endUser;
 
