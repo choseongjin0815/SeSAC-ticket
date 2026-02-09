@@ -1,5 +1,6 @@
 package com.onspring.onspring_customer.domain.common.repository;
 
+import com.onspring.onspring_customer.domain.common.dto.TransactionInfoDto;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,11 +59,52 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "ORDER BY YEAR(t.transactionTime) DESC, MONTH(t.transactionTime) DESC")
     List<Object[]> getMonthlyTransactionSummary(@Param("franchiseId") Long franchiseId);
 
-
-    List<Transaction> findByIsClosed(boolean closed);
-
-    Page<Transaction> findByParty_Customer_Admins_IdAndIsAcceptedTrueAndIsClosedFalseOrderByIdDesc(@NonNull Long id,
-                                                                                      Pageable pageable);
+    /**
+     * 승인된 거래내역 조회
+     * - N+1 문제 해결: JOIN으로 연관 엔티티 함께 조회
+     * - over-fetching 방지: 필요한 컬럼만 SELECT
+     * - count 쿼리 최적화: 불필요한 JOIN 제거
+     */
+    @Query(
+            value = """
+            SELECT new com.onspring.onspring_customer.domain.common.dto.TransactionInfoDto(
+                t.id,
+                t.amount,
+                t.transactionTime,
+                p.name,
+                e.name,
+                f.name,
+                t.isAccepted,
+                t.isClosed
+            )
+            FROM Transaction t
+            JOIN t.franchise f
+            JOIN t.endUser e
+            JOIN t.party p
+            JOIN p.customer c
+            JOIN c.admins a
+            WHERE a.id = :adminId
+              AND t.isAccepted = true
+            ORDER BY t.transactionTime DESC
+            """,
+            countQuery = """
+            SELECT COUNT(t.id)
+            FROM Transaction t
+            JOIN t.party p
+            JOIN p.customer c
+            JOIN c.admins a
+            WHERE a.id = :adminId
+              AND t.isAccepted = true
+            """
+    )
+    Page<TransactionInfoDto> findAllAcceptedTransaction(
+            @Param("adminId") Long adminId,
+            Pageable pageable
+    );
+    Page<TransactionInfoDto> findAllAcceptedAndNotClosedTransaction(
+            @Param("adminId") Long adminId,
+            Pageable pageable
+    );
 
     @Transactional
     @Modifying

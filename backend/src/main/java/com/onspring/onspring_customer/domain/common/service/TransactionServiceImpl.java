@@ -2,6 +2,7 @@ package com.onspring.onspring_customer.domain.common.service;
 
 import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
+import com.onspring.onspring_customer.domain.common.dto.TransactionInfoDto;
 import com.onspring.onspring_customer.domain.common.entity.QTransaction;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
@@ -235,7 +236,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         return summaries;
     }
-    // 거래내역 중 미정산된 (isClosed = False) 모든 거래 내역 띄우기 => Figma 홈_정산관리_정산
+    // 거래내역 목록
     @Override
     public List<TransactionDto> findAllTransaction() {
         QTransaction transaction = QTransaction.transaction;
@@ -260,48 +261,18 @@ public class TransactionServiceImpl implements TransactionService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Long adminId, Pageable pageable) {
-        QTransaction tx = QTransaction.transaction;
-        QFranchise franchise = QFranchise.franchise;
-        QParty party = QParty.party;
-        QCustomer customer = QCustomer.customer;
-        QAdmin admin = QAdmin.admin;
-        QEndUser endUser = QEndUser.endUser;
-
-        // content 쿼리
-        List<Transaction> content = queryFactory.selectFrom(tx)
-                .join(tx.party, party).fetchJoin()
-                .join(party.customer, customer)
-                .join(customer.admins, admin)
-                .join(tx.franchise, franchise).fetchJoin()
-                .join(tx.endUser, endUser).fetchJoin()
-                .where(
-                        admin.id.eq(adminId),
-                        tx.isAccepted.isTrue(),
-                        tx.isClosed.isFalse()
-                )
-                .orderBy(tx.id.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        // count 쿼리 (fetchJoin X)
-        Long total = queryFactory.select(tx.count())
-                .from(tx)
-                .join(tx.party, party)
-                .join(party.customer, customer)
-                .join(customer.admins, admin)
-                .where(
-                        admin.id.eq(adminId),
-                        tx.isAccepted.isTrue(),
-                        tx.isClosed.isFalse()
-                )
-                .fetchOne();
-
-        return new PageImpl<>(content.stream()
-                .map(t -> modelMapper.map(t, TransactionDto.class))
-                .toList(), pageable, total);
+    /**
+     * 관리자의 승인된 거래내역 조회
+     *
+     * @param adminId 관리자 ID
+     * @param pageable 페이징 정보
+     * @return 거래내역 페이지
+     */
+    public Page<TransactionInfoDto> findAllAcceptedTransaction(
+            Long adminId,
+            Pageable pageable
+    ) {
+        return transactionRepository.findAllAcceptedTransaction(adminId, pageable);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.onspring.onspring_customer.domain.common.service;
 
 import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
+import com.onspring.onspring_customer.domain.common.dto.TransactionInfoDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -46,4 +47,6 @@ public interface TransactionService {
     List<SettlmentSummaryDto> getMonthlySettlementSummaries(Long franchiseId);
 
     boolean cancelTransaction(Long franchiseId, Long transactionId);
+
+    Page<TransactionInfoDto> findAllAcceptedTransaction(Long adminId, Pageable pageable);
 }
